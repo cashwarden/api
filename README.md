@@ -13,14 +13,14 @@ The template contains the basic features including user join/login api.
 It includes all commonly used configurations that would allow you to focus on adding new
 features to your application.
 
-[![Testing](https://github.com/forecho/yii2-rest-api/workflows/Testing/badge.svg)](https://github.com/forecho/yii2-rest-api/actions)
-[![Lint](https://github.com/forecho/yii2-rest-api/workflows/Lint/badge.svg)](https://github.com/forecho/yii2-rest-api/actions)
-[![Code Coverage](https://scrutinizer-ci.com/g/forecho/yii2-rest-api/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/forecho/yii2-rest-api/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/forecho/yii2-rest-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/forecho/yii2-rest-api/?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/forecho/yii2-rest-api/v/stable)](https://packagist.org/packages/forecho/yii2-rest-api) 
-[![Total Downloads](https://poser.pugx.org/forecho/yii2-rest-api/downloads)](https://packagist.org/packages/forecho/yii2-rest-api) 
-[![Latest Unstable Version](https://poser.pugx.org/forecho/yii2-rest-api/v/unstable)](https://packagist.org/packages/forecho/yii2-rest-api) 
-[![License](https://poser.pugx.org/forecho/yii2-rest-api/license)](https://packagist.org/packages/forecho/yii2-rest-api)
+[![Testing](https://github.com/cashwarden/core-api/workflows/Testing/badge.svg)](https://github.com/cashwarden/core-api/actions)
+[![Lint](https://github.com/cashwarden/core-api/workflows/Lint/badge.svg)](https://github.com/cashwarden/core-api/actions)
+[![Code Coverage](https://scrutinizer-ci.com/g/cashwarden/core-api/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/core-api/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cashwarden/core-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/core-api/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/cashwarden/core-api/v/stable)](https://packagist.org/packages/cashwarden/core-api) 
+[![Total Downloads](https://poser.pugx.org/cashwarden/core-api/downloads)](https://packagist.org/packages/cashwarden/core-api) 
+[![Latest Unstable Version](https://poser.pugx.org/cashwarden/core-api/v/unstable)](https://packagist.org/packages/cashwarden/core-api) 
+[![License](https://poser.pugx.org/cashwarden/core-api/license)](https://packagist.org/packages/cashwarden/core-api)
 
 REQUIREMENTS
 ------------
@@ -38,7 +38,7 @@ at [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
 You can then install this project template using the following command:
 
 ~~~
-composer create-project --prefer-dist forecho/yii2-rest-api <rest-api>
+composer create-project --prefer-dist cashwarden/core-api <rest-api>
 cd <rest-api>
 cp .env.example .env
 php yii generate/key # optional 
@@ -53,7 +53,7 @@ http://localhost/<rest-api>/web/
 
 ### Install from GitHub
 
-Accessing [Use this template](https://github.com/forecho/yii2-rest-api/generate) Create a new repository from yii2-rest-api
+Accessing [Use this template](https://github.com/cashwarden/core-api/generate) Create a new repository from yii2-rest-api
 
 ```sh
 cd <rest-api>

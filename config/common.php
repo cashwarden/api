@@ -1,5 +1,7 @@
 <?php
 
+use yii\log\Logger;
+
 return [
     'timeZone' => env('APP_TIME_ZONE'),
     'language' => env('APP_LANGUAGE'),
@@ -46,6 +48,59 @@ return [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
+                [
+                    'class' => yiier\graylog\Target::class,
+                    // 日志等级
+                    'levels' => Logger::LEVEL_ERROR | Logger::LEVEL_WARNING,
+                    'logVars' => ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'],
+                    'categories' => [
+                        'yii\db\*',
+                        'yii\web\HttpException:*',
+                        'application',
+                    ],
+                    'except' => [
+                        'yii\web\HttpException:404',
+                    ],
+                    'transport' => [
+                        'class' => yiier\graylog\transport\UdpTransport::class,
+                        'host' => getenv('GRAYLOG_HOST'),
+                        'chunkSize' => 4321,
+                    ],
+                    'additionalFields' => [
+                        'request_id' => function ($yii) {
+                            return Yii::$app->requestId->id;
+                        },
+                        'user_ip' => function ($yii) {
+                            return ($yii instanceof \yii\console\Application) ? '' : $yii->request->userIP;
+                        },
+                        'tag' => getenv('GRAYLOG_TAG')
+                    ],
+                ],
+                [
+                    'class' => yiier\graylog\Target::class,
+                    'levels' => Logger::LEVEL_ERROR | Logger::LEVEL_WARNING | Logger::LEVEL_INFO,
+                    'logVars' => ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'],
+                    'categories' => [
+                        'graylog'
+                    ],
+                    'except' => [
+                        'yii\web\HttpException:404',
+                    ],
+                    'transport' => [
+                        'class' => yiier\graylog\transport\UdpTransport::class,
+                        'host' => getenv('GRAYLOG_HOST'),
+                        'chunkSize' => 4321,
+                    ],
+                    'additionalFields' => [
+                        'request_id' => function ($yii) {
+                            return Yii::$app->requestId->id;
+                        },
+                        'user_ip' => function ($yii) {
+                            return ($yii instanceof \yii\console\Application) ? '' : $yii->request->userIP;
+                        },
+                        'tag' => getenv('GRAYLOG_TAG')
+                    ],
+                ],
                 /**
                  * 错误级别日志：当某些需要立马解决的致命问题发生的时候，调用此方法记录相关信息。
                  * 使用方法：Yii::error()
