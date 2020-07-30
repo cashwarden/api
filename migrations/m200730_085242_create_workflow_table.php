@@ -3,21 +3,23 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%currency_rate}}`.
+ * Handles the creation of table `{{%workflow}}`.
  */
-class m200730_082622_create_currency_rate_table extends Migration
+class m200730_085242_create_workflow_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%currency_rate}}', [
+        $this->createTable('{{%workflow}}', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
-            'currency_code' => $this->string(3)->notNull(),
-            'currency_name' => $this->string(60)->notNull(),
-            'rate' => $this->bigInteger(),
+            'trading_behavior' => $this->tinyInteger()->notNull(),
+            'pattern' => $this->string()->notNull(),
+            'category_id' => $this->integer(),
+            'account_id' => $this->integer(),
+            'tags' => $this->string()->comment('Multiple choice use,'),
             'status' => $this->tinyInteger()->defaultValue(1),
             'created_at' => $this->timestamp()->defaultValue(null),
             'updated_at' => $this->timestamp()->defaultValue(null),
@@ -29,6 +31,6 @@ class m200730_082622_create_currency_rate_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%currency_rate}}');
+        $this->dropTable('{{%workflow}}');
     }
 }
