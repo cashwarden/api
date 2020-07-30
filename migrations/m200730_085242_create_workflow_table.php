@@ -24,6 +24,8 @@ class m200730_085242_create_workflow_table extends Migration
             'created_at' => $this->timestamp()->defaultValue(null),
             'updated_at' => $this->timestamp()->defaultValue(null),
         ]);
+
+        $this->createIndex('workflow_user_id', '{{%workflow}}', 'user_id');
     }
 
     /**

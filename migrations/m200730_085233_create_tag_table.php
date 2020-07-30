@@ -21,6 +21,8 @@ class m200730_085233_create_tag_table extends Migration
             'created_at' => $this->timestamp()->defaultValue(null),
             'updated_at' => $this->timestamp()->defaultValue(null),
         ]);
+
+        $this->createIndex('tag_user_id', '{{%tag}}', 'user_id');
     }
 
     /**

@@ -22,6 +22,8 @@ class m200730_082622_create_currency_rate_table extends Migration
             'created_at' => $this->timestamp()->defaultValue(null),
             'updated_at' => $this->timestamp()->defaultValue(null),
         ]);
+
+        $this->createIndex('currency_rate_user_id', '{{%currency_rate}}', 'user_id');
     }
 
     /**
