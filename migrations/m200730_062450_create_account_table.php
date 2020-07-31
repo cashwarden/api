@@ -16,7 +16,7 @@ class m200730_062450_create_account_table extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'name' => $this->string(120)->notNull(),
-            'type' => $this->tinyInteger()->defaultValue(0),
+            'type' => $this->tinyInteger()->notNull(),
             'color' => $this->string(7)->notNull(),
             'balance_cent' => $this->bigInteger()->defaultValue(0),
             'currency_code' => $this->string(3)->notNull(),

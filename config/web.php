@@ -64,6 +64,10 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 "POST <module>/<alias:login|join|refresh-token>" => '<module>/user/<alias>',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['v1/account']
+                ],
                 "GET health-check" => 'site/health-check',
                 '<module>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
             ],

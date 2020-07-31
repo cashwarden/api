@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7a44248d3a0c99de37170c51d261218",
+    "content-hash": "6133d0e7c5d1c8b4dc29ec53aaa0da25",
     "packages": [
         {
             "name": "bower-asset/inputmask",
@@ -1409,6 +1409,47 @@
                 "yii2"
             ],
             "time": "2020-07-27T03:15:07+00:00"
+        },
+        {
+            "name": "yiier/yii2-validators",
+            "version": "v0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiier/yii2-validators.git",
+                "reference": "51385a553e3dbdc7b2c55267140afa8d4a2e01b1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiier/yii2-validators/zipball/51385a553e3dbdc7b2c55267140afa8d4a2e01b1",
+                "reference": "51385a553e3dbdc7b2c55267140afa8d4a2e01b1",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "~2.0.0"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "yiier\\validators\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-4-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "forecho",
+                    "email": "caizhenghai@gmail.com"
+                }
+            ],
+            "description": "Validators for Yii2",
+            "keywords": [
+                "extension",
+                "validators",
+                "yii2"
+            ],
+            "time": "2018-06-21T12:17:04+00:00"
         },
         {
             "name": "yiisoft/yii2",

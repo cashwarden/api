@@ -2,7 +2,15 @@
 
 namespace app\core\models;
 
+use app\core\exceptions\InvalidArgumentException;
+use app\core\helpers\FormatFactory;
+use app\core\types\AccountType;
+use app\core\types\CurrencyCode;
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yiier\helpers\DateHelper;
+use yiier\helpers\Setup;
+use yiier\validators\MoneyValidator;
 
 /**
  * This is the model class for table "{{%account}}".
@@ -10,7 +18,7 @@ use Yii;
  * @property int $id
  * @property int $user_id
  * @property string $name
- * @property int|null $type
+ * @property int|string $type
  * @property string $color
  * @property int|null $balance_cent
  * @property string $currency_code
@@ -24,6 +32,10 @@ use Yii;
  */
 class Account extends \yii\db\ActiveRecord
 {
+    public $balance;
+
+    public const SCENARIO_CREDIT_CARD = 'credit_card';
+
     /**
      * {@inheritdoc}
      */
@@ -33,19 +45,35 @@ class Account extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ],
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['user_id', 'name', 'color', 'currency_code'], 'required'],
+            [['user_id', 'name', 'type', 'color', 'balance', 'currency_code'], 'required'],
+            [
+                ['credit_card_limit', 'credit_card_repayment_day', 'credit_card_billing_day'],
+                'required',
+                'on' => self::SCENARIO_CREDIT_CARD
+            ],
             [
                 [
                     'user_id',
-                    'type',
                     'balance_cent',
                     'status',
-                    'exclude_from_stats',
                     'credit_card_limit',
                     'credit_card_repayment_day',
                     'credit_card_billing_day'
@@ -55,7 +83,10 @@ class Account extends \yii\db\ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 120],
             [['color'], 'string', 'max' => 7],
-            [['currency_code'], 'string', 'max' => 3],
+            ['type', 'in', 'range' => AccountType::names()],
+            ['balance', MoneyValidator::class], //todo message
+            ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
+            ['currency_code', 'in', 'range' => CurrencyCode::getKeys()],
         ];
     }
 
@@ -70,6 +101,7 @@ class Account extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'type' => Yii::t('app', 'Type'),
             'color' => Yii::t('app', 'Color'),
+            'balance' => Yii::t('app', 'Balance'),
             'balance_cent' => Yii::t('app', 'Balance Cent'),
             'currency_code' => Yii::t('app', 'Currency Code'),
             'status' => Yii::t('app', 'Status'),
@@ -80,5 +112,56 @@ class Account extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+    }
+
+
+    /**
+     * @param bool $insert
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            $this->balance_cent = Setup::toFen($this->balance);
+            $this->type = AccountType::toEnumValue($this->type);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['balance_cent'], $fields['user_id']);
+
+        $fields['type'] = function (self $model) {
+            return AccountType::getName($model->type);
+        };
+
+        $fields['balance'] = function (self $model) {
+            return Setup::toYuan($model->balance_cent);
+        };
+
+        $fields['created_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->created_at);
+        };
+
+        $fields['updated_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->updated_at);
+        };
+
+        return $fields;
     }
 }
