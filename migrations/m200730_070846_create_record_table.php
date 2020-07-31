@@ -24,6 +24,7 @@ class m200730_070846_create_record_table extends Migration
             'currency_amount_cent' => $this->integer()->notNull(),
             'currency_code' => $this->string(3)->notNull(),
             'tags' => $this->string()->comment('Multiple choice use,'),
+            'description' => $this->string(),
             'remark' => $this->string(),
             'image' => $this->string(),
             'trading_status' => $this->tinyInteger()->defaultValue(1),
@@ -35,7 +36,7 @@ class m200730_070846_create_record_table extends Migration
 
         $this->createIndex('record_user_id', '{{%record}}', 'user_id');
 
-        $this->execute("ALTER TABLE {{%record}} ADD FULLTEXT INDEX `full_text` (`tags`,`remark`)");
+        $this->execute("ALTER TABLE {{%record}} ADD FULLTEXT INDEX `full_text` (`description`, `tags`, `remark`)");
     }
 
     /**
