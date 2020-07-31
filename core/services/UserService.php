@@ -25,6 +25,7 @@ class UserService
         try {
             $user->username = $request->username;
             $user->email = $request->email;
+            $user->base_currency_code = $request->base_currency_code;
             $user->setPassword($request->password);
             $user->generateAuthKey();
             if (!$user->save()) {

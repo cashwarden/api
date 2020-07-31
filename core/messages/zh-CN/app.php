@@ -8,4 +8,5 @@ return [
     'Email' => '邮箱',
     'Password' => '密码',
     'The JWT secret must be configured first.' => '必须先配置 JWT_SECRET',
+    'Base Currency Code' => '基础货币',
 ];

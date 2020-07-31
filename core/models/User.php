@@ -20,6 +20,7 @@ use yiier\helpers\DateHelper;
  * @property string|null $password_reset_token
  * @property string|null $email
  * @property int|null $status 状态：1正常 0冻结
+ * @property string $base_currency_code
  * @property int|null $created_at
  * @property int|null $updated_at
  *
