@@ -27,6 +27,23 @@ class CreateUserCest
             [
                 'data' => [
                     'username' => 'demo',
+                    'email' => 'demo@yii.com',
+                    'password' => 'pass123',
+                    'base_currency_code' => 'CNS',
+                ],
+                'code' => ErrorCodes::INVALID_ARGUMENT_ERROR
+            ],
+            [
+                'data' => [
+                    'username' => 'demo',
+                    'email' => 'demo@yii.com',
+                    'password' => 'pass123',
+                ],
+                'code' => ErrorCodes::INVALID_ARGUMENT_ERROR
+            ],
+            [
+                'data' => [
+                    'username' => 'demo',
                     'email' => 'demo',
                     'password' => 'pass123',
                 ],
@@ -82,6 +99,7 @@ class CreateUserCest
             'username' => 'demo',
             'email' => 'demo@yii.com',
             'password' => 'pass123',
+            'base_currency_code' => 'CNY',
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseIsJson();
