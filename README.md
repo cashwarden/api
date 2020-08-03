@@ -41,6 +41,7 @@ You can then install this project template using the following command:
 composer create-project --prefer-dist cashwarden/core-api <rest-api>
 cd <rest-api>
 cp .env.example .env
+chmod 777 -R runtime/
 php yii generate/key # optional 
 ~~~
 
@@ -56,8 +57,10 @@ http://localhost/<rest-api>/web/
 Accessing [Use this template](https://github.com/cashwarden/core-api/generate) Create a new repository from yii2-rest-api
 
 ```sh
+git clone xxxx
 cd <rest-api>
 cp .env.example .env
+chmod 777 -R runtime/
 php yii generate/key # optional 
 ```
 
