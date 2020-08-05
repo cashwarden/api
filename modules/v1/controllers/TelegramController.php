@@ -50,9 +50,7 @@ class TelegramController extends ActiveController
                     );
                 },
                 function (Update $update) {
-                    return $update->getMessage()
-                        && $update->getMessage()->getContact()
-                        &&
+                    return $update->getMessage() && $update->getMessage()->getContact() &&
                         $update->getMessage()->getContact()->getUserId() === $update->getMessage()->getFrom()->getId();
                 }
             );
