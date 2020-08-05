@@ -13,7 +13,7 @@ class InitController extends Controller
     {
         $url = Url::to('/v1/telegram/hook', true);
         TelegramService::newClient()->setWebHook($url);
-        $this->stdout('Telegram set Webhook success!');
+        $this->stdout("Telegram set Webhook url success!: {$url}\n");
         return ExitCode::OK;
     }
 }
