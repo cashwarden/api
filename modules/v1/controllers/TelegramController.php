@@ -33,6 +33,10 @@ class TelegramController extends ActiveController
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), 'pong!');
             });
+            $bot->on(function ($update) use ($bot) {
+            }, function ($update) {
+                return true;
+            });
             $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
