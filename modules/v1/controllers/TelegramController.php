@@ -5,7 +5,6 @@ namespace app\modules\v1\controllers;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use TelegramBot\Api\BotApi;
-use TelegramBot\Api\Types\Update;
 use yii\helpers\Url;
 
 class TelegramController extends ActiveController
@@ -40,21 +39,11 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), Url::to('/v1/telegram/bind', true));
             });
 
-            // react only on self contact
-            $bot->on(
-                function (Update $update) use ($bot) {
-                    /** @var BotApi $bot */
-                    $bot->sendMessage(
-                        $update->getMessage()->getChat()->getId(),
-                        $update->getMessage()->getContact()->getPhoneNumber()
-                    );
-                },
-                function (Update $update) {
-                    return $update->getMessage() && $update->getMessage()->getContact() &&
-                        $update->getMessage()->getContact()->getUserId() === $update->getMessage()->getFrom()->getId();
-                }
-            );
-            $bot->run();
+            $updates = $bot->getUpdates();
+            $bot->handle($updates);
+            if ($lastUpdate = end($updates)) {
+                $bot->getUpdates($lastUpdate->getUpdateId() + 1, 1);
+            }
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
