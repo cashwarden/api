@@ -35,7 +35,6 @@ class TelegramController extends ActiveController
             $bot->command('login', function ($message) use ($bot) {
                 $bot->sendMessage($message->getChat()->getId(), Url::to('/v1/telegram/bind', true));
             });
-            $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
