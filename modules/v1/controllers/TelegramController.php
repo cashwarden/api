@@ -4,6 +4,7 @@ namespace app\modules\v1\controllers;
 
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
+use yii\helpers\Url;
 
 class TelegramController extends ActiveController
 {
@@ -31,10 +32,18 @@ class TelegramController extends ActiveController
             $bot->command('ping', function ($message) use ($bot) {
                 $bot->sendMessage($message->getChat()->getId(), 'pong!');
             });
+            $bot->command('login', function ($message) use ($bot) {
+                $bot->sendMessage($message->getChat()->getId(), Url::to('/v1/telegram/bind', true));
+            });
             $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
         }
+    }
+
+    public function actionBind()
+    {
+        dd(\Yii::$app->request->params);
     }
 }
