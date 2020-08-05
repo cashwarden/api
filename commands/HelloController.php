@@ -8,6 +8,7 @@
 
 namespace app\commands;
 
+use app\core\services\TelegramService;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -31,6 +32,13 @@ class HelloController extends Controller
         echo $message . "\n";
 
         \Yii::error(['request_id' => \Yii::$app->requestId->id, 'test_request_id']);
+        return ExitCode::OK;
+    }
+
+    public function actionTelegram()
+    {
+        $client = TelegramService::newClient();
+        dump($client->getMe());
         return ExitCode::OK;
     }
 }

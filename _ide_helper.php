@@ -14,6 +14,7 @@ class Yii extends \yii\BaseYii
 
 /**
  * @property Mis\IdeHelper\IdeHelper $ideHelper
+ * @property aki\telegram\Telegram $telegram
  * @property yiier\helpers\RequestId $requestId
  * @property yii\caching\FileCache $cache
  * @property yii\db\Connection $db

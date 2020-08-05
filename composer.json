@@ -23,7 +23,9 @@
         "sizeg/yii2-jwt": "^2.0",
         "yiier/yii2-helpers": "^2.0",
         "yiier/yii2-graylog-target": "^1.1",
-        "yiier/yii2-validators": "^0.2.0"
+        "yiier/yii2-validators": "^0.2.0",
+        "mis/yii2-ide-helper": "^1.0",
+        "telegram-bot/api": "^2.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -39,8 +41,7 @@
         "codeception/module-rest": "^1.0.0",
         "codeception/module-phpbrowser": "^1.0.0",
         "squizlabs/php_codesniffer": "^3.5.5",
-        "phpro/grumphp": "^0.19.1",
-        "mis/yii2-ide-helper": "^1.0"
+        "phpro/grumphp": "^0.19.1"
     },
     "config": {
         "process-timeout": 1800,

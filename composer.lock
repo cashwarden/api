@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6133d0e7c5d1c8b4dc29ec53aaa0da25",
+    "content-hash": "6947480e2b2572f0da6416b07a280a38",
     "packages": [
         {
             "name": "bower-asset/inputmask",
@@ -443,6 +443,59 @@
                 }
             ],
             "time": "2020-05-22T08:21:12+00:00"
+        },
+        {
+            "name": "mis/yii2-ide-helper",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/takashiki/yii2-ide-helper.git",
+                "reference": "51b25fbad8b4be1ac056acc242b2e8c4193cf2e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/takashiki/yii2-ide-helper/zipball/51b25fbad8b4be1ac056acc242b2e8c4193cf2e4",
+                "reference": "51b25fbad8b4be1ac056acc242b2e8c4193cf2e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mis\\IdeHelper\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "takashiki",
+                    "email": "857995137@qq.com"
+                }
+            ],
+            "description": "Yii2 IDE Helper, generates correct PHPDocs for all components, to improve auto-completion.",
+            "keywords": [
+                "autocomplete",
+                "codeintel",
+                "helper",
+                "ide",
+                "netbeans",
+                "phpdoc",
+                "phpstorm",
+                "sublime",
+                "yii2"
+            ],
+            "time": "2016-11-22T01:26:36+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -1249,6 +1302,62 @@
                 }
             ],
             "time": "2020-07-14T12:35:20+00:00"
+        },
+        {
+            "name": "telegram-bot/api",
+            "version": "v2.3.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TelegramBot/Api.git",
+                "reference": "27834eb9935a92882f44f61cfd05a8b74deda675"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TelegramBot/Api/zipball/27834eb9935a92882f44f61cfd05a8b74deda675",
+                "reference": "27834eb9935a92882f44f61cfd05a8b74deda675",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "*",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TelegramBot\\Api\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ilya Gusev",
+                    "email": "mail@igusev.ru",
+                    "homepage": "https://php-cat.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP Wrapper for Telegram Bot API",
+            "homepage": "https://github.com/TelegramBot/Api",
+            "keywords": [
+                "bot",
+                "bot api",
+                "php",
+                "telegram"
+            ],
+            "time": "2020-07-12T13:00:53+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -3459,59 +3568,6 @@
                 "schema"
             ],
             "time": "2020-05-27T16:41:55+00:00"
-        },
-        {
-            "name": "mis/yii2-ide-helper",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/takashiki/yii2-ide-helper.git",
-                "reference": "51b25fbad8b4be1ac056acc242b2e8c4193cf2e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/takashiki/yii2-ide-helper/zipball/51b25fbad8b4be1ac056acc242b2e8c4193cf2e4",
-                "reference": "51b25fbad8b4be1ac056acc242b2e8c4193cf2e4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "yiisoft/yii2": "*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Mis\\IdeHelper\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "takashiki",
-                    "email": "857995137@qq.com"
-                }
-            ],
-            "description": "Yii2 IDE Helper, generates correct PHPDocs for all components, to improve auto-completion.",
-            "keywords": [
-                "autocomplete",
-                "codeintel",
-                "helper",
-                "ide",
-                "netbeans",
-                "phpdoc",
-                "phpstorm",
-                "sublime",
-                "yii2"
-            ],
-            "time": "2016-11-22T01:26:36+00:00"
         },
         {
             "name": "monolog/monolog",
