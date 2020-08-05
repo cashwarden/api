@@ -39,11 +39,7 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), Url::to('/v1/telegram/bind', true));
             });
 
-            $updates = $bot->getUpdates();
-            $bot->handle($updates);
-            if ($lastUpdate = end($updates)) {
-                $bot->getUpdates($lastUpdate->getUpdateId() + 1, 1);
-            }
+            $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
