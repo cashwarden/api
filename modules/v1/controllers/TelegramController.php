@@ -2,8 +2,9 @@
 
 namespace app\modules\v1\controllers;
 
-use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
+use TelegramBot\Api\BotApi;
+use TelegramBot\Api\Types\Message;
 
 class TelegramController extends ActiveController
 {
@@ -26,28 +27,14 @@ class TelegramController extends ActiveController
     public function actionHook()
     {
         try {
-            $bot = TelegramService::newClient();
-            $bot->on(function ($update) use ($bot) {
-                $message = $update->getMessage();
-                $input = $message->getText();
-                $cid = $message->getChat()->getId();
-                if ($input === "/start") {
-                    $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup([
-                        [
-                            ["text" => "кнопка",],
-                            ["text" => "кнопка"]
-                        ]
-                    ], true, true);
-                    $bot->sendMessage($cid, 'старт!', null, true, null, $keyboard);
-                    $bot->answerCallbackQuery($update->getCallbackQuery()->getId());
-                }
-            }, function ($update) use ($bot) {
-                $msg = $update->getMessage();
-                if (is_null($msg) || !strlen($msg->getText())) {
-                    return false;
-                }
-                return true;
+            # $bot = TelegramService::newClient();
+            $bot = new \TelegramBot\Api\Client(params('telegramToken'));
+            $bot->command('ping', function (Message $message) use ($bot) {
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), 'pong!');
             });
+
+            $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
