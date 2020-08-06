@@ -25,7 +25,8 @@
         "yiier/yii2-graylog-target": "^1.1",
         "yiier/yii2-validators": "^0.2.0",
         "mis/yii2-ide-helper": "^1.0",
-        "telegram-bot/api": "^2.3"
+        "telegram-bot/api": "^2.3",
+        "ext-json": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
