@@ -48,6 +48,8 @@ class TelegramController extends ActiveController
             });
 
             $bot->run();
+            \Yii::$app->response->send();
+            die;
         } catch (\TelegramBot\Api\Exception $e) {
             Log::error('webHook error' . $e->getMessage(), (string)$e);
             throw $e;
