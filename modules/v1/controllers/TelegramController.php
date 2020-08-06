@@ -41,8 +41,7 @@ class TelegramController extends ActiveController
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), "hi");
             }, function (Update $message) use ($bot) {
-                Log::error('webHook info' . $message->getMessage()->getText());
-                if ($message->getMessage()->getText() == '/login') {
+                if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
                     return true;
                 }
                 return false;
