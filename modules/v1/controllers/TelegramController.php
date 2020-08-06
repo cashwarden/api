@@ -39,8 +39,13 @@ class TelegramController extends ActiveController
                         ]
                     ], true, true);
                     $bot->sendMessage($cid, 'старт!', null, true, null, $keyboard);
+                    $bot->answerCallbackQuery($update->getCallbackQuery()->getId());
                 }
-            }, function () {
+            }, function ($update) use ($bot) {
+                $msg = $update->getMessage();
+                if (is_null($msg) || !strlen($msg->getText())) {
+                    return false;
+                }
                 return true;
             });
             $bot->run();
