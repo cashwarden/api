@@ -2,8 +2,10 @@
 
 namespace app\modules\v1\controllers;
 
+use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use TelegramBot\Api\BotApi;
+use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
 
@@ -27,33 +29,12 @@ class TelegramController extends ActiveController
      */
     public function actionHook()
     {
-        $path = "https://api.telegram.org/bot" . params('telegramToken');
-
-        $update = json_decode(file_get_contents("php://input"), true);
-
-        $chatId = $update["message"]["chat"]["id"];
-        $message = $update["message"]["text"];
-
-        if (strpos($message, "/weather") === 0) {
-            $location = substr($message, 9);
-            $weather = json_decode(
-                file_get_contents("http://api.openweathermap.org/data/2.5/weather?q={$location}&appid=mytoken"),
-                true
-            )["weather"][0]["main"];
-            file_get_contents(
-                "{$path}/sendmessage?chat_id={$chatId}&text=Here's the weather in {$location}:{$weather}"
-            );
-        }
-        die;
-
-
         try {
-            # $bot = TelegramService::newClient();
-            $bot = new \TelegramBot\Api\Client(params('telegramToken'));
-//            $bot->command('ping', function (Message $message) use ($bot) {
-//                /** @var BotApi $bot */
-//                $bot->sendMessage($message->getChat()->getId(), 'pong!');
-//            });
+            $bot = TelegramService::newClient();
+            $bot->command('ping', function (Message $message) use ($bot) {
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), 'pong!');
+            });
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
@@ -68,12 +49,11 @@ class TelegramController extends ActiveController
             });
 
             $bot->run();
-            \Yii::$app->response->send();
-            die;
         } catch (\TelegramBot\Api\Exception $e) {
             Log::error('webHook error' . $e->getMessage(), (string)$e);
             throw $e;
         }
+        return '';
     }
 
     public function actionBind()
