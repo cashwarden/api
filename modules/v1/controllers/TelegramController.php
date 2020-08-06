@@ -48,7 +48,6 @@ class TelegramController extends ActiveController
                 }
                 return true;
             });
-            $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
             dump($e->getMessage());
             throw $e;
