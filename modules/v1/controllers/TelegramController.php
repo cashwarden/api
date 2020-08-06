@@ -5,6 +5,7 @@ namespace app\modules\v1\controllers;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use TelegramBot\Api\BotApi;
+use TelegramBot\Api\Types\Message;
 
 class TelegramController extends ActiveController
 {
@@ -28,22 +29,19 @@ class TelegramController extends ActiveController
     {
         try {
             $bot = TelegramService::newClient();
-            $bot->command('devanswer', function ($message) use ($bot) {
+            $bot->on(function (Message $message) use ($bot) {
                 /** @var BotApi $bot */
-                preg_match_all(
-                    '/{"text":"(.*?)",/s',
-                    file_get_contents('http://devanswers.ru/'),
-                    $result
-                );
-                $bot->sendMessage(
-                    $message->getChat()->getId(),
-                    str_replace("<br/>", "\n", json_decode('"' . $result[1][0] . '"'))
-                );
-            });
+                switch ($message->getText()) {
+                    case '/login':
+                        $bot->sendMessage($message->getChat()->getId(), 'Welcome text here');
+                        break;
 
-            $bot->command('qaanswer', function ($message) use ($bot) {
-                /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), file_get_contents('http://qaanswers.ru/qwe.php'));
+                    default:
+                        # code...
+                        break;
+                }
+            }, function () {
+                return true;
             });
             $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
