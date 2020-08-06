@@ -5,6 +5,7 @@ namespace app\modules\v1\controllers;
 use app\core\traits\ServiceTrait;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Update;
+use yiier\graylog\Log;
 
 class TelegramController extends ActiveController
 {
@@ -39,7 +40,8 @@ class TelegramController extends ActiveController
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), "hi");
             }, function (Update $message) use ($bot) {
-                if ($message->getMessage() == '/login') {
+                Log::error('webHook info' . $message->getMessage()->getText());
+                if ($message->getMessage()->getText() == '/login') {
                     return true;
                 }
                 return false;
@@ -47,7 +49,7 @@ class TelegramController extends ActiveController
 
             $bot->run();
         } catch (\TelegramBot\Api\Exception $e) {
-            dump($e->getMessage());
+            Log::error('webHook error' . $e->getMessage(), (string)$e);
             throw $e;
         }
     }
