@@ -63,7 +63,8 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                "POST <module>/<alias:login|join|refresh-token>" => '<module>/user/<alias>',
+                "POST <module>/<alias:login|join>" => '<module>/user/<alias>',
+                "POST <module>/token/refresh" => '<module>/user/refresh-token',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/account']
