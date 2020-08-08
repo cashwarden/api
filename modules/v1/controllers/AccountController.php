@@ -23,7 +23,7 @@ class AccountController extends ActiveController
     {
         $actions = parent::actions();
         // 注销系统自带的实现方法
-        unset($actions['update'], $actions['index'], $actions['delete'], $actions['create']);
+        unset($actions['update'], $actions['delete'], $actions['create']);
         return $actions;
     }
 
