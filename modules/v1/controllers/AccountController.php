@@ -55,16 +55,16 @@ class AccountController extends ActiveController
     {
         /** @var Account $modelClass */
         $modelClass = $this->modelClass;
-        $searchModel = new SearchModel(
-            [
-                'defaultOrder' => ['id' => SORT_DESC],
-                'model' => $modelClass::find()->where(['user_id' => Yii::$app->user->id]),
-                'scenario' => 'default',
-                'pageSize' => $this->getPageSize()
-            ]
-        );
+        $searchModel = new SearchModel([
+            'defaultOrder' => ['id' => SORT_DESC],
+            'model' => $modelClass,
+            'scenario' => 'default',
+            'pageSize' => $this->getPageSize()
+        ]);
 
-        return $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $dataProvider = $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
+        return $dataProvider;
     }
 
     /**
