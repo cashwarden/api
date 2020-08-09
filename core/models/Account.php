@@ -63,7 +63,7 @@ class Account extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'name', 'type', 'color', 'balance', 'currency_code'], 'required'],
+            [['user_id', 'name', 'type', 'balance', 'currency_code'], 'required'],
             [
                 ['credit_card_limit', 'credit_card_repayment_day', 'credit_card_billing_day'],
                 'required',
@@ -80,7 +80,6 @@ class Account extends \yii\db\ActiveRecord
                 ],
                 'integer'
             ],
-            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 120],
             [['color'], 'string', 'max' => 7],
             ['type', 'in', 'range' => AccountType::names()],
@@ -152,6 +151,10 @@ class Account extends \yii\db\ActiveRecord
 
         $fields['balance'] = function (self $model) {
             return Setup::toYuan($model->balance_cent);
+        };
+
+        $fields['exclude_from_stats'] = function (self $model) {
+            return (bool)$model->exclude_from_stats;
         };
 
         $fields['created_at'] = function (self $model) {

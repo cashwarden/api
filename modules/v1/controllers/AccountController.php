@@ -6,8 +6,10 @@ use app\core\models\Account;
 use app\core\services\AccountService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AccountType;
+use app\core\types\ColorType;
 use Yii;
 use yii\web\NotFoundHttpException;
+use yiier\helpers\SearchModel;
 
 /**
  * Account controller for the `v1` module
@@ -39,9 +41,30 @@ class AccountController extends ActiveController
         if (data_get($params, 'type') == AccountType::CREDIT_CARD) {
             $model->setScenario(AccountType::CREDIT_CARD);
         }
+        /** @var Account $model */
         $model = $this->validate($model, $params);
+        $model->color = $model->color ?: array_rand(array_flip(ColorType::names()), 1);
 
         return $this->accountService->createUpdate($model);
+    }
+
+    /**
+     * @return \yii\data\ActiveDataProvider
+     */
+    public function prepareDataProvider()
+    {
+        /** @var Account $modelClass */
+        $modelClass = $this->modelClass;
+        $searchModel = new SearchModel(
+            [
+                'defaultOrder' => ['id' => SORT_DESC],
+                'model' => $modelClass::find()->where(['user_id' => Yii::$app->user->id]),
+                'scenario' => 'default',
+                'pageSize' => $this->getPageSize()
+            ]
+        );
+
+        return $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
     }
 
     /**
