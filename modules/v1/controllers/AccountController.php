@@ -83,6 +83,7 @@ class AccountController extends ActiveController
         if (data_get($params, 'type') == AccountType::CREDIT_CARD) {
             $model->setScenario(AccountType::CREDIT_CARD);
         }
+        /** @var Account $model */
         $model = $this->validate($model, $params);
 
         return $this->accountService->createUpdate($model);
