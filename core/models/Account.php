@@ -5,6 +5,7 @@ namespace app\core\models;
 use app\core\exceptions\InvalidArgumentException;
 use app\core\helpers\FormatFactory;
 use app\core\types\AccountType;
+use app\core\types\ColorType;
 use app\core\types\CurrencyCode;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -129,6 +130,10 @@ class Account extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $ran = ColorType::items();
+                $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
+            }
             $this->balance_cent = Setup::toFen($this->balance);
             $this->type = AccountType::toEnumValue($this->type);
             return true;

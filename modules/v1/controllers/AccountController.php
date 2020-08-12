@@ -6,7 +6,6 @@ use app\core\models\Account;
 use app\core\services\AccountService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AccountType;
-use app\core\types\ColorType;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yiier\helpers\SearchModel;
@@ -43,7 +42,6 @@ class AccountController extends ActiveController
         }
         /** @var Account $model */
         $model = $this->validate($model, $params);
-        $model->color = $model->color ?: array_rand(array_flip(ColorType::names()), 1);
 
         return $this->accountService->createUpdate($model);
     }

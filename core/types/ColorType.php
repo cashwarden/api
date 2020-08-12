@@ -2,30 +2,43 @@
 
 namespace app\core\types;
 
-class ColorType extends BaseType
+/**
+ * @link https://ant-design.gitee.io/docs/spec/colors-cn First white font background color
+ * @package app\core\types
+ */
+class ColorType
 {
-    public const SKY = 'sky';
-    public const GREEN = 'green';
-    public const BLUE = 'blue';
-    public const ORANGE = 'orange';
-    public const RED = 'red';
-    public const PURPLE = 'purple';
-    public const PINK = 'pink';
-    public const LIME = 'lime';
-    public const GREY = 'grey';
+    public const RED = '#f5222d';
+    public const VOLCANO = '#fa541c';
+    public const ORANGE = '#fa8c16';
+    public const GOLD = '#faad14';
+    public const YELLOW = '#d4b106';
+    public const LIME = '#a0d911';
+    public const GREEN = '#52c41a';
+    public const CYAN = '#13c2c2';
+    public const BLUE = '#1890ff';
+    public const GEEK_BLUE = '#2f54eb';
+    public const PURPLE = '#722ed1';
+    public const MAGENTA = '#eb2f96';
 
-    public static function names(): array
+    /**
+     * @return string[]
+     */
+    public static function items()
     {
         return [
-            self::SKY => '#00AECC',
-            self::GREEN => '#519839',
-            self::BLUE => '#0079BF',
-            self::ORANGE => '#D29034',
-            self::RED => '#B04632',
-            self::PURPLE => '#89609E',
-            self::PINK => '#CD5A91',
-            self::LIME => '#4BBF6B',
-            self::GREY => '#838C91',
+            self::RED,
+            self::VOLCANO,
+            self::ORANGE,
+            self::GOLD,
+            self::YELLOW,
+            self::LIME,
+            self::GREEN,
+            self::CYAN,
+            self::BLUE,
+            self::GEEK_BLUE,
+            self::PURPLE,
+            self::MAGENTA,
         ];
     }
 }
