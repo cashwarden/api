@@ -7,6 +7,7 @@ use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
 use yii\base\Model;
 use yii\filters\Cors;
+use yii\web\ForbiddenHttpException;
 use yiier\helpers\SearchModel;
 use yiier\helpers\Setup;
 
@@ -65,17 +66,16 @@ class ActiveController extends \yii\rest\ActiveController
     public function prepareDataProvider()
     {
         $modelClass = $this->modelClass;
+        $searchModel = new SearchModel([
+            'defaultOrder' => ['id' => SORT_DESC],
+            'model' => $modelClass,
+            'scenario' => 'default',
+            'pageSize' => $this->getPageSize()
+        ]);
 
-        $searchModel = new SearchModel(
-            [
-                'defaultOrder' => ['id' => SORT_DESC],
-                'model' => $modelClass,
-                'scenario' => 'default',
-                'pageSize' => $this->getPageSize()
-            ]
-        );
-
-        return $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $dataProvider = $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
+        return $dataProvider;
     }
 
     /**
@@ -106,5 +106,22 @@ class ActiveController extends \yii\rest\ActiveController
             throw new InvalidArgumentException(Setup::errorMessage($model->firstErrors));
         }
         return $model;
+    }
+
+    /**
+     * @param string $action
+     * @param null $model
+     * @param array $params
+     * @throws ForbiddenHttpException
+     */
+    public function checkAccess($action, $model = null, $params = [])
+    {
+        if (in_array($action, ['delete', 'update', 'view'])) {
+            if ($model->user_id !== \Yii::$app->user->id) {
+                throw new ForbiddenHttpException(
+                    t('app', 'You can only ' . $action . ' data that you\'ve created.')
+                );
+            }
+        }
     }
 }

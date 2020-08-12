@@ -2,7 +2,12 @@
 
 namespace app\core\models;
 
+use app\core\exceptions\InvalidArgumentException;
+use app\core\types\ColorType;
+use app\core\types\DirectionType;
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yiier\helpers\DateHelper;
 
 /**
  * This is the model class for table "{{%category}}".
@@ -28,16 +33,30 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ],
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['user_id', 'direction', 'name', 'color', 'icon_name'], 'required'],
-            [['user_id', 'direction', 'status'], 'integer'],
+            [['direction', 'name', 'color', 'icon_name'], 'required'],
+            [['user_id', 'status'], 'integer'],
+            ['direction', 'in', 'range' => DirectionType::names()],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'icon_name'], 'string', 'max' => 120],
-            [['color'], 'string', 'max' => 7],
+            ['color', 'in', 'range' => ColorType::items()],
         ];
     }
 
@@ -57,5 +76,46 @@ class Category extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->user_id = Yii::$app->user->id;
+            }
+            $this->direction = DirectionType::toEnumValue($this->direction);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['user_id']);
+
+        $fields['direction'] = function (self $model) {
+            return DirectionType::getName($model->direction);
+        };
+
+        $fields['created_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->created_at);
+        };
+
+        $fields['updated_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->updated_at);
+        };
+
+        return $fields;
     }
 }

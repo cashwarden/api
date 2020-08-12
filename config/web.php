@@ -67,7 +67,7 @@ $config = [
                 "POST <module>/token/refresh" => '<module>/user/refresh-token',
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/account']
+                    'controller' => ['v1/account', 'v1/category']
                 ],
                 "GET health-check" => 'site/health-check',
                 '<module>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',

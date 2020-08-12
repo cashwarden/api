@@ -47,25 +47,6 @@ class AccountController extends ActiveController
     }
 
     /**
-     * @return \yii\data\ActiveDataProvider
-     */
-    public function prepareDataProvider()
-    {
-        /** @var Account $modelClass */
-        $modelClass = $this->modelClass;
-        $searchModel = new SearchModel([
-            'defaultOrder' => ['id' => SORT_DESC],
-            'model' => $modelClass,
-            'scenario' => 'default',
-            'pageSize' => $this->getPageSize()
-        ]);
-
-        $dataProvider = $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
-        $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
-        return $dataProvider;
-    }
-
-    /**
      * @param int $id
      * @return Account
      * @throws NotFoundHttpException
