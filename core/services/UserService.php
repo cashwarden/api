@@ -103,6 +103,7 @@ class UserService
                 'type' => 'cash',
                 'user_id' => $user->id,
                 'balance' => 0,
+                'default' => Account::DEFAULT,
                 'currency_code' => $user->base_currency_code
             ]);
             if (!$account->save()) {
@@ -167,7 +168,8 @@ class UserService
                     'name' => t('app', 'Other expenses'),
                     'color' => ColorType::GEEK_BLUE,
                     'icon_name' => 'wallet',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Account::DEFAULT,
                 ],
                 [
                     'name' => t('app', 'Work income'),
@@ -185,7 +187,8 @@ class UserService
                     'name' => t('app', 'Other income'),
                     'color' => ColorType::MAGENTA,
                     'icon_name' => 'piggy-bank',
-                    'direction' => DirectionType::IN
+                    'direction' => DirectionType::IN,
+                    'default' => Category::DEFAULT,
                 ],
             ];
             $time = date('Y-m-d H:i:s');

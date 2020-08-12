@@ -44,4 +44,13 @@ class AccountService
             ->andWhere(['user_id' => Yii::$app->user->id])
             ->one();
     }
+
+    public static function getDefaultAccount(int $userId)
+    {
+        return Account::find()
+            ->where(['user_id' => $userId, 'default' => Account::DEFAULT])
+            ->orderBy(['id' => SORT_ASC])
+            ->asArray()
+            ->one();
+    }
 }

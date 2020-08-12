@@ -3,6 +3,9 @@
 namespace app\core\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yiier\helpers\Setup;
+use yiier\validators\MoneyValidator;
 
 /**
  * This is the model class for table "{{%record}}".
@@ -18,6 +21,7 @@ use Yii;
  * @property int $currency_amount_cent
  * @property string $currency_code
  * @property string|null $tags
+ * @property string|null $description
  * @property string|null $remark
  * @property string|null $image
  * @property int|null $trading_status
@@ -29,11 +33,35 @@ use Yii;
 class Record extends \yii\db\ActiveRecord
 {
     /**
+     * @var integer
+     */
+    public $amount;
+
+    /**
+     * @var integer
+     */
+    public $currency_amount;
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return '{{%record}}';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ],
+        ];
     }
 
     /**
@@ -71,9 +99,10 @@ class Record extends \yii\db\ActiveRecord
                 ],
                 'integer'
             ],
+            [['amount', 'currency_amount'], MoneyValidator::class], //todo message
             [['created_at', 'updated_at'], 'safe'],
             [['currency_code'], 'string', 'max' => 3],
-            [['tags', 'remark', 'image'], 'string', 'max' => 255],
+            [['tags', 'description', 'remark', 'image'], 'string', 'max' => 255],
         ];
     }
 
@@ -91,9 +120,12 @@ class Record extends \yii\db\ActiveRecord
             'category_id' => Yii::t('app', 'Category ID'),
             'direction' => Yii::t('app', 'Direction'),
             'amount_cent' => Yii::t('app', 'Amount Cent'),
+            'amount' => Yii::t('app', 'Amount'),
             'currency_amount_cent' => Yii::t('app', 'Currency Amount Cent'),
+            'currency_amount' => Yii::t('app', 'Currency Amount'),
             'currency_code' => Yii::t('app', 'Currency Code'),
             'tags' => Yii::t('app', 'Tags'),
+            'description' => Yii::t('app', 'Description'),
             'remark' => Yii::t('app', 'Remark'),
             'image' => Yii::t('app', 'Image'),
             'trading_status' => Yii::t('app', 'Trading Status'),
@@ -102,5 +134,21 @@ class Record extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            $this->amount_cent = Setup::toFen($this->amount);
+            $this->currency_amount_cent = Setup::toFen($this->currency_amount);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

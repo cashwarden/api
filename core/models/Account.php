@@ -28,11 +28,13 @@ use yiier\validators\MoneyValidator;
  * @property int|null $credit_card_limit
  * @property int|null $credit_card_repayment_day
  * @property int|null $credit_card_billing_day
+ * @property int $default
  * @property string|null $created_at
  * @property string|null $updated_at
  */
 class Account extends \yii\db\ActiveRecord
 {
+    public const DEFAULT = 1;
     public $balance;
 
     public const SCENARIO_CREDIT_CARD = 'credit_card';
@@ -77,7 +79,8 @@ class Account extends \yii\db\ActiveRecord
                     'status',
                     'credit_card_limit',
                     'credit_card_repayment_day',
-                    'credit_card_billing_day'
+                    'credit_card_billing_day',
+                    'default'
                 ],
                 'integer'
             ],
@@ -109,6 +112,7 @@ class Account extends \yii\db\ActiveRecord
             'credit_card_limit' => Yii::t('app', 'Credit Card Limit'),
             'credit_card_repayment_day' => Yii::t('app', 'Credit Card Repayment Day'),
             'credit_card_billing_day' => Yii::t('app', 'Credit Card Billing Day'),
+            'default' => Yii::t('app', 'Default'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

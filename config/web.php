@@ -65,6 +65,7 @@ $config = [
             'rules' => [
                 "POST <module>/<alias:login|join>" => '<module>/user/<alias>',
                 "POST <module>/token/refresh" => '<module>/user/refresh-token',
+                "POST <module>/record/by-description" => '<module>/record/create-by-description',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/account', 'v1/category']

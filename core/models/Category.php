@@ -19,11 +19,14 @@ use yiier\helpers\DateHelper;
  * @property string $color
  * @property string $icon_name
  * @property int|null $status
+ * @property int $default
  * @property string|null $created_at
  * @property string|null $updated_at
  */
 class Category extends \yii\db\ActiveRecord
 {
+    public const DEFAULT = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -52,7 +55,7 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             [['direction', 'name', 'color', 'icon_name'], 'required'],
-            [['user_id', 'status'], 'integer'],
+            [['user_id', 'status', 'default'], 'integer'],
             ['direction', 'in', 'range' => DirectionType::names()],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'icon_name'], 'string', 'max' => 120],
@@ -73,6 +76,7 @@ class Category extends \yii\db\ActiveRecord
             'color' => Yii::t('app', 'Color'),
             'icon_name' => Yii::t('app', 'Icon Name'),
             'status' => Yii::t('app', 'Status'),
+            'default' => Yii::t('app', 'Default'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
