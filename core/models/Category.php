@@ -25,6 +25,7 @@ use yiier\helpers\DateHelper;
  */
 class Category extends \yii\db\ActiveRecord
 {
+    public const NOT_DEFAULT = 0;
     public const DEFAULT = 1;
 
     /**

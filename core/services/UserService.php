@@ -114,55 +114,64 @@ class UserService
                     'name' => t('app', 'Food and drink'),
                     'color' => ColorType::RED,
                     'icon_name' => 'utensils',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Home life'),
                     'color' => ColorType::ORANGE,
                     'icon_name' => 'home',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Traffic'),
                     'color' => ColorType::BLUE,
                     'icon_name' => 'car',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Recreation'),
                     'color' => ColorType::VOLCANO,
                     'icon_name' => 'gamepad',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Health care'),
                     'color' => ColorType::GREEN,
                     'icon_name' => 'briefcase-medical',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Clothes'),
                     'color' => ColorType::PURPLE,
                     'icon_name' => 'tshirt',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Cultural education'),
                     'color' => ColorType::CYAN,
                     'icon_name' => 'book',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Investment expenditure'),
                     'color' => ColorType::GOLD,
                     'icon_name' => 'seedling',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Childcare'),
                     'color' => ColorType::LIME,
                     'icon_name' => 'baby',
-                    'direction' => DirectionType::OUT
+                    'direction' => DirectionType::OUT,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Other expenses'),
@@ -175,13 +184,15 @@ class UserService
                     'name' => t('app', 'Work income'),
                     'color' => ColorType::BLUE,
                     'icon_name' => 'file-invoice-dollar',
-                    'direction' => DirectionType::IN
+                    'direction' => DirectionType::IN,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Investment income'),
                     'color' => ColorType::GOLD,
                     'icon_name' => 'chart-line',
-                    'direction' => DirectionType::IN
+                    'direction' => DirectionType::IN,
+                    'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => t('app', 'Other income'),
@@ -192,6 +203,7 @@ class UserService
                 ],
             ];
             $time = date('Y-m-d H:i:s');
+            $rows = [];
             foreach ($items as $key => $value) {
                 $rows[$key] = $value;
                 $rows[$key]['user_id'] = $user->id;
