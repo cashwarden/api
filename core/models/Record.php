@@ -26,7 +26,7 @@ use yiier\validators\MoneyValidator;
  * @property string|null $description
  * @property string|null $remark
  * @property string|null $image
- * @property int|null $trading_status
+ * @property int|null $transaction_status
  * @property int|null $reimbursement_status
  * @property int|null $rating
  * @property string|null $created_at
@@ -98,7 +98,7 @@ class Record extends \yii\db\ActiveRecord
                     'direction',
                     'amount_cent',
                     'currency_amount_cent',
-                    'trading_status',
+                    'transaction_status',
                     'reimbursement_status',
                     'rating'
                 ],
@@ -133,7 +133,7 @@ class Record extends \yii\db\ActiveRecord
             'description' => Yii::t('app', 'Description'),
             'remark' => Yii::t('app', 'Remark'),
             'image' => Yii::t('app', 'Image'),
-            'trading_status' => Yii::t('app', 'Trading Status'),
+            'transaction_status' => Yii::t('app', 'Transaction Status'),
             'reimbursement_status' => Yii::t('app', 'Reimbursement Status'),
             'rating' => Yii::t('app', 'Rating'),
             'created_at' => Yii::t('app', 'Created At'),
@@ -192,8 +192,8 @@ class Record extends \yii\db\ActiveRecord
             return (bool)$model->reimbursement_status;
         };
 
-        $fields['trading_status'] = function (self $model) {
-            return (bool)$model->trading_status;
+        $fields['transaction_status'] = function (self $model) {
+            return (bool)$model->transaction_status;
         };
 
         $fields['created_at'] = function (self $model) {

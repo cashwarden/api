@@ -10,5 +10,4 @@ use app\core\models\Category;
 class CategoryController extends ActiveController
 {
     public $modelClass = Category::class;
-    public $noAuthActions = [];
 }
