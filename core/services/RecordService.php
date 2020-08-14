@@ -23,8 +23,8 @@ class RecordService
         try {
             $model->description = $request->description;
             $model->user_id = Yii::$app->user->id;
-            $model->account_id = data_get(AccountService::getDefaultAccount($model->user_id), 'id');
-            $model->category_id = data_get(CategoryService::getDefaultCategory($model->user_id), 'id');
+            $model->account_id = $this->getAccountIdByDesc($model->description);
+            $model->category_id = $this->getCategoryIdByDesc($model->description);
             $model->direction = $this->getDirectionByDesc($model->description);
             $model->amount = $this->getAmountByDesc($model->description);
             $model->currency_amount = $model->amount;
@@ -60,5 +60,27 @@ class RecordService
             return array_pop($matches[0]);
         }
         return 0;
+    }
+
+    /**
+     * @param string $desc
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getAccountIdByDesc(string $desc)
+    {
+        $userId = Yii::$app->user->id;
+        return data_get(AccountService::getDefaultAccount($userId), 'id');
+    }
+
+    /**
+     * @param string $desc
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getCategoryIdByDesc(string $desc)
+    {
+        $userId = Yii::$app->user->id;
+        return data_get(CategoryService::getDefaultCategory($userId), 'id');
     }
 }

@@ -2,8 +2,10 @@
 
 namespace app\core\models;
 
+use app\core\types\DirectionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 use yiier\validators\MoneyValidator;
 
@@ -29,6 +31,9 @@ use yiier\validators\MoneyValidator;
  * @property int|null $rating
  * @property string|null $created_at
  * @property string|null $updated_at
+ *
+ * @property-read Category $category
+ * @property-read Account $account
  */
 class Record extends \yii\db\ActiveRecord
 {
@@ -150,5 +155,55 @@ class Record extends \yii\db\ActiveRecord
         } else {
             return false;
         }
+    }
+
+
+    public function getCategory()
+    {
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    public function getAccount()
+    {
+        return $this->hasOne(Account::class, ['id' => 'account_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['currency_amount_cent'], $fields['user_id'], $fields['amount_cent']);
+
+        $fields['account_name'] = function (self $model) {
+            return data_get($model->account, 'name');
+        };
+
+        $fields['direction'] = function (self $model) {
+            return data_get(DirectionType::names(), $model->direction);
+        };
+
+        $fields['category_name'] = function (self $model) {
+            return data_get($model->category, 'name');
+        };
+
+        $fields['reimbursement_status'] = function (self $model) {
+            return (bool)$model->reimbursement_status;
+        };
+
+        $fields['trading_status'] = function (self $model) {
+            return (bool)$model->trading_status;
+        };
+
+        $fields['created_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->created_at);
+        };
+
+        $fields['updated_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->updated_at);
+        };
+
+        return $fields;
     }
 }

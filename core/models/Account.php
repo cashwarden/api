@@ -3,7 +3,6 @@
 namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
-use app\core\helpers\FormatFactory;
 use app\core\types\AccountType;
 use app\core\types\ColorType;
 use app\core\types\CurrencyCode;
@@ -31,6 +30,7 @@ use yiier\validators\MoneyValidator;
  * @property int $default
  * @property string|null $created_at
  * @property string|null $updated_at
+ *
  */
 class Account extends \yii\db\ActiveRecord
 {
@@ -145,6 +145,7 @@ class Account extends \yii\db\ActiveRecord
             return false;
         }
     }
+
 
     /**
      * @return array

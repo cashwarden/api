@@ -2,14 +2,14 @@
 
 namespace app\core\services;
 
-use app\core\models\Account;
+use app\core\models\Category;
 
 class CategoryService
 {
     public static function getDefaultCategory(int $userId)
     {
-        return Account::find()
-            ->where(['user_id' => $userId, 'default' => Account::DEFAULT])
+        return Category::find()
+            ->where(['user_id' => $userId, 'default' => Category::DEFAULT])
             ->orderBy(['id' => SORT_ASC])
             ->asArray()
             ->one();
