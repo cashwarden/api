@@ -20,8 +20,6 @@ class RecordController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
-        // 注销系统自带的实现方法
-        unset($actions['update'], $actions['delete']);
         return $actions;
     }
 

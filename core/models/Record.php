@@ -22,7 +22,7 @@ use yiier\validators\MoneyValidator;
  * @property int $amount_cent
  * @property int $currency_amount_cent
  * @property string $currency_code
- * @property string|null $tags
+ * @property string|array $tags
  * @property string|null $description
  * @property string|null $remark
  * @property string|null $image
@@ -190,6 +190,9 @@ class Record extends \yii\db\ActiveRecord
 
         $fields['direction'] = function (self $model) {
             return data_get(DirectionType::names(), $model->direction);
+        };
+        $fields['tags'] = function (self $model) {
+            return $model->tags ? explode(',', $model->tags) : [];
         };
 
         $fields['category'] = function (self $model) {
