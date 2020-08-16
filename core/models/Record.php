@@ -33,7 +33,8 @@ use yiier\validators\MoneyValidator;
  * @property string|null $updated_at
  *
  * @property-read Category $category
- * @property-read Account $account
+ * @property-read Account $fromAccount
+ * @property-read Account $toAccount
  */
 class Record extends \yii\db\ActiveRecord
 {
@@ -161,9 +162,14 @@ class Record extends \yii\db\ActiveRecord
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
-    public function getAccount()
+    public function getFromAccount()
     {
-        return $this->hasOne(Account::class, ['id' => 'account_id']);
+        return $this->hasOne(Account::class, ['id' => 'from_account_id']);
+    }
+
+    public function getToAccount()
+    {
+        return $this->hasOne(Account::class, ['id' => 'to_account_id']);
     }
 
     /**
@@ -174,12 +180,28 @@ class Record extends \yii\db\ActiveRecord
         $fields = parent::fields();
         unset($fields['currency_amount_cent'], $fields['user_id'], $fields['amount_cent']);
 
+        $fields['currency_amount'] = function (self $model) {
+            return Setup::toYuan($model->currency_amount_cent);
+        };
+
+        $fields['amount'] = function (self $model) {
+            return Setup::toYuan($model->amount_cent);
+        };
+
         $fields['direction'] = function (self $model) {
             return data_get(DirectionType::names(), $model->direction);
         };
 
-        $fields['category_name'] = function (self $model) {
-            return data_get($model->category, 'name');
+        $fields['category'] = function (self $model) {
+            return $model->category;
+        };
+
+        $fields['from_account'] = function (self $model) {
+            return $model->fromAccount;
+        };
+
+        $fields['to_account'] = function (self $model) {
+            return $model->toAccount;
         };
 
         $fields['reimbursement_status'] = function (self $model) {
