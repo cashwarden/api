@@ -38,7 +38,9 @@ class LoggerBehavior extends Behavior
                 'url' => $request->absoluteUrl,
                 'response' => Json::encode($response->data)
             ];
-            $response->data = ['request_id' => $requestId] + $response->data;
+            if (is_array($response->data)) {
+                $response->data = ['request_id' => $requestId] + $response->data;
+            }
             $code === 0 ? Yii::info($message, 'request') : Yii::error($message, 'request');
         }
     }

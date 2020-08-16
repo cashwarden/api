@@ -23,7 +23,7 @@ class RecordService
         try {
             $model->description = $request->description;
             $model->user_id = Yii::$app->user->id;
-            $model->account_id = $this->getAccountIdByDesc($model->description);
+            $model->from_account_id = $this->getAccountIdByDesc($model->description);
             $model->category_id = $this->getCategoryIdByDesc($model->description);
             $model->direction = $this->getDirectionByDesc($model->description);
             $model->amount = $this->getAmountByDesc($model->description);
@@ -42,9 +42,9 @@ class RecordService
         return Record::findOne($model->id);
     }
 
-    public function getDirectionByDesc(string $desc)
+    public function getDirectionByDesc(string $desc): string
     {
-        return DirectionType::OUT;
+        return data_get(DirectionType::names(), DirectionType::OUT);
     }
 
     /**
