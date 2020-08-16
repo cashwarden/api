@@ -7,6 +7,7 @@ use app\core\models\Account;
 use app\core\models\Category;
 use app\core\models\User;
 use app\core\requests\JoinRequest;
+use app\core\types\AccountType;
 use app\core\types\ColorType;
 use app\core\types\DirectionType;
 use app\core\types\UserStatus;
@@ -99,8 +100,8 @@ class UserService
         try {
             $account = new Account();
             $account->setAttributes([
-                'name' => t('app', 'Cash'),
-                'type' => 'cash',
+                'name' => t('app', 'General Account'),
+                'type' => AccountType::getName(AccountType::GENERAL),
                 'user_id' => $user->id,
                 'balance' => 0,
                 'default' => Account::DEFAULT,

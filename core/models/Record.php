@@ -7,6 +7,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
+use yiier\validators\ArrayValidator;
 use yiier\validators\MoneyValidator;
 
 /**
@@ -14,9 +15,8 @@ use yiier\validators\MoneyValidator;
  *
  * @property int $id
  * @property int $user_id
- * @property int $account_id
- * @property int|null $target_account_id
- * @property int $action_type
+ * @property int|null $from_account_id
+ * @property int|null $to_account_id
  * @property int $category_id
  * @property int $direction
  * @property int $amount_cent
@@ -75,27 +75,13 @@ class Record extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['category_id', 'direction', 'currency_code'], 'required'],
             [
                 [
                     'user_id',
-                    'account_id',
-                    'action_type',
+                    'from_account_id',
+                    'to_account_id',
                     'category_id',
-                    'direction',
-                    'amount_cent',
-                    'currency_amount_cent',
-                    'currency_code'
-                ],
-                'required'
-            ],
-            [
-                [
-                    'user_id',
-                    'account_id',
-                    'target_account_id',
-                    'action_type',
-                    'category_id',
-                    'direction',
                     'amount_cent',
                     'currency_amount_cent',
                     'transaction_status',
@@ -104,10 +90,12 @@ class Record extends \yii\db\ActiveRecord
                 ],
                 'integer'
             ],
+            ['direction', 'in', 'range' => DirectionType::names()],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
-            [['created_at', 'updated_at'], 'safe'],
+            [['date', 'created_at', 'updated_at'], 'safe'],
             [['currency_code'], 'string', 'max' => 3],
-            [['tags', 'description', 'remark', 'image'], 'string', 'max' => 255],
+            [['description', 'remark', 'image'], 'string', 'max' => 255],
+            ['tags', ArrayValidator::class],
         ];
     }
 
@@ -119,9 +107,8 @@ class Record extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'account_id' => Yii::t('app', 'Account ID'),
-            'target_account_id' => Yii::t('app', 'Target Account ID'),
-            'action_type' => Yii::t('app', 'Action Type'),
+            'from_account_id' => Yii::t('app', 'From Account ID'),
+            'to_account_id' => Yii::t('app', 'To Account ID'),
             'category_id' => Yii::t('app', 'Category ID'),
             'direction' => Yii::t('app', 'Direction'),
             'amount_cent' => Yii::t('app', 'Amount Cent'),
@@ -136,6 +123,7 @@ class Record extends \yii\db\ActiveRecord
             'transaction_status' => Yii::t('app', 'Transaction Status'),
             'reimbursement_status' => Yii::t('app', 'Reimbursement Status'),
             'rating' => Yii::t('app', 'Rating'),
+            'date' => Yii::t('app', 'Date'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -149,8 +137,18 @@ class Record extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->user_id = Yii::$app->user->id;
+            }
+            $this->tags = $this->tags ? implode(',', $this->tags) : null;
+            $this->direction = DirectionType::toEnumValue($this->direction);
             $this->amount_cent = Setup::toFen($this->amount);
-            $this->currency_amount_cent = Setup::toFen($this->currency_amount);
+            if ($this->currency_code == user('base_currency_code')) {
+                $this->currency_amount_cent = $this->amount_cent;
+            } else {
+                // todo 计算汇率
+            }
+            // $this->currency_amount_cent = Setup::toFen($this->currency_amount);
             return true;
         } else {
             return false;
@@ -175,10 +173,6 @@ class Record extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
         unset($fields['currency_amount_cent'], $fields['user_id'], $fields['amount_cent']);
-
-        $fields['account_name'] = function (self $model) {
-            return data_get($model->account, 'name');
-        };
 
         $fields['direction'] = function (self $model) {
             return data_get(DirectionType::names(), $model->direction);

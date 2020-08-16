@@ -2,7 +2,6 @@
 
 namespace app\modules\v1\controllers;
 
-use app\core\models\Account;
 use app\core\models\Record;
 use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
@@ -15,20 +14,20 @@ class RecordController extends ActiveController
 {
     use ServiceTrait;
 
-    public $modelClass = Account::class;
+    public $modelClass = Record::class;
     public $noAuthActions = [];
 
     public function actions()
     {
         $actions = parent::actions();
         // 注销系统自带的实现方法
-        unset($actions['update'], $actions['delete'], $actions['create']);
+        unset($actions['update'], $actions['delete']);
         return $actions;
     }
 
     /**
      * @return Record
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      */
     public function actionCreateByDescription()
     {

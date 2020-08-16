@@ -4,6 +4,9 @@ namespace app\core\types;
 
 class AccountType extends BaseType
 {
+    /** @var int General */
+    public const GENERAL = 0;
+
     /** @var int Cash */
     public const CASH = 1;
 
@@ -22,6 +25,7 @@ class AccountType extends BaseType
     public static function names(): array
     {
         return [
+            self::GENERAL => 'general',
             self::CASH => 'cash',
             self::DEBIT_CARD => 'debit_card',
             self::CREDIT_CARD => 'credit_card',

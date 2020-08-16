@@ -9,6 +9,7 @@ return [
     'Password' => '密码',
     'The JWT secret must be configured first.' => '必须先配置 JWT_SECRET',
 
+    'General Account' => '一般账户',
     'Base Currency Code' => '基础货币',
     'Food and drink' => '餐饮食品',
     'Home life' => '居家生活',

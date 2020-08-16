@@ -68,7 +68,13 @@ $config = [
                 "POST <module>/record/by-description" => '<module>/record/create-by-description',
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/account', 'v1/category', 'v1/rule']
+                    'controller' => [
+                        'v1/account',
+                        'v1/category',
+                        'v1/rule',
+                        'v1/tag',
+                        'v1/record',
+                    ]
                 ],
                 "GET health-check" => 'site/health-check',
                 '<module>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
