@@ -3,6 +3,8 @@
 namespace app\core\models;
 
 use app\core\types\DirectionType;
+use app\core\types\ReimbursementStatus;
+use app\core\types\TransactionStatus;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -85,17 +87,17 @@ class Record extends \yii\db\ActiveRecord
                     'category_id',
                     'amount_cent',
                     'currency_amount_cent',
-                    'transaction_status',
-                    'reimbursement_status',
                     'rating'
                 ],
                 'integer'
             ],
             [['description', 'remark'], 'trim'],
+            ['reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
+            ['transaction_status', 'in', 'range' => TransactionStatus::names()],
             ['direction', 'in', 'range' => DirectionType::names()],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
             [['amount', 'currency_amount'], 'compare', 'compareValue' => 0, 'operator' => '>'],
-            [['date', 'created_at', 'updated_at'], 'safe'],
+            [['date'], 'safe'],
             [['currency_code'], 'string', 'max' => 3],
             [['description', 'remark', 'image'], 'string', 'max' => 255],
             ['tags', ArrayValidator::class],
@@ -143,6 +145,11 @@ class Record extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
+            $this->reimbursement_status =
+                ReimbursementStatus::toEnumValue($this->reimbursement_status) ?: ReimbursementStatus::NONE;
+            $this->transaction_status =
+                TransactionStatus::toEnumValue($this->transaction_status) ?: TransactionStatus::DONE;
+
             $this->tags = $this->tags ? implode(',', $this->tags) : null;
             $this->direction = DirectionType::toEnumValue($this->direction);
             $this->amount_cent = Setup::toFen($this->amount);
@@ -193,6 +200,7 @@ class Record extends \yii\db\ActiveRecord
         $fields['direction'] = function (self $model) {
             return data_get(DirectionType::names(), $model->direction);
         };
+
         $fields['tags'] = function (self $model) {
             return $model->tags ? explode(',', $model->tags) : [];
         };
@@ -210,11 +218,11 @@ class Record extends \yii\db\ActiveRecord
         };
 
         $fields['reimbursement_status'] = function (self $model) {
-            return (bool)$model->reimbursement_status;
+            return ReimbursementStatus::getName($model->reimbursement_status);
         };
 
         $fields['transaction_status'] = function (self $model) {
-            return (bool)$model->transaction_status;
+            return TransactionStatus::getName($model->transaction_status);
         };
 
         $fields['created_at'] = function (self $model) {
