@@ -8,6 +8,7 @@ class DirectionType extends BaseType
     public const IN = 2;
     public const TRANSFER = 3;
     public const ADJUST = 4;
+    public const ANY = 9;
 
     public static function names(): array
     {
@@ -16,6 +17,7 @@ class DirectionType extends BaseType
             self::IN => 'in',
             self::TRANSFER => 'transfer',
             self::ADJUST => 'adjust',
+            self::ANY => 'any',
         ];
     }
 }

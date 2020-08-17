@@ -2,6 +2,6 @@
 
 namespace app\core\types;
 
-class UserStatus extends BaseStatus
+class RuleStatus extends BaseStatus
 {
 }

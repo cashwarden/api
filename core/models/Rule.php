@@ -4,6 +4,7 @@ namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
 use app\core\types\DirectionType;
+use app\core\types\RuleStatus;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -60,18 +61,25 @@ class Rule extends \yii\db\ActiveRecord
             [
                 [
                     'user_id',
-                    'if_direction',
                     'then_direction',
                     'then_category_id',
                     'then_account_id',
                     'then_transaction_status',
                     'then_reimbursement_status',
-                    'status'
                 ],
                 'integer'
             ],
+            ['status', 'in', 'range' => RuleStatus::names()],
+            [
+                'if_direction',
+                'in',
+                'range' => [
+                    DirectionType::getName(DirectionType::ANY),
+                    DirectionType::getName(DirectionType::IN),
+                    DirectionType::getName(DirectionType::OUT),
+                ]
+            ],
             [['if_keywords', 'then_tags'], ArrayValidator::class],
-            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -110,6 +118,7 @@ class Rule extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
+            $this->status = RuleStatus::toEnumValue($this->status);
             $this->if_direction = $this->if_direction ? DirectionType::toEnumValue($this->if_direction) : null;
             $this->then_direction = $this->then_direction ? DirectionType::toEnumValue($this->then_direction) : null;
             $this->if_keywords = $this->if_keywords ? implode(',', $this->if_keywords) : null;
@@ -129,11 +138,11 @@ class Rule extends \yii\db\ActiveRecord
         unset($fields['user_id']);
 
         $fields['if_direction'] = function (self $model) {
-            return data_get(DirectionType::names(), $model->if_direction);
+            return $model->if_direction ? DirectionType::getName($model->if_direction) : null;
         };
 
         $fields['then_direction'] = function (self $model) {
-            return data_get(DirectionType::names(), $model->then_direction);
+            return $model->then_direction ? DirectionType::getName($model->then_direction) : null;
         };
 
         $fields['then_tags'] = function (self $model) {
@@ -142,6 +151,10 @@ class Rule extends \yii\db\ActiveRecord
 
         $fields['if_keywords'] = function (self $model) {
             return explode(',', $model->if_keywords);
+        };
+
+        $fields['status'] = function (self $model) {
+            return RuleStatus::getName($model->status);
         };
 
         $fields['created_at'] = function (self $model) {
