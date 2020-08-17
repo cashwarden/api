@@ -145,10 +145,10 @@ class Record extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
-            $this->reimbursement_status =
-                ReimbursementStatus::toEnumValue($this->reimbursement_status) ?: ReimbursementStatus::NONE;
-            $this->transaction_status =
-                TransactionStatus::toEnumValue($this->transaction_status) ?: TransactionStatus::DONE;
+            $this->reimbursement_status = is_null($this->reimbursement_status) ?
+                ReimbursementStatus::NONE : ReimbursementStatus::toEnumValue($this->reimbursement_status);
+            $this->transaction_status = is_null($this->transaction_status) ?
+                TransactionStatus::DONE : TransactionStatus::toEnumValue($this->transaction_status);
 
             $this->tags = $this->tags ? implode(',', $this->tags) : null;
             $this->direction = DirectionType::toEnumValue($this->direction);
