@@ -3,6 +3,8 @@
 namespace app\core\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yiier\helpers\DateHelper;
 
 /**
  * This is the model class for table "{{%tag}}".
@@ -26,16 +28,30 @@ class Tag extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ],
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['user_id', 'color', 'name'], 'required'],
+            [['color', 'name'], 'required'],
             [['user_id', 'count'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['color'], 'string', 'max' => 7],
             [['name'], 'string', 'max' => 60],
+            [['user_id', 'name'], 'unique'],
         ];
     }
 
@@ -53,5 +69,40 @@ class Tag extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->user_id = Yii::$app->user->id;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['user_id']);
+
+        $fields['created_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->created_at);
+        };
+
+        $fields['updated_at'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->updated_at);
+        };
+
+        return $fields;
     }
 }
