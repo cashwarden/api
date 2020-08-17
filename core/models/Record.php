@@ -91,8 +91,10 @@ class Record extends \yii\db\ActiveRecord
                 ],
                 'integer'
             ],
+            [['description', 'remark'], 'trim'],
             ['direction', 'in', 'range' => DirectionType::names()],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
+            [['amount', 'currency_amount'], 'compare', 'compareValue' => 0, 'operator' => '>'],
             [['date', 'created_at', 'updated_at'], 'safe'],
             [['currency_code'], 'string', 'max' => 3],
             [['description', 'remark', 'image'], 'string', 'max' => 255],

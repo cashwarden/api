@@ -1,5 +1,6 @@
 <?php
 
+use app\core\components\ResponseHandler;
 use app\core\models\User;
 
 $common = require(__DIR__ . '/common.php');
@@ -29,7 +30,7 @@ $config = [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
                 yii::createObject([
-                    'class' => yiier\helpers\ResponseHandler::class,
+                    'class' => ResponseHandler::class,
                     'event' => $event,
                 ])->formatResponse();
             },
@@ -50,7 +51,7 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'class' => '\yii\web\ErrorHandler',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
