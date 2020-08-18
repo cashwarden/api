@@ -3,9 +3,7 @@
 namespace app\modules\v1\controllers;
 
 use app\core\models\Record;
-use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
-use Yii;
 
 /**
  * Record controller for the `v1` module
@@ -20,20 +18,7 @@ class RecordController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
+        unset($actions['create'], $actions['update'], $actions['delete']);
         return $actions;
-    }
-
-    /**
-     * @return Record
-     * @throws \Exception|\Throwable
-     */
-    public function actionCreateByDescription()
-    {
-        $params = Yii::$app->request->bodyParams;
-        $model = new RecordCreateByDescRequest();
-        /** @var RecordCreateByDescRequest $model */
-        $model = $this->validate($model, $params);
-
-        return $this->recordService->createByDesc($model);
     }
 }

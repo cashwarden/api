@@ -67,7 +67,7 @@ $config = [
             'rules' => [
                 "POST <module>/<alias:login|join>" => '<module>/user/<alias>',
                 "POST <module>/token/refresh" => '<module>/user/refresh-token',
-                "POST <module>/record/by-description" => '<module>/record/create-by-description',
+                "POST <module>/transactions/by-description" => '<module>/transaction/create-by-description',
                 "POST <module>/rules/<id:\d+>/copy" => '<module>/rule/copy',
                 "PUT <module>/rules/<id:\d+>/status" => '<module>/rule/update-status',
                 [
@@ -78,6 +78,7 @@ $config = [
                         'v1/rule',
                         'v1/tag',
                         'v1/record',
+                        'v1/transaction',
                     ]
                 ],
                 "GET health-check" => 'site/health-check',

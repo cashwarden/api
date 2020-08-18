@@ -4,6 +4,7 @@ namespace app\core\services;
 
 use app\core\exceptions\InternalException;
 use app\core\models\Record;
+use app\core\models\Transaction;
 use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
@@ -12,37 +13,65 @@ use Exception;
 use Yii;
 use yiier\helpers\Setup;
 
-class RecordService
+class TransactionService
 {
     use ServiceTrait;
 
+    public static function createRecord(Transaction $transaction)
+    {
+        $data = [];
+        if (in_array($transaction->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
+            array_push($data, ['direction' => DirectionType::OUT, 'account_id' => $transaction->from_account_id]);
+        }
+        if (in_array($transaction->type, [TransactionType::IN, TransactionType::TRANSFER])) {
+            array_push($data, ['direction' => DirectionType::IN, 'account_id' => $transaction->to_account_id]);
+        }
+        $model = new Record();
+        foreach ($data as $datum) {
+            $_model = clone $model;
+            $_model->user_id = $transaction->user_id;
+            $_model->transaction_id = $transaction->id;
+            $_model->amount_cent = $transaction->amount_cent;
+            $_model->date = $transaction->date;
+            $_model->load($datum, '');
+            if (!$_model->save()) {
+                throw new \yii\db\Exception(Setup::errorMessage($_model->firstErrors));
+            }
+        }
+        return true;
+    }
+
     /**
      * @param RecordCreateByDescRequest $request
-     * @return Record
+     * @return Transaction
      * @throws InternalException|\Throwable
      */
-    public function createByDesc(RecordCreateByDescRequest $request): Record
+    public function createByDesc(RecordCreateByDescRequest $request): Transaction
     {
-        $model = new Record();
+        $model = new Transaction();
         try {
             $model->description = $request->description;
             $model->user_id = Yii::$app->user->id;
             $rules = $this->getRuleService()->getRulesByDesc($model->description);
-            $model->transaction_type = $this->getDataByDesc(
+            $model->type = $this->getDataByDesc(
                 $rules,
                 'then_transaction_type',
                 function () {
                     return TransactionType::getName(TransactionType::OUT);
                 }
             );
+            $transactionType = TransactionType::toEnumValue($model->type);
 
-            $model->account_id = $this->getDataByDesc(
-                $rules,
-                'then_from_account_id',
-                [$this, 'getAccountIdByDesc']
-            );
+            if (in_array($transactionType, [TransactionType::OUT, TransactionType::TRANSFER])) {
+                $model->from_account_id = $this->getDataByDesc(
+                    $rules,
+                    'then_from_account_id',
+                    [$this, 'getAccountIdByDesc']
+                );
+            }
 
-            if (TransactionType::toEnumValue($model->transaction_type) == DirectionType::TRANSFER) {
+
+            if (in_array($transactionType, [TransactionType::IN, TransactionType::TRANSFER])) {
                 $model->to_account_id = $this->getDataByDesc(
                     $rules,
                     'then_to_account_id',
@@ -60,7 +89,7 @@ class RecordService
             );
 
             $model->tags = $this->getDataByDesc($rules, 'then_tags');
-            $model->transaction_status = $this->getDataByDesc($rules, 'then_transaction_status');
+            $model->status = $this->getDataByDesc($rules, 'then_transaction_status');
             $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
 
             $model->amount = $this->getAmountByDesc($model->description);
@@ -69,6 +98,7 @@ class RecordService
             if (!$model->save(false)) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
             }
+            return $model;
         } catch (Exception $e) {
             Yii::error(
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors, (string)$e],
@@ -76,7 +106,6 @@ class RecordService
             );
             throw new InternalException($e->getMessage());
         }
-        return Record::findOne($model->id);
     }
 
     /**

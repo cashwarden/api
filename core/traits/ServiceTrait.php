@@ -10,8 +10,8 @@ namespace app\core\traits;
 
 use app\core\services\AccountService;
 use app\core\services\CategoryService;
-use app\core\services\RecordService;
 use app\core\services\RuleService;
+use app\core\services\TransactionService;
 use app\core\services\UserService;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -20,7 +20,7 @@ use yii\base\InvalidConfigException;
  * Trait ServiceTrait
  * @property UserService $userService
  * @property AccountService $accountService
- * @property RecordService $recordService
+ * @property TransactionService $transactionService
  * @property CategoryService $categoryService
  * @property RuleService $ruleService
  */
@@ -52,14 +52,14 @@ trait ServiceTrait
     }
 
     /**
-     * @return RecordService|object
+     * @return TransactionService|object
      */
-    public function getRecordService()
+    public function getTransactionService()
     {
         try {
-            return Yii::createObject(RecordService::class);
+            return Yii::createObject(TransactionService::class);
         } catch (InvalidConfigException $e) {
-            return new RecordService();
+            return new TransactionService();
         }
     }
 
