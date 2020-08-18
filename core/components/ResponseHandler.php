@@ -46,7 +46,6 @@ class ResponseHandler
         switch ($response->statusCode) {
             case 404:
                 $response->data['code'] = 404;
-                $response->data['message'] = null;
                 break;
             case 204:
                 if (\Yii::$app->request->isDelete) {
