@@ -113,6 +113,21 @@ class Rule extends \yii\db\ActiveRecord
     }
 
     /**
+     * @throws InvalidArgumentException
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+//        is_null($this->if_direction) ?: $this->if_direction = DirectionType::getName($this->if_direction);
+//        is_null($this->then_direction) ?: $this->then_direction = DirectionType::getName($this->then_direction);
+//        is_null($this->status) ?: $this->status = RuleStatus::getName($this->status);
+//        is_null($this->then_transaction_status) ?:
+//            $this->then_transaction_status = TransactionStatus::getName($this->then_transaction_status);
+//        is_null($this->then_reimbursement_status) ?:
+//            $this->then_reimbursement_status = ReimbursementStatus::getName($this->then_reimbursement_status);
+    }
+
+    /**
      * @param bool $insert
      * @return bool
      * @throws InvalidArgumentException

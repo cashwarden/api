@@ -11,6 +11,7 @@ namespace app\core\traits;
 use app\core\services\AccountService;
 use app\core\services\CategoryService;
 use app\core\services\RecordService;
+use app\core\services\RuleService;
 use app\core\services\UserService;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -21,6 +22,7 @@ use yii\base\InvalidConfigException;
  * @property AccountService $accountService
  * @property RecordService $recordService
  * @property CategoryService $categoryService
+ * @property RuleService $ruleService
  */
 trait ServiceTrait
 {
@@ -70,6 +72,18 @@ trait ServiceTrait
             return Yii::createObject(CategoryService::class);
         } catch (InvalidConfigException $e) {
             return new CategoryService();
+        }
+    }
+
+    /**
+     * @return RuleService|object
+     */
+    public function getRuleService()
+    {
+        try {
+            return Yii::createObject(RuleService::class);
+        } catch (InvalidConfigException $e) {
+            return new RuleService();
         }
     }
 }
