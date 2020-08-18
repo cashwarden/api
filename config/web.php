@@ -69,6 +69,7 @@ $config = [
                 "POST <module>/token/refresh" => '<module>/user/refresh-token',
                 "POST <module>/record/by-description" => '<module>/record/create-by-description',
                 "POST <module>/rules/<id:\d+>/copy" => '<module>/rule/copy',
+                "PUT <module>/rules/<id:\d+>/status" => '<module>/rule/update-status',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [
