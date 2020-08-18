@@ -2,9 +2,11 @@
 
 namespace app\core\models;
 
+use app\core\services\RecordService;
 use app\core\types\DirectionType;
 use app\core\types\ReimbursementStatus;
 use app\core\types\TransactionStatus;
+use app\core\types\TransactionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -17,10 +19,10 @@ use yiier\validators\MoneyValidator;
  *
  * @property int $id
  * @property int $user_id
- * @property int|null $from_account_id
- * @property int|null $to_account_id
+ * @property int $account_id
  * @property int $category_id
  * @property int $direction
+ * @property string $transaction_type
  * @property int $amount_cent
  * @property int $currency_amount_cent
  * @property string $currency_code
@@ -31,12 +33,12 @@ use yiier\validators\MoneyValidator;
  * @property int|null $transaction_status
  * @property int|null $reimbursement_status
  * @property int|null $rating
+ * @property string $date
  * @property string|null $created_at
  * @property string|null $updated_at
  *
  * @property-read Category $category
- * @property-read Account $fromAccount
- * @property-read Account $toAccount
+ * @property-read Account $account
  */
 class Record extends \yii\db\ActiveRecord
 {
@@ -49,6 +51,18 @@ class Record extends \yii\db\ActiveRecord
      * @var integer
      */
     public $currency_amount;
+    /**
+     * @var mixed|null
+     */
+    public $to_account_id;
+
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -78,12 +92,10 @@ class Record extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'direction', 'currency_code'], 'required'],
+            [['category_id', 'transaction_type', 'currency_code', 'account_id'], 'required'],
             [
                 [
                     'user_id',
-                    'from_account_id',
-                    'to_account_id',
                     'category_id',
                     'amount_cent',
                     'currency_amount_cent',
@@ -92,6 +104,7 @@ class Record extends \yii\db\ActiveRecord
                 'integer'
             ],
             [['description', 'remark'], 'trim'],
+            ['transaction_type', 'in', 'range' => TransactionType::names()],
             ['reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
             ['transaction_status', 'in', 'range' => TransactionStatus::names()],
             ['direction', 'in', 'range' => DirectionType::names()],
@@ -112,10 +125,10 @@ class Record extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'from_account_id' => Yii::t('app', 'From Account ID'),
-            'to_account_id' => Yii::t('app', 'To Account ID'),
+            'account_id' => Yii::t('app', 'Account ID'),
             'category_id' => Yii::t('app', 'Category ID'),
             'direction' => Yii::t('app', 'Direction'),
+            'transaction_type' => Yii::t('app', 'Transaction Type'),
             'amount_cent' => Yii::t('app', 'Amount Cent'),
             'amount' => Yii::t('app', 'Amount'),
             'currency_amount_cent' => Yii::t('app', 'Currency Amount Cent'),
@@ -138,6 +151,8 @@ class Record extends \yii\db\ActiveRecord
     /**
      * @param bool $insert
      * @return bool
+     * @throws \Throwable
+     * @throws \app\core\exceptions\InvalidArgumentException
      */
     public function beforeSave($insert)
     {
@@ -151,7 +166,12 @@ class Record extends \yii\db\ActiveRecord
                 TransactionStatus::DONE : TransactionStatus::toEnumValue($this->transaction_status);
 
             $this->tags = $this->tags ? implode(',', $this->tags) : null;
-            $this->direction = DirectionType::toEnumValue($this->direction);
+            $this->transaction_type = TransactionType::toEnumValue($this->transaction_type);
+
+            $this->direction = is_null($this->direction) ?
+                $this->transaction_type : DirectionType::toEnumValue($this->direction);
+
+
             $this->amount_cent = Setup::toFen($this->amount);
             if ($this->currency_code == user('base_currency_code')) {
                 $this->currency_amount_cent = $this->amount_cent;
@@ -166,19 +186,44 @@ class Record extends \yii\db\ActiveRecord
     }
 
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     * @throws \app\core\exceptions\InternalException
+     * @throws \yii\db\Exception
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if ($this->transaction_type == TransactionType::TRANSFER && $this->direction == DirectionType::OUT) {
+            RecordService::transferInto($this, $this->to_account_id);
+        }
+    }
+
+
+    public static function getDefaultDirection(int $transactionType): int
+    {
+        if ($transactionType == TransactionType::IN) {
+            return DirectionType::IN;
+        }
+        if (in_array($transactionType, [TransactionType::OUT, TransactionType::TRANSFER])) {
+            return DirectionType::OUT;
+        }
+        if ($transactionType == TransactionType::ADJUST) {
+            // 调整余额
+            return DirectionType::OUT;
+        }
+    }
+
+
     public function getCategory()
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
-    public function getFromAccount()
+    public function getAccount()
     {
-        return $this->hasOne(Account::class, ['id' => 'from_account_id']);
-    }
-
-    public function getToAccount()
-    {
-        return $this->hasOne(Account::class, ['id' => 'to_account_id']);
+        return $this->hasOne(Account::class, ['id' => 'account_id']);
     }
 
     /**
@@ -197,6 +242,10 @@ class Record extends \yii\db\ActiveRecord
             return Setup::toYuan($model->amount_cent);
         };
 
+        $fields['transaction_type'] = function (self $model) {
+            return TransactionType::getName($model->transaction_type);
+        };
+
         $fields['direction'] = function (self $model) {
             return data_get(DirectionType::names(), $model->direction);
         };
@@ -209,12 +258,8 @@ class Record extends \yii\db\ActiveRecord
             return $model->category;
         };
 
-        $fields['from_account'] = function (self $model) {
-            return $model->fromAccount;
-        };
-
-        $fields['to_account'] = function (self $model) {
-            return $model->toAccount;
+        $fields['account'] = function (self $model) {
+            return $model->account;
         };
 
         $fields['reimbursement_status'] = function (self $model) {

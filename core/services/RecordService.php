@@ -7,6 +7,7 @@ use app\core\models\Record;
 use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
+use app\core\types\TransactionType;
 use Exception;
 use Yii;
 use yiier\helpers\Setup;
@@ -27,22 +28,21 @@ class RecordService
             $model->description = $request->description;
             $model->user_id = Yii::$app->user->id;
             $rules = $this->getRuleService()->getRulesByDesc($model->description);
-            $model->direction = $this->getDataByDesc(
+            $model->transaction_type = $this->getDataByDesc(
                 $rules,
-                'then_direction',
+                'then_transaction_type',
                 function () {
-                    return DirectionType::getName(DirectionType::OUT);
+                    return TransactionType::getName(TransactionType::OUT);
                 }
             );
-            $direction = DirectionType::toEnumValue($model->direction);
-            if (in_array($direction, [DirectionType::OUT, DirectionType::TRANSFER])) {
-                $model->from_account_id = $this->getDataByDesc(
-                    $rules,
-                    'then_from_account_id',
-                    [$this, 'getAccountIdByDesc']
-                );
-            }
-            if (in_array($direction, [DirectionType::IN, DirectionType::TRANSFER])) {
+
+            $model->account_id = $this->getDataByDesc(
+                $rules,
+                'then_from_account_id',
+                [$this, 'getAccountIdByDesc']
+            );
+
+            if (TransactionType::toEnumValue($model->transaction_type) == DirectionType::TRANSFER) {
                 $model->to_account_id = $this->getDataByDesc(
                     $rules,
                     'then_to_account_id',
@@ -53,8 +53,9 @@ class RecordService
             $model->category_id = $this->getDataByDesc(
                 $rules,
                 'then_category_id',
-                function () use ($direction) {
-                    return (int)data_get(CategoryService::getDefaultCategory($direction), 'id', 0);
+                function () {
+                    //  todo 根据交易类型查找默认分类
+                    return (int)data_get(CategoryService::getDefaultCategory(), 'id', 0);
                 }
             );
 
@@ -77,6 +78,30 @@ class RecordService
         }
         return Record::findOne($model->id);
     }
+
+    /**
+     * @param Record $record
+     * @param int $accountId
+     * @return Record
+     * @throws InternalException
+     * @throws \yii\db\Exception|\app\core\exceptions\InvalidArgumentException
+     */
+    public static function transferInto(Record $record, int $accountId): Record
+    {
+        if ($record->transaction_type != TransactionType::TRANSFER) {
+            throw new InternalException();
+        }
+        $model = new Record();
+        $values = $record->toArray();
+        $model->load($values, '');
+        $model->direction = DirectionType::getName(DirectionType::IN);
+        $model->account_id = $accountId;
+        if (!$model->save(false)) {
+            throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
+        }
+        return $model;
+    }
+
 
     /**
      * @param string $desc
