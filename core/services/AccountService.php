@@ -45,8 +45,9 @@ class AccountService
             ->one();
     }
 
-    public static function getDefaultAccount(int $userId)
+    public static function getDefaultAccount(int $userId = 0)
     {
+        $userId = $userId ?: Yii::$app->user->id;
         return Account::find()
             ->where(['user_id' => $userId, 'default' => Account::DEFAULT])
             ->orderBy(['id' => SORT_ASC])

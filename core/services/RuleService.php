@@ -2,7 +2,9 @@
 
 namespace app\core\services;
 
+use app\core\helpers\ArrayHelper;
 use app\core\models\Rule;
+use app\core\types\RuleStatus;
 use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 use yiier\helpers\Setup;
@@ -44,6 +46,28 @@ class RuleService
             throw new Exception(Setup::errorMessage($model->firstErrors));
         }
         return $model;
+    }
+
+
+    /**
+     * @param string $desc
+     * @return Rule[]
+     */
+    public function getRulesByDesc(string $desc)
+    {
+        $models = Rule::find()
+            ->where(['user_id' => \Yii::$app->user->id, 'status' => RuleStatus::ACTIVE])
+            ->orderBy(['id' => SORT_DESC])
+            ->all();
+        $rules = [];
+        /** @var Rule $model */
+        foreach ($models as $model) {
+//            dump(ArrayHelper::strPosArr($desc, $model->if_keywords));
+            if (ArrayHelper::strPosArr($desc, $model->if_keywords) !== false) {
+                array_push($rules, $model);
+            }
+        }
+        return $rules;
     }
 
     /**

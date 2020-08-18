@@ -5,6 +5,7 @@ namespace app\core\services;
 use app\core\exceptions\InternalException;
 use app\core\models\Record;
 use app\core\requests\RecordCreateByDescRequest;
+use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use Exception;
 use Yii;
@@ -12,6 +13,8 @@ use yiier\helpers\Setup;
 
 class RecordService
 {
+    use ServiceTrait;
+
     /**
      * @param RecordCreateByDescRequest $request
      * @return Record
@@ -23,9 +26,42 @@ class RecordService
         try {
             $model->description = $request->description;
             $model->user_id = Yii::$app->user->id;
-            $model->from_account_id = $this->getAccountIdByDesc($model->description);
-            $model->category_id = $this->getCategoryIdByDesc($model->description);
-            $model->direction = $this->getDirectionByDesc($model->description);
+            $rules = $this->getRuleService()->getRulesByDesc($model->description);
+            $model->direction = $this->getDataByDesc(
+                $rules,
+                'then_direction',
+                function () {
+                    return DirectionType::getName(DirectionType::OUT);
+                }
+            );
+            $direction = DirectionType::toEnumValue($model->direction);
+            if (in_array($direction, [DirectionType::OUT, DirectionType::TRANSFER])) {
+                $model->from_account_id = $this->getDataByDesc(
+                    $rules,
+                    'then_from_account_id',
+                    [$this, 'getAccountIdByDesc']
+                );
+            }
+            if (in_array($direction, [DirectionType::IN, DirectionType::TRANSFER])) {
+                $model->to_account_id = $this->getDataByDesc(
+                    $rules,
+                    'then_to_account_id',
+                    [$this, 'getAccountIdByDesc']
+                );
+            }
+
+            $model->category_id = $this->getDataByDesc(
+                $rules,
+                'then_category_id',
+                function () use ($direction) {
+                    return (int)data_get(CategoryService::getDefaultCategory($direction), 'id', 0);
+                }
+            );
+
+            $model->tags = $this->getDataByDesc($rules, 'then_tags');
+            $model->transaction_status = $this->getDataByDesc($rules, 'then_transaction_status');
+            $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
+
             $model->amount = $this->getAmountByDesc($model->description);
             $model->currency_amount = $model->amount;
             $model->currency_code = user('base_currency_code');
@@ -40,11 +76,6 @@ class RecordService
             throw new InternalException($e->getMessage());
         }
         return Record::findOne($model->id);
-    }
-
-    public function getDirectionByDesc(string $desc): string
-    {
-        return data_get(DirectionType::names(), DirectionType::OUT);
     }
 
     /**
@@ -63,24 +94,29 @@ class RecordService
     }
 
     /**
-     * @param string $desc
-     * @return mixed|null
+     * @param array $rules
+     * @param string $field
+     * @param \Closure|array|null $callback
+     * @return null|int|string
      * @throws Exception
      */
-    public function getAccountIdByDesc(string $desc)
+    public function getDataByDesc(array $rules, string $field, $callback = null)
     {
-        $userId = Yii::$app->user->id;
-        return data_get(AccountService::getDefaultAccount($userId), 'id');
+        foreach ($rules as $rule) {
+            if ($data = data_get($rule->toArray(), $field)) {
+                return $data;
+            }
+        }
+        return $callback ? call_user_func($callback) : null;
     }
 
     /**
-     * @param string $desc
-     * @return mixed|null
+     * @return int
      * @throws Exception
      */
-    public function getCategoryIdByDesc(string $desc)
+    public function getAccountIdByDesc(): int
     {
         $userId = Yii::$app->user->id;
-        return data_get(CategoryService::getDefaultCategory($userId), 'id');
+        return (int)data_get(AccountService::getDefaultAccount($userId), 'id', 0);
     }
 }
