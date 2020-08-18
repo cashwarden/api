@@ -4,7 +4,9 @@ namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
 use app\core\types\DirectionType;
+use app\core\types\ReimbursementStatus;
 use app\core\types\RuleStatus;
+use app\core\types\TransactionStatus;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -20,7 +22,7 @@ use yiier\validators\ArrayValidator;
  * @property int|null $if_direction 0:any
  * @property int|null $then_direction
  * @property int|null $then_category_id
- * @property int|null $then_account_id
+ * @property int|null $then_from_account_id
  * @property int|null $then_transaction_status
  * @property int|null $then_reimbursement_status
  * @property string|null|array $then_tags Multiple choice use,
@@ -53,22 +55,13 @@ class Rule extends \yii\db\ActiveRecord
 
     /**
      * {@inheritdoc}
+     * @throws InvalidArgumentException
      */
     public function rules()
     {
         return [
             [['name', 'if_keywords'], 'required'],
-            [
-                [
-                    'user_id',
-                    'then_direction',
-                    'then_category_id',
-                    'then_account_id',
-                    'then_transaction_status',
-                    'then_reimbursement_status',
-                ],
-                'integer'
-            ],
+            [['user_id', 'then_category_id', 'then_from_account_id', 'then_to_account_id'], 'integer'],
             ['status', 'in', 'range' => RuleStatus::names()],
             [
                 'if_direction',
@@ -76,9 +69,21 @@ class Rule extends \yii\db\ActiveRecord
                 'range' => [
                     DirectionType::getName(DirectionType::ANY),
                     DirectionType::getName(DirectionType::IN),
+                    DirectionType::getName(DirectionType::TRANSFER),
                     DirectionType::getName(DirectionType::OUT),
                 ]
             ],
+            [
+                'then_direction',
+                'in',
+                'range' => [
+                    DirectionType::getName(DirectionType::IN),
+                    DirectionType::getName(DirectionType::TRANSFER),
+                    DirectionType::getName(DirectionType::OUT),
+                ]
+            ],
+            ['then_reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
+            ['then_transaction_status', 'in', 'range' => TransactionStatus::names()],
             [['if_keywords', 'then_tags'], ArrayValidator::class],
             [['name'], 'string', 'max' => 255],
         ];
@@ -97,7 +102,7 @@ class Rule extends \yii\db\ActiveRecord
             'if_direction' => Yii::t('app', 'If Direction'),
             'then_direction' => Yii::t('app', 'Then Direction'),
             'then_category_id' => Yii::t('app', 'Then Category ID'),
-            'then_account_id' => Yii::t('app', 'Then Account ID'),
+            'then_from_account_id' => Yii::t('app', 'Then From Account ID'),
             'then_transaction_status' => Yii::t('app', 'Then Transaction Status'),
             'then_reimbursement_status' => Yii::t('app', 'Then Reimbursement Status'),
             'then_tags' => Yii::t('app', 'Then Tags'),
@@ -118,7 +123,12 @@ class Rule extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
-            $this->status = RuleStatus::toEnumValue($this->status);
+            $this->then_reimbursement_status = is_null($this->then_reimbursement_status) ?
+                ReimbursementStatus::NONE : ReimbursementStatus::toEnumValue($this->then_reimbursement_status);
+            $this->then_transaction_status = is_null($this->then_transaction_status) ?
+                TransactionStatus::DONE : TransactionStatus::toEnumValue($this->then_transaction_status);
+
+            $this->status = is_null($this->status) ? RuleStatus::ACTIVE : RuleStatus::toEnumValue($this->status);
             $this->if_direction = $this->if_direction ? DirectionType::toEnumValue($this->if_direction) : null;
             $this->then_direction = $this->then_direction ? DirectionType::toEnumValue($this->then_direction) : null;
             $this->if_keywords = $this->if_keywords ? implode(',', $this->if_keywords) : null;
@@ -155,6 +165,13 @@ class Rule extends \yii\db\ActiveRecord
 
         $fields['status'] = function (self $model) {
             return RuleStatus::getName($model->status);
+        };
+        $fields['then_reimbursement_status'] = function (self $model) {
+            return ReimbursementStatus::getName($model->then_reimbursement_status);
+        };
+
+        $fields['then_transaction_status'] = function (self $model) {
+            return TransactionStatus::getName($model->then_transaction_status);
         };
 
         $fields['created_at'] = function (self $model) {
