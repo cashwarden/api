@@ -17,7 +17,12 @@ class TransactionService
 {
     use ServiceTrait;
 
-    public static function createRecord(Transaction $transaction)
+    /**
+     * @param Transaction $transaction
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    public static function createUpdateRecord(Transaction $transaction)
     {
         $data = [];
         if (in_array($transaction->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
@@ -28,10 +33,16 @@ class TransactionService
         }
         $model = new Record();
         foreach ($data as $datum) {
-            $_model = clone $model;
+            $conditions = ['transaction_id' => $transaction->id, 'direction' => $datum['direction']];
+            if (!$_model = Record::find()->where($conditions)->one()) {
+                $_model = clone $model;
+            }
             $_model->user_id = $transaction->user_id;
             $_model->transaction_id = $transaction->id;
+            $_model->category_id = $transaction->category_id;
             $_model->amount_cent = $transaction->amount_cent;
+            $_model->currency_amount_cent = $transaction->currency_amount_cent;
+            $_model->currency_code = $transaction->currency_code;
             $_model->date = $transaction->date;
             $_model->load($datum, '');
             if (!$_model->save()) {
@@ -40,6 +51,24 @@ class TransactionService
         }
         return true;
     }
+
+    /**
+     * @param Transaction $transaction
+     * @param array $changedAttributes
+     * @throws Exception|\Throwable
+     */
+    public static function deleteRecord(Transaction $transaction, array $changedAttributes)
+    {
+        $type = $transaction->type;
+        if (data_get($changedAttributes, 'type') !== $type && $type !== TransactionType::TRANSFER) {
+            $direction = $type == TransactionType::IN ? DirectionType::OUT : DirectionType::IN;
+            Record::find()->where([
+                'transaction_id' => $transaction->id,
+                'direction' => $direction
+            ])->one()->delete();
+        }
+    }
+
 
     /**
      * @param RecordCreateByDescRequest $request

@@ -3,7 +3,6 @@
 namespace app\core\models;
 
 use app\core\services\TransactionService;
-use app\core\types\DirectionType;
 use app\core\types\ReimbursementStatus;
 use app\core\types\TransactionStatus;
 use app\core\types\TransactionType;
@@ -209,31 +208,16 @@ class Transaction extends \yii\db\ActiveRecord
     /**
      * @param bool $insert
      * @param array $changedAttributes
-     * @throws \yii\db\Exception
+     * @throws \yii\db\Exception|\Throwable
      */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        if ($insert) {
-            TransactionService::createRecord($this);
+        TransactionService::createUpdateRecord($this);
+        if (!$insert) {
+            TransactionService::deleteRecord($this, $changedAttributes);
         }
     }
-
-
-    public static function getDefaultDirection(int $transactionType): int
-    {
-        if ($transactionType == TransactionType::IN) {
-            return DirectionType::IN;
-        }
-        if (in_array($transactionType, [TransactionType::OUT, TransactionType::TRANSFER])) {
-            return DirectionType::OUT;
-        }
-        if ($transactionType == TransactionType::ADJUST) {
-            // 调整余额
-            return DirectionType::OUT;
-        }
-    }
-
 
     public function getCategory()
     {
@@ -272,18 +256,6 @@ class Transaction extends \yii\db\ActiveRecord
 
         $fields['tags'] = function (self $model) {
             return $model->tags ? explode(',', $model->tags) : [];
-        };
-
-        $fields['category'] = function (self $model) {
-            return $model->category;
-        };
-
-        $fields['from_account'] = function (self $model) {
-            return $model->fromAccount;
-        };
-
-        $fields['to_account'] = function (self $model) {
-            return $model->toAccount;
         };
 
         $fields['reimbursement_status'] = function (self $model) {
