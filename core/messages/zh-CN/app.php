@@ -10,6 +10,13 @@ return [
     'The JWT secret must be configured first.' => '必须先配置 JWT_SECRET',
 
     'General Account' => '一般账户',
+    'Cash Account' => '现金账户',
+    'Debit Card' => '借记卡',
+    'Credit Card' => '信用卡',
+    'Saving Account' => '储蓄账户',
+    'Investment Account' => '投资账户',
+    # 'Cash' => '',
+
     'Base Currency Code' => '基础货币',
     'Food and drink' => '餐饮食品',
     'Home life' => '居家生活',

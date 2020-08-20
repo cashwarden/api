@@ -8,7 +8,6 @@ use app\core\traits\ServiceTrait;
 use app\core\types\AccountType;
 use Yii;
 use yii\web\NotFoundHttpException;
-use yiier\helpers\SearchModel;
 
 /**
  * Account controller for the `v1` module
@@ -24,7 +23,7 @@ class AccountController extends ActiveController
     {
         $actions = parent::actions();
         // 注销系统自带的实现方法
-        unset($actions['update'], $actions['delete'], $actions['create']);
+        unset($actions['update'], $actions['create']);
         return $actions;
     }
 
@@ -66,5 +65,20 @@ class AccountController extends ActiveController
         $model = $this->validate($model, $params);
 
         return $this->accountService->createUpdate($model);
+    }
+
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function actionTypes()
+    {
+        $items = [];
+        $texts = AccountType::texts();
+        foreach (AccountType::names() as $key => $name) {
+            $items[] = ['type' => $name, 'name' => data_get($texts, $key)];
+        }
+        return $items;
     }
 }

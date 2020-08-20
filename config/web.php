@@ -70,6 +70,7 @@ $config = [
                 "POST <module>/transactions/by-description" => '<module>/transaction/create-by-description',
                 "POST <module>/rules/<id:\d+>/copy" => '<module>/rule/copy',
                 "PUT <module>/rules/<id:\d+>/status" => '<module>/rule/update-status',
+                "GET <module>/accounts/types" => '<module>/account/types',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [

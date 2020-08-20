@@ -159,12 +159,8 @@ class Account extends \yii\db\ActiveRecord
             return AccountType::getName($model->type);
         };
 
-        $fields['type_text'] = function (self $model) {
+        $fields['type_name'] = function (self $model) {
             return data_get(AccountType::texts(), $model->type);
-        };
-
-        $fields['icon'] = function (self $model) {
-            return data_get(AccountType::iconUrls(), $model->type);
         };
 
         $fields['balance'] = function (self $model) {

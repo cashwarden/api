@@ -94,14 +94,15 @@ class UserService
     /**
      * @param User $user
      * @throws DBException
+     * @throws \app\core\exceptions\InvalidArgumentException
      */
     public function createUserAfterInitData(User $user)
     {
         try {
             $account = new Account();
             $account->setAttributes([
-                'name' => t('app', 'General Account'),
-                'type' => AccountType::getName(AccountType::GENERAL),
+                'name' => Yii::t('app', 'General Account'),
+                'type' => AccountType::getName(AccountType::GENERAL_ACCOUNT),
                 'user_id' => $user->id,
                 'balance' => 0,
                 'default' => Account::DEFAULT,
@@ -112,93 +113,93 @@ class UserService
             }
             $items = [
                 [
-                    'name' => t('app', 'Food and drink'),
+                    'name' => Yii::t('app', 'Food and drink'),
                     'color' => ColorType::RED,
-                    'icon_name' => 'utensils',
+                    'icon_name' => 'food',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Home life'),
+                    'name' => Yii::t('app', 'Home life'),
                     'color' => ColorType::ORANGE,
                     'icon_name' => 'home',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Traffic'),
+                    'name' => Yii::t('app', 'Traffic'),
                     'color' => ColorType::BLUE,
-                    'icon_name' => 'car',
+                    'icon_name' => 'bus',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Recreation'),
+                    'name' => Yii::t('app', 'Recreation'),
                     'color' => ColorType::VOLCANO,
-                    'icon_name' => 'gamepad',
+                    'icon_name' => 'game',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Health care'),
+                    'name' => Yii::t('app', 'Health care'),
                     'color' => ColorType::GREEN,
-                    'icon_name' => 'briefcase-medical',
+                    'icon_name' => 'medicine-chest',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Clothes'),
+                    'name' => Yii::t('app', 'Clothes'),
                     'color' => ColorType::PURPLE,
-                    'icon_name' => 'tshirt',
+                    'icon_name' => 'clothes',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Cultural education'),
+                    'name' => Yii::t('app', 'Cultural education'),
                     'color' => ColorType::CYAN,
-                    'icon_name' => 'book',
+                    'icon_name' => 'education',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Investment expenditure'),
+                    'name' => Yii::t('app', 'Investment expenditure'),
                     'color' => ColorType::GOLD,
-                    'icon_name' => 'seedling',
+                    'icon_name' => 'investment',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Childcare'),
+                    'name' => Yii::t('app', 'Childcare'),
                     'color' => ColorType::LIME,
                     'icon_name' => 'baby',
                     'direction' => DirectionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Other expenses'),
+                    'name' => Yii::t('app', 'Other expenses'),
                     'color' => ColorType::GEEK_BLUE,
-                    'icon_name' => 'wallet',
+                    'icon_name' => 'expenses',
                     'direction' => DirectionType::OUT,
                     'default' => Account::DEFAULT,
                 ],
                 [
-                    'name' => t('app', 'Work income'),
+                    'name' => Yii::t('app', 'Work income'),
                     'color' => ColorType::BLUE,
-                    'icon_name' => 'file-invoice-dollar',
+                    'icon_name' => 'work',
                     'direction' => DirectionType::IN,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Investment income'),
+                    'name' => Yii::t('app', 'Investment income'),
                     'color' => ColorType::GOLD,
-                    'icon_name' => 'chart-line',
+                    'icon_name' => 'investment',
                     'direction' => DirectionType::IN,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
-                    'name' => t('app', 'Other income'),
+                    'name' => Yii::t('app', 'Other income'),
                     'color' => ColorType::MAGENTA,
-                    'icon_name' => 'piggy-bank',
+                    'icon_name' => 'income',
                     'direction' => DirectionType::IN,
                     'default' => Category::DEFAULT,
                 ],
