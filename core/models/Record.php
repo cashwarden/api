@@ -124,6 +124,20 @@ class Record extends ActiveRecord
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
+
+    /**
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        if ($this->transaction_id) {
+            Transaction::find()->where(['id' => $this->transaction_id])->one()->delete();
+            Record::deleteAll(['transaction_id' => $this->transaction_id]);
+        }
+    }
+
     /**
      * @return array
      */

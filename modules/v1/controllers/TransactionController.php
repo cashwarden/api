@@ -20,7 +20,7 @@ class TransactionController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
-        unset($actions['index']);
+        unset($actions['index'], $actions['delete']);
         return $actions;
     }
 

@@ -18,7 +18,7 @@ class RecordController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
-        unset($actions['create'], $actions['update'], $actions['delete']);
+        unset($actions['create'], $actions['update']);
         return $actions;
     }
 }
