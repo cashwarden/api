@@ -123,8 +123,7 @@ class TransactionService
             $model->status = $this->getDataByDesc($rules, 'then_transaction_status');
             $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
 
-            $model->amount = $this->getAmountByDesc($model->description);
-            $model->currency_amount = $model->amount;
+            $model->currency_amount = $this->getAmountByDesc($model->description);
             $model->currency_code = user('base_currency_code');
             if (!$model->save(false)) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
@@ -174,9 +173,10 @@ class TransactionService
      * @return mixed|null
      * @throws Exception
      */
-    public function getAmountByDesc(string $desc): int
+    public function getAmountByDesc(string $desc): float
     {
-        preg_match_all('!\d+!', $desc, $matches);
+        // todo 支持简单的算数
+        preg_match_all('!([0-9]+(?:\.[0-9]{1,2})?)!', $desc, $matches);
 
         if (count($matches[0])) {
             return array_pop($matches[0]);
