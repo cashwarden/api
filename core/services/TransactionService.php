@@ -10,7 +10,6 @@ use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
-use app\models\BalanceRecord;
 use Exception;
 use Yii;
 use yiier\helpers\Setup;
@@ -62,7 +61,7 @@ class TransactionService
     public static function deleteRecord(Transaction $transaction, array $changedAttributes)
     {
         $type = $transaction->type;
-        if (data_get($changedAttributes, 'type') !== $type && $type !== TransactionType::TRANSFER) {
+        if (data_get($changedAttributes, 'type') && $transaction->type !== TransactionType::TRANSFER) {
             $direction = $type == TransactionType::IN ? DirectionType::OUT : DirectionType::IN;
             Record::find()->where([
                 'transaction_id' => $transaction->id,
