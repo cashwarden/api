@@ -68,7 +68,7 @@ class AccountService
             throw new \yii\db\Exception('not found account');
         }
         $model->load($model->toArray(), '');
-        $model->currency_balance = self::getCalculateCurrencyBalanceCent($accountId);
+        $model->currency_balance = Setup::toYuan(self::getCalculateCurrencyBalanceCent($accountId));
         if (!$model->save()) {
             Yii::error(
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
@@ -96,6 +96,6 @@ class AccountService
             'direction' => DirectionType::OUT,
         ])->sum('currency_amount_cent');
 
-        return ($out - $in) ?: 0;
+        return ($in - $out) ?: 0;
     }
 }

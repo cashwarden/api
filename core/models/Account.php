@@ -206,6 +206,10 @@ class Account extends \yii\db\ActiveRecord
             return Setup::toYuan($model->balance_cent);
         };
 
+        $fields['currency_balance'] = function (self $model) {
+            return Setup::toYuan($model->currency_balance_cent);
+        };
+
         $fields['exclude_from_stats'] = function (self $model) {
             return (bool)$model->exclude_from_stats;
         };

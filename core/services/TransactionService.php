@@ -151,7 +151,7 @@ class TransactionService
             return false;
         }
         $model = new Record();
-        $model->direction = $diff > 0 ? DirectionType::OUT : DirectionType::IN;
+        $model->direction = $diff > 0 ? DirectionType::IN : DirectionType::OUT;
         $model->currency_amount_cent = abs($diff);
         $model->user_id = $account->user_id;
         $model->account_id = $account->id;
