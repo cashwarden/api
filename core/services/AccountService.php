@@ -64,10 +64,17 @@ class AccountService
      */
     public static function updateAccountBalance(int $accountId): bool
     {
-        $model = self::getCurrentUserAccount($accountId);
-        $model->balance_cent = self::getCalculateAccountBalanceCent($accountId);
+        if (!$model = self::getCurrentUserAccount($accountId)) {
+            throw new \yii\db\Exception('not found account');
+        }
+        $model->load($model->toArray(), '');
+        $model->currency_balance = self::getCalculateCurrencyBalanceCent($accountId);
         if (!$model->save()) {
-            throw new \yii\db\Exception('update account failure');
+            Yii::error(
+                ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
+                __FUNCTION__
+            );
+            throw new \yii\db\Exception('update account failure ' . Setup::errorMessage($model->firstErrors));
         }
         return true;
     }
@@ -77,17 +84,17 @@ class AccountService
      * @param int $accountId
      * @return int
      */
-    public static function getCalculateAccountBalanceCent(int $accountId): int
+    public static function getCalculateCurrencyBalanceCent(int $accountId): int
     {
         $in = Record::find()->where([
             'account_id' => $accountId,
             'direction' => DirectionType::IN,
-        ])->sum('amount_cent');
+        ])->sum('currency_amount_cent');
 
         $out = Record::find()->where([
             'account_id' => $accountId,
             'direction' => DirectionType::OUT,
-        ])->sum('amount_cent');
+        ])->sum('currency_amount_cent');
 
         return ($out - $in) ?: 0;
     }

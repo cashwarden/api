@@ -96,7 +96,7 @@ class UserService
      * @throws DBException
      * @throws \app\core\exceptions\InvalidArgumentException
      */
-    public function createUserAfterInitData(User $user)
+    public function createUserAfterInitData(User $user): void
     {
         try {
             $account = new Account();
@@ -104,7 +104,7 @@ class UserService
                 'name' => Yii::t('app', 'General Account'),
                 'type' => AccountType::getName(AccountType::GENERAL_ACCOUNT),
                 'user_id' => $user->id,
-                'balance' => 0,
+                'currency_balance' => 0,
                 'default' => Account::DEFAULT,
                 'currency_code' => $user->base_currency_code
             ]);

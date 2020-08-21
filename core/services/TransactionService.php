@@ -146,12 +146,12 @@ class TransactionService
      */
     public static function createAdjustRecord(Account $account)
     {
-        $diff = $account->currency_balance_cent - AccountService::getCalculateAccountBalanceCent($account->id);
+        $diff = $account->currency_balance_cent - AccountService::getCalculateCurrencyBalanceCent($account->id);
         if (!$diff) {
             return false;
         }
         $model = new Record();
-        $model->direction = $diff > 0 ? DirectionType::IN : DirectionType::OUT;
+        $model->direction = $diff > 0 ? DirectionType::OUT : DirectionType::IN;
         $model->currency_amount_cent = abs($diff);
         $model->user_id = $account->user_id;
         $model->account_id = $account->id;
@@ -160,6 +160,10 @@ class TransactionService
         $model->currency_code = $account->currency_code;
         $model->date = date('Y-m-d');
         if (!$model->save()) {
+            Yii::error(
+                ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
+                __FUNCTION__
+            );
             throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
         }
         return true;

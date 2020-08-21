@@ -33,6 +33,8 @@ use yiier\validators\MoneyValidator;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
+ * @property-read User $user
+ *
  */
 class Account extends \yii\db\ActiveRecord
 {
@@ -48,6 +50,14 @@ class Account extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return '{{%account}}';
+    }
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+            self::SCENARIO_CREDIT_CARD => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+        ];
     }
 
     /**
@@ -143,7 +153,7 @@ class Account extends \yii\db\ActiveRecord
                 $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
             }
             $this->currency_balance_cent = Setup::toFen($this->currency_balance);
-            if ($this->currency_code == user('base_currency_code')) {
+            if ($this->currency_code == $this->user->base_currency_code) {
                 $this->balance_cent = $this->currency_balance_cent;
             } else {
                 // $this->balance_cent = $this->currency_balance_cent;
@@ -155,6 +165,11 @@ class Account extends \yii\db\ActiveRecord
         } else {
             return false;
         }
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
@@ -177,7 +192,7 @@ class Account extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        unset($fields['balance_cent'], $fields['user_id']);
+        unset($fields['currency_balance_cent'], $fields['balance_cent'], $fields['user_id']);
 
         $fields['type'] = function (self $model) {
             return AccountType::getName($model->type);

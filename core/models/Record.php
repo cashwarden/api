@@ -73,7 +73,6 @@ class Record extends ActiveRecord
                     'user_id',
                     'account_id',
                     'category_id',
-                    'amount_cent',
                     'currency_amount_cent',
                     'currency_code',
                     'direction'
@@ -92,7 +91,7 @@ class Record extends ActiveRecord
                 ],
                 'integer'
             ],
-            ['direction', 'in', 'range' => DirectionType::names()],
+            ['direction', 'in', 'range' => [DirectionType::IN, DirectionType::OUT]],
             [['date'], 'safe'],
         ];
     }
@@ -165,9 +164,13 @@ class Record extends ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        AccountService::updateAccountBalance($this->account_id);
-        if (($accountId = data_get($changedAttributes, 'account_id')) !== $this->account_id) {
-            AccountService::updateAccountBalance($accountId);
+        if ($this->transaction_id) {
+            // Exclude balance adjustment transaction type
+            AccountService::updateAccountBalance($this->account_id);
+            $accountId = data_get($changedAttributes, 'account_id');
+            if ($accountId && $accountId !== $this->account_id) {
+                AccountService::updateAccountBalance($accountId);
+            }
         }
     }
 
