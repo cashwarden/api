@@ -23,7 +23,7 @@
         "sizeg/yii2-jwt": "^2.0",
         "yiier/yii2-helpers": "^2.0",
         "yiier/yii2-graylog-target": "^1.1",
-        "yiier/yii2-validators": "^0.2.0",
+        "yiier/yii2-validators": "^0.3.0",
         "mis/yii2-ide-helper": "^1.0",
         "telegram-bot/api": "^2.3",
         "ext-json": "*"

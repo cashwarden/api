@@ -101,7 +101,7 @@ class Account extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 120],
             [['color'], 'string', 'max' => 7],
             ['type', 'in', 'range' => AccountType::names()],
-            [['balance', 'currency_balance'], MoneyValidator::class], //todo message
+            [['balance', 'currency_balance'], MoneyValidator::class, 'allowsNegative' => true], //todo message
             ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
             ['currency_code', 'in', 'range' => CurrencyCode::getKeys()],
         ];
