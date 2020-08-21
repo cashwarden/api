@@ -2,6 +2,7 @@
 
 namespace app\core\models;
 
+use app\core\services\AccountService;
 use app\core\types\DirectionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -52,6 +53,15 @@ class Record extends ActiveRecord
         ];
     }
 
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+        ];
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -82,7 +92,7 @@ class Record extends ActiveRecord
                 ],
                 'integer'
             ],
-            ['direction', 'in', 'range' => [DirectionType::OUT, DirectionType::IN]],
+            ['direction', 'in', 'range' => DirectionType::names()],
             [['date'], 'safe'],
         ];
     }
@@ -124,18 +134,63 @@ class Record extends ActiveRecord
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
+    /**
+     * @param bool $insert
+     * @return bool
+     * @throws \Throwable
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (!$this->amount_cent) {
+                if ($this->currency_code == user('base_currency_code')) {
+                    $this->amount_cent = $this->currency_amount_cent;
+                } else {
+                    // $this->amount_cent = $this->currency_amount_cent;
+                    // todo 计算汇率
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     * @throws \yii\db\Exception|\Throwable
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        AccountService::updateAccountBalance($this->account_id);
+        if (($accountId = data_get($changedAttributes, 'account_id')) !== $this->account_id) {
+            AccountService::updateAccountBalance($accountId);
+        }
+    }
 
     /**
      * @throws \Throwable
+     * @throws \yii\db\Exception
      * @throws \yii\db\StaleObjectException
      */
     public function afterDelete()
     {
         parent::afterDelete();
         if ($this->transaction_id) {
-            Transaction::find()->where(['id' => $this->transaction_id])->one()->delete();
-            Record::deleteAll(['transaction_id' => $this->transaction_id]);
+            if ($transaction = Transaction::find()->where(['id' => $this->transaction_id])->one()) {
+                $transaction->delete();
+            }
+            $record = Record::find()
+                ->where(['user_id' => $this->user_id, 'transaction_id' => $this->transaction_id])
+                ->one();
+            if ($record) {
+                $record->delete();
+            }
         }
+        AccountService::updateAccountBalance($this->account_id);
     }
 
     /**

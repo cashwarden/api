@@ -9,7 +9,7 @@ use app\core\models\User;
 use app\core\requests\JoinRequest;
 use app\core\types\AccountType;
 use app\core\types\ColorType;
-use app\core\types\DirectionType;
+use app\core\types\TransactionType;
 use app\core\types\UserStatus;
 use Exception;
 use sizeg\jwt\Jwt;
@@ -116,92 +116,106 @@ class UserService
                     'name' => Yii::t('app', 'Food and drink'),
                     'color' => ColorType::RED,
                     'icon_name' => 'food',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Home life'),
                     'color' => ColorType::ORANGE,
                     'icon_name' => 'home',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Traffic'),
                     'color' => ColorType::BLUE,
                     'icon_name' => 'bus',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Recreation'),
                     'color' => ColorType::VOLCANO,
                     'icon_name' => 'game',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Health care'),
                     'color' => ColorType::GREEN,
                     'icon_name' => 'medicine-chest',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Clothes'),
                     'color' => ColorType::PURPLE,
                     'icon_name' => 'clothes',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Cultural education'),
                     'color' => ColorType::CYAN,
                     'icon_name' => 'education',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Investment expenditure'),
                     'color' => ColorType::GOLD,
                     'icon_name' => 'investment',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Childcare'),
                     'color' => ColorType::LIME,
                     'icon_name' => 'baby',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Other expenses'),
                     'color' => ColorType::GEEK_BLUE,
                     'icon_name' => 'expenses',
-                    'direction' => DirectionType::OUT,
+                    'transaction_type' => TransactionType::OUT,
                     'default' => Account::DEFAULT,
                 ],
                 [
                     'name' => Yii::t('app', 'Work income'),
                     'color' => ColorType::BLUE,
                     'icon_name' => 'work',
-                    'direction' => DirectionType::IN,
+                    'transaction_type' => TransactionType::IN,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Investment income'),
                     'color' => ColorType::GOLD,
                     'icon_name' => 'investment',
-                    'direction' => DirectionType::IN,
+                    'transaction_type' => TransactionType::IN,
                     'default' => Category::NOT_DEFAULT
                 ],
                 [
                     'name' => Yii::t('app', 'Other income'),
                     'color' => ColorType::MAGENTA,
                     'icon_name' => 'income',
-                    'direction' => DirectionType::IN,
+                    'transaction_type' => TransactionType::IN,
                     'default' => Category::DEFAULT,
+                ],
+                [
+                    'name' => Yii::t('app', 'Transfer'),
+                    'color' => ColorType::GREEN,
+                    'icon_name' => 'transfer',
+                    'transaction_type' => TransactionType::TRANSFER,
+                    'default' => Category::NOT_DEFAULT,
+                ],
+                [
+                    'name' => Yii::t('app', 'Adjust Balance'),
+                    'color' => ColorType::BLUE,
+                    'icon_name' => 'adjust',
+                    'transaction_type' => TransactionType::ADJUST,
+                    'default' => Category::NOT_DEFAULT,
                 ],
             ];
             $time = date('Y-m-d H:i:s');

@@ -3,12 +3,14 @@
 namespace app\core\services;
 
 use app\core\exceptions\InternalException;
+use app\core\models\Account;
 use app\core\models\Record;
 use app\core\models\Transaction;
 use app\core\requests\RecordCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
+use app\models\BalanceRecord;
 use Exception;
 use Yii;
 use yiier\helpers\Setup;
@@ -138,28 +140,30 @@ class TransactionService
     }
 
     /**
-     * @param Record $record
-     * @param int $accountId
-     * @return Record
-     * @throws InternalException
-     * @throws \yii\db\Exception|\app\core\exceptions\InvalidArgumentException
+     * @param Account $account
+     * @return bool
+     * @throws \yii\db\Exception
      */
-    public static function transferInto(Record $record, int $accountId): Record
+    public static function createAdjustRecord(Account $account)
     {
-        if ($record->transaction_type != TransactionType::TRANSFER) {
-            throw new InternalException();
+        $diff = $account->currency_balance_cent - AccountService::getCalculateAccountBalanceCent($account->id);
+        if (!$diff) {
+            return false;
         }
         $model = new Record();
-        $values = $record->toArray();
-        $model->load($values, '');
-        $model->direction = DirectionType::getName(DirectionType::IN);
-        $model->account_id = $accountId;
-        if (!$model->save(false)) {
+        $model->direction = $diff > 0 ? DirectionType::IN : DirectionType::OUT;
+        $model->currency_amount_cent = abs($diff);
+        $model->user_id = $account->user_id;
+        $model->account_id = $account->id;
+        $model->transaction_id = 0;
+        $model->category_id = CategoryService::getAdjustCategoryId();
+        $model->currency_code = $account->currency_code;
+        $model->date = date('Y-m-d');
+        if (!$model->save()) {
             throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
         }
-        return $model;
+        return true;
     }
-
 
     /**
      * @param string $desc

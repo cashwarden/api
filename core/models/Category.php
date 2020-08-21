@@ -4,7 +4,7 @@ namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
 use app\core\types\ColorType;
-use app\core\types\DirectionType;
+use app\core\types\TransactionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -14,7 +14,7 @@ use yiier\helpers\DateHelper;
  *
  * @property int $id
  * @property int $user_id
- * @property int $direction
+ * @property int $transaction_type
  * @property string $name
  * @property string $color
  * @property string $icon_name
@@ -55,9 +55,9 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['direction', 'name', 'color', 'icon_name'], 'required'],
+            [['transaction_type', 'name', 'color', 'icon_name'], 'required'],
             [['user_id', 'status', 'default'], 'integer'],
-            ['direction', 'in', 'range' => DirectionType::names()],
+            ['transaction_type', 'in', 'range' => TransactionType::names()],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'icon_name'], 'string', 'max' => 120],
             ['color', 'in', 'range' => ColorType::items()],
@@ -72,7 +72,7 @@ class Category extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'direction' => Yii::t('app', 'Direction'),
+            'transaction_type' => Yii::t('app', 'Transaction Type'),
             'name' => Yii::t('app', 'Name'),
             'color' => Yii::t('app', 'Color'),
             'icon_name' => Yii::t('app', 'Icon Name'),
@@ -94,7 +94,7 @@ class Category extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
-            $this->direction = DirectionType::toEnumValue($this->direction);
+            $this->transaction_type = TransactionType::toEnumValue($this->transaction_type);
             return true;
         } else {
             return false;
@@ -109,8 +109,8 @@ class Category extends \yii\db\ActiveRecord
         $fields = parent::fields();
         unset($fields['user_id']);
 
-        $fields['direction'] = function (self $model) {
-            return DirectionType::getName($model->direction);
+        $fields['transaction_type'] = function (self $model) {
+            return TransactionType::getName($model->transaction_type);
         };
 
         $fields['created_at'] = function (self $model) {

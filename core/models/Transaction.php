@@ -99,7 +99,7 @@ class Transaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'category_id', 'amount', 'currency_code'], 'required'],
+            [['type', 'category_id', 'currency_amount', 'currency_code'], 'required'],
             [
                 'to_account_id',
                 'required',
@@ -191,13 +191,13 @@ class Transaction extends \yii\db\ActiveRecord
             $this->tags = $this->tags ? implode(',', $this->tags) : null;
             $this->type = TransactionType::toEnumValue($this->type);
 
-            $this->amount_cent = Setup::toFen($this->amount);
+            $this->currency_amount_cent = Setup::toFen($this->currency_amount);
             if ($this->currency_code == user('base_currency_code')) {
-                $this->currency_amount_cent = $this->amount_cent;
+                $this->amount_cent = $this->currency_amount_cent;
             } else {
+                // $this->amount_cent = $this->currency_amount_cent;
                 // todo 计算汇率
             }
-            // $this->currency_amount_cent = Setup::toFen($this->currency_amount);
             return true;
         } else {
             return false;

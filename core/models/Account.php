@@ -3,6 +3,7 @@
 namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
+use app\core\services\TransactionService;
 use app\core\types\AccountType;
 use app\core\types\ColorType;
 use app\core\types\CurrencyCode;
@@ -21,6 +22,7 @@ use yiier\validators\MoneyValidator;
  * @property int|string $type
  * @property string $color
  * @property int|null $balance_cent
+ * @property int|null $currency_balance_cent
  * @property string $currency_code
  * @property int|null $status
  * @property int|null $exclude_from_stats
@@ -36,6 +38,7 @@ class Account extends \yii\db\ActiveRecord
 {
     public const DEFAULT = 1;
     public $balance;
+    public $currency_balance;
 
     public const SCENARIO_CREDIT_CARD = 'credit_card';
 
@@ -66,7 +69,7 @@ class Account extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'name', 'type', 'balance', 'currency_code'], 'required'],
+            [['user_id', 'name', 'type', 'currency_balance', 'currency_code'], 'required'],
             [
                 ['credit_card_limit', 'credit_card_repayment_day', 'credit_card_billing_day'],
                 'required',
@@ -76,6 +79,7 @@ class Account extends \yii\db\ActiveRecord
                 [
                     'user_id',
                     'balance_cent',
+                    'currency_balance_cent',
                     'status',
                     'credit_card_limit',
                     'credit_card_repayment_day',
@@ -87,7 +91,7 @@ class Account extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 120],
             [['color'], 'string', 'max' => 7],
             ['type', 'in', 'range' => AccountType::names()],
-            ['balance', MoneyValidator::class], //todo message
+            [['balance', 'currency_balance'], MoneyValidator::class], //todo message
             ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
             ['currency_code', 'in', 'range' => CurrencyCode::getKeys()],
         ];
@@ -129,7 +133,7 @@ class Account extends \yii\db\ActiveRecord
     /**
      * @param bool $insert
      * @return bool
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|\Throwable
      */
     public function beforeSave($insert)
     {
@@ -138,7 +142,14 @@ class Account extends \yii\db\ActiveRecord
                 $ran = ColorType::items();
                 $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
             }
-            $this->balance_cent = Setup::toFen($this->balance);
+            $this->currency_balance_cent = Setup::toFen($this->currency_balance);
+            if ($this->currency_code == user('base_currency_code')) {
+                $this->balance_cent = $this->currency_balance_cent;
+            } else {
+                // $this->balance_cent = $this->currency_balance_cent;
+                // todo 计算汇率
+            }
+
             $this->type = AccountType::toEnumValue($this->type);
             return true;
         } else {
@@ -146,6 +157,19 @@ class Account extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     * @throws \yii\db\Exception
+     * @throws \Exception
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if (data_get($changedAttributes, 'currency_balance_cent') !== $this->currency_balance_cent) {
+            TransactionService::createAdjustRecord($this);
+        }
+    }
 
     /**
      * @return array

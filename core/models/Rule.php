@@ -55,7 +55,6 @@ class Rule extends \yii\db\ActiveRecord
 
     /**
      * {@inheritdoc}
-     * @throws InvalidArgumentException
      */
     public function rules()
     {

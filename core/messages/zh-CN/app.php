@@ -15,6 +15,8 @@ return [
     'Credit Card' => '信用卡',
     'Saving Account' => '储蓄账户',
     'Investment Account' => '投资账户',
+    'Transfer' => '转账',
+    'Adjust Balance' => '调整余额',
     # 'Cash' => '',
 
     'Base Currency Code' => '基础货币',
