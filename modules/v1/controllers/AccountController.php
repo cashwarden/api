@@ -6,8 +6,10 @@ use app\core\models\Account;
 use app\core\services\AccountService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AccountType;
+use Exception;
 use Yii;
 use yii\web\NotFoundHttpException;
+use yiier\helpers\Setup;
 
 /**
  * Account controller for the `v1` module
@@ -29,7 +31,7 @@ class AccountController extends ActiveController
 
     /**
      * @return Account
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionCreate()
     {
@@ -49,7 +51,7 @@ class AccountController extends ActiveController
      * @param int $id
      * @return Account
      * @throws NotFoundHttpException
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionUpdate(int $id)
     {
@@ -70,7 +72,7 @@ class AccountController extends ActiveController
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionTypes()
     {
@@ -79,6 +81,35 @@ class AccountController extends ActiveController
         foreach (AccountType::names() as $key => $name) {
             $items[] = ['type' => $name, 'name' => data_get($texts, $key)];
         }
+        return $items;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionStatistics()
+    {
+        $balanceCentSum = Account::find()
+            ->where(['user_id' => Yii::$app->user->id, 'exclude_from_stats' => false])
+            ->sum('balance_cent');
+        $items['net_asset'] = $balanceCentSum ? Setup::toYuan($balanceCentSum) : 0;
+
+        $balanceCentSum = Account::find()
+            ->where(['user_id' => Yii::$app->user->id, 'exclude_from_stats' => false])
+            ->andWhere(['>', 'balance_cent', 0])
+            ->sum('balance_cent');
+        $items['total_assets'] = $balanceCentSum ? Setup::toYuan($balanceCentSum) : 0;
+
+        $balanceCentSum = Account::find()
+            ->where(['user_id' => Yii::$app->user->id, 'exclude_from_stats' => false])
+            ->andWhere(['<', 'balance_cent', 0])
+            ->sum('balance_cent');
+        $items['liabilities'] = $balanceCentSum ? Setup::toYuan($balanceCentSum) : 0;
+
+        $items['count'] = Account::find()
+            ->where(['user_id' => Yii::$app->user->id, 'exclude_from_stats' => false])
+            ->count('id');
+
         return $items;
     }
 }

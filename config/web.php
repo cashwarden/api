@@ -71,6 +71,7 @@ $config = [
                 "POST <module>/rules/<id:\d+>/copy" => '<module>/rule/copy',
                 "PUT <module>/rules/<id:\d+>/status" => '<module>/rule/update-status',
                 "GET <module>/accounts/types" => '<module>/account/types',
+                "GET <module>/accounts/statistics" => '<module>/account/statistics',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [
