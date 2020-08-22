@@ -39,6 +39,7 @@ use yiier\validators\MoneyValidator;
 class Account extends \yii\db\ActiveRecord
 {
     public const DEFAULT = 1;
+    public const NO_DEFAULT = 0;
     public $balance;
     public $currency_balance;
 
@@ -94,7 +95,6 @@ class Account extends \yii\db\ActiveRecord
                     'credit_card_limit',
                     'credit_card_repayment_day',
                     'credit_card_billing_day',
-                    'default'
                 ],
                 'integer'
             ],
@@ -103,6 +103,7 @@ class Account extends \yii\db\ActiveRecord
             ['type', 'in', 'range' => AccountType::names()],
             [['balance', 'currency_balance'], MoneyValidator::class, 'allowsNegative' => true], //todo message
             ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
+            ['default', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
             ['currency_code', 'in', 'range' => CurrencyCode::getKeys()],
         ];
     }
@@ -184,6 +185,12 @@ class Account extends \yii\db\ActiveRecord
         if (data_get($changedAttributes, 'currency_balance_cent') !== $this->currency_balance_cent) {
             TransactionService::createAdjustRecord($this);
         }
+        if ($this->default) {
+            Account::updateAll(
+                ['default' => self::NO_DEFAULT, 'updated_at' => date('Y-m-d H:i:s')],
+                ['and', ['user_id' => $this->user_id, 'default' => self::DEFAULT], ['!=', 'id', $this->id]]
+            );
+        }
     }
 
     /**
@@ -208,6 +215,10 @@ class Account extends \yii\db\ActiveRecord
 
         $fields['currency_balance'] = function (self $model) {
             return Setup::toYuan($model->currency_balance_cent);
+        };
+
+        $fields['default'] = function (self $model) {
+            return (bool)$model->default;
         };
 
         $fields['exclude_from_stats'] = function (self $model) {
