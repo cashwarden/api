@@ -22,7 +22,6 @@ use yii\db\ActiveRecord;
 use yii\db\Exception as DBException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yiier\graylog\Log;
 use yiier\helpers\ModelHelper;
 use yiier\helpers\Setup;
 
@@ -282,7 +281,7 @@ class UserService
      */
     public function bingTelegram(string $token, Message $message)
     {
-        Log::error('telegram_message' . $token, $message);
+        Yii::error($message, 'telegram_message' . $token);
         $user = $this->getUserByResetToken($token);
         $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
