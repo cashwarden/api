@@ -276,34 +276,6 @@ class UserService
 
     /**
      * @param string $token
-     * @param $message
-     * @throws InvalidArgumentException|DBException
-     * @throws Exception
-     */
-    public function bingTelegram(string $token, Message $message)
-    {
-        Yii::error(json_encode($message), 'telegram_message' . $token);
-
-        $user = $this->getUserByResetToken($token);
-        $conditions = [
-            'type' => AuthClientType::TELEGRAM,
-            'user_id' => data_get($user, 'id'),
-            'status' => AuthClientStatus::ACTIVE
-        ];
-        if (!$model = AuthClient::find()->where($conditions)->one()) {
-            $model = new AuthClient();
-            $model->load($conditions, '');
-        }
-        $model->client_id = $message->getFrom()->getId();
-        $model->data = Json::encode($message);
-        if (!$model->save()) {
-            throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
-        }
-    }
-
-
-    /**
-     * @param string $token
      * @return User|array|ActiveRecord|null
      * @throws InvalidArgumentException
      */

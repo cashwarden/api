@@ -53,7 +53,7 @@ class TelegramController extends ActiveController
                 $text = '绑定成功！';
                 $token = StringHelper::after('/bind/', $message->getText());
                 try {
-                    $this->userService->bingTelegram($token, $message);
+                    $this->telegramService->bind($token, $message);
                 } catch (\Exception $e) {
                     $text = $e->getMessage();
                 }
