@@ -54,7 +54,7 @@ class TelegramController extends ActiveController
                 try {
                     $user = $this->userService->getUserByResetToken($token);
                     $this->telegramService->bind($user, $token, $message);
-                    $text = '成功绑定 ' . data_get($user, 'username') . ' ！';
+                    $text = '成功绑定账号【' . data_get($user, 'username') . '】！';
                 } catch (\Exception $e) {
                     $text = $e->getMessage();
                 }
@@ -73,6 +73,9 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), $message->getText());
             }, function (Update $message) {
                 if ($message->getMessage()) {
+                    if (strpos($message->getMessage()->getText(), '/bind') === false) {
+                        return false;
+                    }
                     return true;
                 }
                 return false;

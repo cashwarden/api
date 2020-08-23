@@ -23,7 +23,7 @@ class m200823_094104_create_auth_client_table extends Migration
             'updated_at' => $this->timestamp()->defaultValue(null),
         ]);
 
-        $this->createIndex('login_user_id', '{{%auth_client}}', 'user_id');
+        $this->createIndex('login_user_id', '{{%auth_client}}', ['user_id', 'type', 'client_id'], true);
     }
 
     /**
