@@ -13,7 +13,6 @@ use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\db\Exception as DBException;
-use yii\helpers\Json;
 use yiier\helpers\Setup;
 
 class TelegramService extends BaseObject
@@ -53,7 +52,7 @@ class TelegramService extends BaseObject
             $model->load($conditions, '');
         }
         $model->client_id = (string)$message->getFrom()->getId();
-        $model->data = Json::encode($message);
+        $model->data = json_encode($message);
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
         }
