@@ -10,6 +10,7 @@ use app\core\models\Category;
 use app\core\models\User;
 use app\core\requests\JoinRequest;
 use app\core\types\AccountType;
+use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use app\core\types\ColorType;
 use app\core\types\TransactionType;
@@ -284,7 +285,11 @@ class UserService
         Yii::error(json_encode($message), 'telegram_message' . $token);
 
         $user = $this->getUserByResetToken($token);
-        $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
+        $conditions = [
+            'type' => AuthClientType::TELEGRAM,
+            'user_id' => data_get($user, 'id'),
+            'status' => AuthClientStatus::ACTIVE
+        ];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
             $model = new AuthClient();
             $model->load($conditions, '');
