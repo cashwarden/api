@@ -113,6 +113,9 @@ return [
                     'class' => 'yiier\helpers\FileTarget',
                     // 日志等级
                     'levels' => ['error'],
+                    'except' => [
+                        'yii\web\HttpException:404',
+                    ],
                     // 被收集记录的额外数据
                     'logVars' => ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'],
                     // 指定日志保存的文件名
