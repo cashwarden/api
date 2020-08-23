@@ -281,7 +281,8 @@ class UserService
      */
     public function bingTelegram(string $token, Message $message)
     {
-        Yii::error($message, 'telegram_message' . $token);
+        Yii::error(json_encode($message), 'telegram_message' . $token);
+
         $user = $this->getUserByResetToken($token);
         $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
