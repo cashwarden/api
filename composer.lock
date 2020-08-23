@@ -1347,16 +1347,16 @@
         },
         {
             "name": "yiier/yii2-helpers",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiier/yii2-helpers.git",
-                "reference": "3b5c8e8fed3dd3db9bffc858db0ee2aa117645ca"
+                "reference": "bc895e0eb63520ae7e2fb9a383a65307b505e20b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiier/yii2-helpers/zipball/3b5c8e8fed3dd3db9bffc858db0ee2aa117645ca",
-                "reference": "3b5c8e8fed3dd3db9bffc858db0ee2aa117645ca",
+                "url": "https://api.github.com/repos/yiier/yii2-helpers/zipball/bc895e0eb63520ae7e2fb9a383a65307b505e20b",
+                "reference": "bc895e0eb63520ae7e2fb9a383a65307b505e20b",
                 "shasum": ""
             },
             "require": {
@@ -1385,7 +1385,7 @@
                 "helpers",
                 "yii2"
             ],
-            "time": "2020-07-27T03:15:07+00:00"
+            "time": "2020-08-23T11:02:11+00:00"
         },
         {
             "name": "yiier/yii2-validators",
@@ -6719,5 +6719,6 @@
         "php": ">=7.2",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
