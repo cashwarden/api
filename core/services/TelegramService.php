@@ -2,8 +2,8 @@
 
 namespace app\core\services;
 
-use app\core\exceptions\InvalidArgumentException;
 use app\core\models\AuthClient;
+use app\core\models\User;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
@@ -32,19 +32,18 @@ class TelegramService extends BaseObject
     }
 
     /**
+     * @param User $user
      * @param string $token
-     * @param $message
-     * @throws InvalidArgumentException|DBException
-     * @throws \Exception
+     * @param Message $message
+     * @throws DBException
      */
-    public function bind(string $token, Message $message)
+    public function bind(User $user, string $token, Message $message): void
     {
         Yii::error($message, 'telegram_message' . $token);
 
-        $user = $this->userService->getUserByResetToken($token);
         $conditions = [
             'type' => AuthClientType::TELEGRAM,
-            'user_id' => data_get($user, 'id'),
+            'user_id' => $user->id,
             'status' => AuthClientStatus::ACTIVE
         ];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
