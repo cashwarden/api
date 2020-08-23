@@ -8,6 +8,7 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
+use yiier\helpers\StringHelper;
 
 class TelegramController extends ActiveController
 {
@@ -49,7 +50,7 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
-                $token = \yiier\helpers\String::after('/bing/', $message->getText());
+                $token = StringHelper::after('/bing/', $message->getText());
                 $this->userService->bingTelegram($token, $message);
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), "绑定成功！");
