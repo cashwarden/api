@@ -3,7 +3,7 @@
 namespace app\modules\v1\controllers;
 
 use app\core\models\Transaction;
-use app\core\requests\RecordCreateByDescRequest;
+use app\core\requests\TransactionCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use Yii;
 
@@ -31,8 +31,8 @@ class TransactionController extends ActiveController
     public function actionCreateByDescription()
     {
         $params = Yii::$app->request->bodyParams;
-        $model = new RecordCreateByDescRequest();
-        /** @var RecordCreateByDescRequest $model */
+        $model = new TransactionCreateByDescRequest();
+        /** @var TransactionCreateByDescRequest $model */
         $model = $this->validate($model, $params);
 
         return $this->transactionService->createByDesc($model);

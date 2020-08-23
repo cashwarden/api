@@ -3,11 +3,14 @@
 namespace app\core\services;
 
 use app\core\exceptions\InternalException;
+use app\core\exceptions\InvalidArgumentException;
 use app\core\models\Account;
+use app\core\models\AuthClient;
 use app\core\models\Category;
 use app\core\models\User;
 use app\core\requests\JoinRequest;
 use app\core\types\AccountType;
+use app\core\types\AuthClientType;
 use app\core\types\ColorType;
 use app\core\types\TransactionType;
 use app\core\types\UserStatus;
@@ -16,6 +19,8 @@ use sizeg\jwt\Jwt;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception as DBException;
+use yii\helpers\ArrayHelper;
+use yiier\graylog\Log;
 use yiier\helpers\ModelHelper;
 use yiier\helpers\Setup;
 
@@ -90,6 +95,25 @@ class UserService
             ->one();
     }
 
+    /**
+     * @param User $user
+     * @return bool
+     * @throws \yii\base\Exception
+     */
+    public function setPasswordResetToken(User $user)
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
+            $user->generatePasswordResetToken();
+        }
+
+        if (!$user->save()) {
+            return false;
+        }
+    }
 
     /**
      * @param User $user
@@ -232,5 +256,53 @@ class UserService
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    public function getAuthClients()
+    {
+        $data = [];
+        if ($items = AuthClient::find()->where(['user_id' => Yii::$app->user->id])->all()) {
+            $items = ArrayHelper::index($items, 'type');
+
+            foreach (AuthClientType::names() as $key => $value) {
+                $data[$value] = $items[$key];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $token
+     * @param $message
+     * @throws InvalidArgumentException
+     */
+    public function bingTelegram(string $token, $message)
+    {
+        $user = $this->getUserByResetToken($token);
+        $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
+        if (!$model = AuthClient::find()->where($conditions)->one()) {
+            $model = new AuthClient();
+            $model->load($conditions, '');
+        }
+        Log::error('telegram_message', $message);
+    }
+
+
+    /**
+     * @param string $token
+     * @return User|array|ActiveRecord|null
+     * @throws InvalidArgumentException
+     */
+    public function getUserByResetToken(string $token)
+    {
+        if (empty($token) || !is_string($token)) {
+            throw new InvalidArgumentException('Token 验证失败，请重新操作。');
+        }
+
+        if (!$user = User::findByPasswordResetToken($token)) {
+            throw new InvalidArgumentException('链接无效或者已失效，请重新操作。');
+        }
+        return $user;
     }
 }

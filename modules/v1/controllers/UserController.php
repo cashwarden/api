@@ -31,7 +31,7 @@ class UserController extends ActiveController
     /**
      * @return User
      * @throws InternalException
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|\Throwable
      */
     public function actionJoin()
     {
@@ -67,5 +67,28 @@ class UserController extends ActiveController
             'user' => $user,
             'token' => (string)$token,
         ];
+    }
+
+    /**
+     * @return array
+     * @throws \yii\base\Exception
+     */
+    public function actionResetToken()
+    {
+        /** @var User $user */
+        $user = Yii::$app->user->identity;
+        $this->userService->setPasswordResetToken($user);
+        return [
+            'reset_token' => $user->password_reset_token,
+            'expire_in' => params('user.passwordResetTokenExpire')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function actionGetAuthClients()
+    {
+        return $this->userService->getAuthClients();
     }
 }

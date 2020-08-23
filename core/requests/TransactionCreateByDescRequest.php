@@ -2,7 +2,7 @@
 
 namespace app\core\requests;
 
-class RecordCreateByDescRequest extends \yii\base\Model
+class TransactionCreateByDescRequest extends \yii\base\Model
 {
     public $description;
 

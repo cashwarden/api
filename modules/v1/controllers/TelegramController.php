@@ -8,6 +8,7 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
+use yiier\helpers\String;
 
 class TelegramController extends ActiveController
 {
@@ -40,11 +41,32 @@ class TelegramController extends ActiveController
                 $message = $Update->getMessage();
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), "hi");
-            }, function (Update $message) use ($bot) {
+            }, function (Update $message) {
                 if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
                     return true;
                 }
                 return false;
+            });
+
+            $bot->on(function (Update $Update) use ($bot) {
+                $message = $Update->getMessage();
+                $token = String::after('/bing/', $message->getText());
+                $this->userService->bingTelegram($token, $message);
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), "绑定成功！");
+            }, function (Update $message) {
+                if ($message->getMessage() && strpos('/bind', $message->getMessage()->getText()) === 0) {
+                    return true;
+                }
+                return false;
+            });
+
+            $bot->on(function (Update $Update) use ($bot) {
+                $message = $Update->getMessage();
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), $message->getText());
+            }, function (Update $message) {
+                return true;
             });
 
             $bot->run();

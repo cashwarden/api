@@ -72,6 +72,7 @@ $config = [
                 "PUT <module>/rules/<id:\d+>/status" => '<module>/rule/update-status',
                 "GET <module>/accounts/types" => '<module>/account/types',
                 "GET <module>/accounts/statistics" => '<module>/account/statistics',
+                "POST <module>/reset-token" => '<module>/user/reset-token',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [

@@ -6,7 +6,7 @@ use app\core\exceptions\InternalException;
 use app\core\models\Account;
 use app\core\models\Record;
 use app\core\models\Transaction;
-use app\core\requests\RecordCreateByDescRequest;
+use app\core\requests\TransactionCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
@@ -72,11 +72,11 @@ class TransactionService
 
 
     /**
-     * @param RecordCreateByDescRequest $request
+     * @param TransactionCreateByDescRequest $request
      * @return Transaction
      * @throws InternalException|\Throwable
      */
-    public function createByDesc(RecordCreateByDescRequest $request): Transaction
+    public function createByDesc(TransactionCreateByDescRequest $request): Transaction
     {
         $model = new Transaction();
         try {
