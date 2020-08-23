@@ -52,7 +52,7 @@ class TelegramService extends BaseObject
             $model->load($conditions, '');
         }
         $model->client_id = (string)$message->getFrom()->getId();
-        $model->data = json_encode($message);
+        $model->data = $message->getFrom()->toJson();
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
         }
