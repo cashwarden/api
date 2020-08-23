@@ -73,7 +73,7 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), $message->getText());
             }, function (Update $message) {
                 if ($message->getMessage()) {
-                    if (strpos($message->getMessage()->getText(), '/bind') === false) {
+                    if (strpos($message->getMessage()->getText(), '/bind') === 0) {
                         return false;
                     }
                     return true;
