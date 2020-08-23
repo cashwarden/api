@@ -16,10 +16,12 @@ use app\core\types\TransactionType;
 use app\core\types\UserStatus;
 use Exception;
 use sizeg\jwt\Jwt;
+use TelegramBot\Api\Types\Message;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception as DBException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yiier\graylog\Log;
 use yiier\helpers\ModelHelper;
 use yiier\helpers\Setup;
@@ -275,15 +277,20 @@ class UserService
     /**
      * @param string $token
      * @param $message
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|DBException
      */
-    public function bingTelegram(string $token, $message)
+    public function bingTelegram(string $token, Message $message)
     {
         $user = $this->getUserByResetToken($token);
         $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
             $model = new AuthClient();
             $model->load($conditions, '');
+        }
+        $model->client_id = $message->getFrom()->getId();
+        $model->data = Json::encode($message);
+        if (!$model->save()) {
+            throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
         }
         Log::error('telegram_message', $message);
     }
