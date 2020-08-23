@@ -55,7 +55,7 @@ class TelegramController extends ActiveController
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), "绑定成功！");
             }, function (Update $message) {
-                if ($message->getMessage() && strpos('/bind', $message->getMessage()->getText()) === 0) {
+                if ($message->getMessage() && strpos($message->getMessage()->getText(), '/bind') === 0) {
                     return true;
                 }
                 return false;
