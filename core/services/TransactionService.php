@@ -6,7 +6,6 @@ use app\core\exceptions\InternalException;
 use app\core\models\Account;
 use app\core\models\Record;
 use app\core\models\Transaction;
-use app\core\requests\TransactionCreateByDescRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
@@ -72,17 +71,18 @@ class TransactionService
 
 
     /**
-     * @param TransactionCreateByDescRequest $request
+     * @param string $description
      * @return Transaction
-     * @throws InternalException|\Throwable
+     * @throws InternalException
+     * @throws \Throwable
      */
-    public function createByDesc(TransactionCreateByDescRequest $request): Transaction
+    public function createByDesc(string $description): Transaction
     {
         $model = new Transaction();
         try {
-            $model->description = $request->description;
+            $model->description = $description;
             $model->user_id = Yii::$app->user->id;
-            $rules = $this->getRuleService()->getRulesByDesc($model->description);
+            $rules = $this->getRuleService()->getRulesByDesc($description);
             $model->type = $this->getDataByDesc(
                 $rules,
                 'then_transaction_type',
@@ -122,7 +122,7 @@ class TransactionService
             $model->status = $this->getDataByDesc($rules, 'then_transaction_status');
             $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
 
-            $model->currency_amount = $this->getAmountByDesc($model->description);
+            $model->currency_amount = $this->getAmountByDesc($description);
             $model->currency_code = user('base_currency_code');
             if (!$model->save(false)) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));

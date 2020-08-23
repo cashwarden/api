@@ -4,10 +4,13 @@ namespace app\modules\v1\controllers;
 
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
+use app\core\types\AuthClientType;
+use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
+use yiier\helpers\Setup;
 use yiier\helpers\StringHelper;
 
 class TelegramController extends ActiveController
@@ -69,8 +72,28 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
+                try {
+                    $user = $this->userService->getUserByClientId(
+                        AuthClientType::TELEGRAM,
+                        $message->getFrom()->getId()
+                    );
+                    \Yii::$app->user->setIdentity($user);
+                    $model = $this->transactionService->createByDesc($message->getText());
+                    $text = "记账成功\n";
+                    $text .= '交易类型：' . TransactionType::getName($model->type) . '\n';
+                    if (in_array($model->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
+                        $text .= '支付账户：' . $model->fromAccount->name . '\n';
+                    }
+                    if (in_array($model->type, [TransactionType::IN, TransactionType::TRANSFER])) {
+                        $text .= '收款账户：' . $model->toAccount->name . '\n';
+                    }
+                    $text .= '金额：' . Setup::toYuan($model->amount_cent);
+                } catch (\Exception $e) {
+                    $text = $e->getMessage();
+                }
+
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), $message->getText());
+                $bot->sendMessage($message->getChat()->getId(), $text);
             }, function (Update $message) {
                 if ($message->getMessage()) {
                     if (strpos($message->getMessage()->getText(), '/bind') === 0) {

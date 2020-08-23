@@ -10,19 +10,16 @@ use app\core\models\Category;
 use app\core\models\User;
 use app\core\requests\JoinRequest;
 use app\core\types\AccountType;
-use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use app\core\types\ColorType;
 use app\core\types\TransactionType;
 use app\core\types\UserStatus;
 use Exception;
 use sizeg\jwt\Jwt;
-use TelegramBot\Api\Types\Message;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception as DBException;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yiier\helpers\ModelHelper;
 use yiier\helpers\Setup;
 
@@ -289,5 +286,16 @@ class UserService
             throw new InvalidArgumentException('链接无效或者已失效，请重新操作。');
         }
         return $user;
+    }
+
+    /**
+     * @param int $type
+     * @param string $clientId
+     * @return User
+     */
+    public function getUserByClientId(int $type, string $clientId): User
+    {
+        $model = AuthClient::find()->where(['type' => $type, 'client_id' => $clientId])->one();
+        return $model->user;
     }
 }

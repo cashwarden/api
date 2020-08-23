@@ -19,6 +19,7 @@ use yiier\helpers\DateHelper;
  * @property int $status
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property-read User $user
  */
 class AuthClient extends \yii\db\ActiveRecord
 {
@@ -75,6 +76,11 @@ class AuthClient extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**

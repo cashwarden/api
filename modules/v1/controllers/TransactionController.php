@@ -35,6 +35,6 @@ class TransactionController extends ActiveController
         /** @var TransactionCreateByDescRequest $model */
         $model = $this->validate($model, $params);
 
-        return $this->transactionService->createByDesc($model);
+        return $this->transactionService->createByDesc($model->description);
     }
 }
