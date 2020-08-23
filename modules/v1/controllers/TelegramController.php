@@ -50,10 +50,15 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
+                $text = '绑定成功！';
                 $token = StringHelper::after('/bing/', $message->getText());
-                $this->userService->bingTelegram($token, $message);
+                try {
+                    $this->userService->bingTelegram($token, $message);
+                } catch (\Exception $e) {
+                    $text = $e->getMessage();
+                }
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), "绑定成功！");
+                $bot->sendMessage($message->getChat()->getId(), $text);
             }, function (Update $message) {
                 if ($message->getMessage() && strpos($message->getMessage()->getText(), '/bind') === 0) {
                     return true;

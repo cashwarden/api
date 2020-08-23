@@ -278,9 +278,11 @@ class UserService
      * @param string $token
      * @param $message
      * @throws InvalidArgumentException|DBException
+     * @throws Exception
      */
     public function bingTelegram(string $token, Message $message)
     {
+        Log::error('telegram_message' . $token, $message);
         $user = $this->getUserByResetToken($token);
         $conditions = ['type' => AuthClientType::TELEGRAM, 'user_id' => data_get($user, 'id'), 'status' => true];
         if (!$model = AuthClient::find()->where($conditions)->one()) {
@@ -292,7 +294,6 @@ class UserService
         if (!$model->save()) {
             throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
         }
-        Log::error('telegram_message', $message);
     }
 
 
