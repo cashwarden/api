@@ -40,7 +40,7 @@ class TelegramService extends BaseObject
      */
     public function bind(string $token, Message $message)
     {
-        Yii::error(json_encode($message), 'telegram_message' . $token);
+        Yii::error($message, 'telegram_message' . $token);
 
         $user = $this->userService->getUserByResetToken($token);
         $conditions = [
@@ -52,7 +52,7 @@ class TelegramService extends BaseObject
             $model = new AuthClient();
             $model->load($conditions, '');
         }
-        $model->client_id = $message->getFrom()->getId();
+        $model->client_id = (string)$message->getFrom()->getId();
         $model->data = Json::encode($message);
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
