@@ -80,12 +80,12 @@ class TelegramController extends ActiveController
                     \Yii::$app->user->setIdentity($user);
                     $model = $this->transactionService->createByDesc($message->getText());
                     $text = "记账成功\n";
-                    $text .= '交易类型：' . TransactionType::getName($model->type) . '\n';
+                    $text .= '交易类型：' . TransactionType::getName($model->type) . "\n";
                     if (in_array($model->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
-                        $text .= '支付账户：' . $model->fromAccount->name . '\n';
+                        $text .= '支付账户：' . $model->fromAccount->name . "\n";
                     }
                     if (in_array($model->type, [TransactionType::IN, TransactionType::TRANSFER])) {
-                        $text .= '收款账户：' . $model->toAccount->name . '\n';
+                        $text .= '收款账户：' . $model->toAccount->name . "\n";
                     }
                     $text .= '金额：' . Setup::toYuan($model->amount_cent);
                 } catch (\Exception $e) {
