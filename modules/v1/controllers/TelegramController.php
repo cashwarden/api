@@ -82,10 +82,14 @@ class TelegramController extends ActiveController
                     $text = "记账成功\n";
                     $text .= '交易类型：' . TransactionType::getName($model->type) . "\n";
                     if (in_array($model->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
-                        $text .= '支付账户：' . $model->fromAccount->name . "\n";
+                        $fromAccountName = $model->fromAccount->name;
+                        $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
+                        $text .= "支付账户： {$fromAccountName} （余额：{$fromAccountBalance}）\n";
                     }
                     if (in_array($model->type, [TransactionType::IN, TransactionType::TRANSFER])) {
-                        $text .= '收款账户：' . $model->toAccount->name . "\n";
+                        $toAccountName = $model->toAccount->name;
+                        $toAccountBalance = Setup::toYuan($model->toAccount->balance_cent);
+                        $text .= "收款账户： {$toAccountName} （余额：{$toAccountBalance}）\n";
                     }
                     $text .= '金额：' . Setup::toYuan($model->amount_cent);
                 } catch (\Exception $e) {
