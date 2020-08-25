@@ -132,6 +132,7 @@ class Transaction extends \yii\db\ActiveRecord
             ['type', 'in', 'range' => TransactionType::names()],
             ['reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
             ['status', 'in', 'range' => TransactionStatus::names()],
+            ['currency_amount', 'compare', 'compareValue' => 0, 'operator' => '>'],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
 
             [['date'], 'safe'],
@@ -182,9 +183,6 @@ class Transaction extends \yii\db\ActiveRecord
         if (parent::beforeSave($insert)) {
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
-            }
-            if (!$this->currency_amount) {
-                return false;
             }
             $this->reimbursement_status = is_null($this->reimbursement_status) ?
                 ReimbursementStatus::NONE : ReimbursementStatus::toEnumValue($this->reimbursement_status);
