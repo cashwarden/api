@@ -36,14 +36,25 @@ class TelegramController extends ActiveController
         try {
             $bot = TelegramService::newClient();
             $bot->command('ping', function (Message $message) use ($bot) {
+                $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup(
+                    [["one", "two", "three"]],
+                    true
+                ); // true for one-time keyboard
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), 'pong!');
+                $bot->sendMessage($message->getChat()->getId(), 'pong!', null, false, null, $keyboard);
             });
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
+                $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup(
+                    [
+                        [
+                            ['text' => 'link', 'url' => 'https://core.telegram.org']
+                        ]
+                    ]
+                );
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), "hi");
+                $bot->sendMessage($message->getChat()->getId(), "hi", null, false, null, $keyboard);
             }, function (Update $message) {
                 if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
                     return true;
