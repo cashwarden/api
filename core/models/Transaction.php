@@ -183,6 +183,9 @@ class Transaction extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
+            if (!$this->currency_amount) {
+                return false;
+            }
             $this->reimbursement_status = is_null($this->reimbursement_status) ?
                 ReimbursementStatus::NONE : ReimbursementStatus::toEnumValue($this->reimbursement_status);
             $this->status = is_null($this->status) ?
