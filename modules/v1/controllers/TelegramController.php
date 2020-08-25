@@ -55,7 +55,7 @@ class TelegramController extends ActiveController
                             ],
                             [
                                 'text' => 'Delete',
-                                'callback_data' => 'delete',
+                                'callback_data' => 56,
                             ]
                         ]
                     ]
