@@ -76,7 +76,6 @@ class TelegramService extends BaseObject
     {
         $data = Json::decode($message->getData());
         if (data_get($data, 'action') == 'delete') {
-            $text = '记录删除失败';
             /** @var Transaction $model */
             if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
                 $transaction = Yii::$app->db->beginTransaction();
@@ -90,9 +89,10 @@ class TelegramService extends BaseObject
                     $transaction->rollBack();
                     $text = '记录删除失败: ' . $e->getMessage();
                 }
+            } else {
+                $text = '删除失败，记录已被删除或者不存在';
             }
-            Yii::error($message->toJson(), '1111111');
-            $replyToMessageId = $message->getId();
+            $replyToMessageId = $message->getMessage()->getMessageId();
             /** @var BotApi $bot */
             $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
         }
