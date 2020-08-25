@@ -193,7 +193,7 @@ class Record extends ActiveRecord
                 $record->delete();
             }
         }
-        AccountService::updateAccountBalance($this->account_id);
+        $this->account_id ?: AccountService::updateAccountBalance($this->account_id);
     }
 
     /**

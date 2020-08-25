@@ -88,10 +88,10 @@ class TelegramService extends BaseObject
                     $transaction->commit();
                 } catch (\Exception $e) {
                     $transaction->rollBack();
-                    $text = '记录成功被失败: ' . $e->getMessage();
+                    $text = '记录删除失败: ' . $e->getMessage();
                 }
             }
-            Yii::error($message, '1111111');
+            Yii::error(Json::encode($message), '1111111');
             /** @var BotApi $bot */
             $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
         }
