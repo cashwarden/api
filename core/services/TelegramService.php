@@ -10,6 +10,8 @@ use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Message;
 use Yii;
@@ -65,6 +67,9 @@ class TelegramService extends BaseObject
     /**
      * @param CallbackQuery $message
      * @param Client $bot
+     * @param null $replyToMessageId
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws \Throwable
      */
     public function callbackQuery(CallbackQuery $message, Client $bot, $replyToMessageId = null)
@@ -86,7 +91,7 @@ class TelegramService extends BaseObject
                     $text = '记录成功被失败: ' . $e->getMessage();
                 }
             }
-            $replyToMessageId = $message->getId();
+            Yii::error($message, '1111111');
             /** @var BotApi $bot */
             $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
         }
