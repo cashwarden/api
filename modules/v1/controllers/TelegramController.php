@@ -49,7 +49,14 @@ class TelegramController extends ActiveController
                 $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup(
                     [
                         [
-                            ['text' => 'link', 'url' => 'https://core.telegram.org']
+                            [
+                                'text' => 'link',
+                                'url' => 'https://core.telegram.org',
+                            ],
+                            [
+                                'text' => 'Delete',
+                                'callback_data' => 'delete',
+                            ]
                         ]
                     ]
                 );
