@@ -35,6 +35,21 @@ class TelegramController extends ActiveController
     {
         try {
             $bot = TelegramService::newClient();
+
+            $bot->callbackQuery(function ($message) use ($bot) {
+                if ($message->getData() == "56") {
+                    // If you want you can send some kind of popup message after the user clicked one of the buttons
+                    $bot->answerCallbackQuery($message->getId(), "You clicked on option1. Loading...");
+
+                    $bot->sendMessage(
+                        $message->getFrom()->getId(),
+                        "Hi " . $message->getFrom()->getUsername() . ", you've choosen <b>Option 1</b>",
+                        "HTML"
+                    );
+                }
+            });
+
+
             $bot->command('ping', function (Message $message) use ($bot) {
                 $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup(
                     [["one", "two", "three"]],
