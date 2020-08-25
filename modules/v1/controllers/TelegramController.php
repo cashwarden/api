@@ -7,8 +7,11 @@ use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
 use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
+use TelegramBot\Api\Types\CallbackQuery;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
+use yii\helpers\Json;
 use yiier\graylog\Log;
 use yiier\helpers\Setup;
 use yiier\helpers\StringHelper;
@@ -36,7 +39,7 @@ class TelegramController extends ActiveController
         try {
             $bot = TelegramService::newClient();
 
-            $bot->callbackQuery(function ($message) use ($bot) {
+            $bot->callbackQuery(function (CallbackQuery $message) use ($bot) {
                 $bot->answerCallbackQuery($message->getId(), "Loading...");
                 /** @var BotApi $bot */
                 $this->telegramService->callbackQuery($message, $bot);
@@ -53,22 +56,8 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
-                $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup(
-                    [
-                        [
-                            [
-                                'text' => 'link',
-                                'url' => 'https://core.telegram.org',
-                            ],
-                            [
-                                'text' => 'Delete',
-                                'callback_data' => 56,
-                            ]
-                        ]
-                    ]
-                );
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), "hi", null, false, null, $keyboard);
+                $bot->sendMessage($message->getChat()->getId(), "hi");
             }, function (Update $message) {
                 if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
                     return true;
@@ -97,6 +86,7 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
+                $keyboard = null;
                 try {
                     $user = $this->userService->getUserByClientId(
                         AuthClientType::TELEGRAM,
@@ -104,6 +94,16 @@ class TelegramController extends ActiveController
                     );
                     \Yii::$app->user->setIdentity($user);
                     $model = $this->transactionService->createByDesc($message->getText());
+                    $keyboard = new InlineKeyboardMarkup(
+                        [
+                            [
+                                [
+                                    'text' => 'Delete',
+                                    'callback_data' => Json::encode(['action' => 'delete', 'id' => $model->id]),
+                                ]
+                            ]
+                        ]
+                    );
                     $text = "记账成功\n";
                     $text .= '交易类型：' . TransactionType::getName($model->type) . "\n";
                     if (in_array($model->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
@@ -120,9 +120,8 @@ class TelegramController extends ActiveController
                 } catch (\Exception $e) {
                     $text = $e->getMessage();
                 }
-
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), $text);
+                $bot->sendMessage($message->getChat()->getId(), $text, null, false, null, $keyboard);
             }, function (Update $message) {
                 if ($message->getMessage()) {
                     if (strpos($message->getMessage()->getText(), '/bind') === 0) {

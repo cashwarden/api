@@ -3,6 +3,7 @@
 namespace app\core\services;
 
 use app\core\models\AuthClient;
+use app\core\models\Transaction;
 use app\core\models\User;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
@@ -11,11 +12,13 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Message;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\db\Exception as DBException;
+use yii\helpers\Json;
 use yiier\helpers\Setup;
 
 class TelegramService extends BaseObject
@@ -62,20 +65,24 @@ class TelegramService extends BaseObject
     }
 
     /**
-     * @param Message $message
+     * @param CallbackQuery $message
      * @param BotApi $bot
      * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|\Throwable
      */
-    public function callbackQuery(Message $message, BotApi $bot)
+    public function callbackQuery(CallbackQuery $message, BotApi $bot)
     {
-        Yii::error($message, '1111111');
-        if ($message->getData() == "56") {
-            $bot->sendMessage(
-                $message->getFrom()->getId(),
-                "Hi " . $message->getFrom()->getUsername() . ", you've choosen <b>Option 1</b>",
-                "HTML"
-            );
+        $data = Json::decode($message->getData());
+        if (data_get($data, 'action') == 'delete') {
+            $text = '记录删除失败';
+            try {
+                if ($model = Transaction::find()->where(data_get($data, 'id'))->one()->delete()) {
+                    $text = '记录成功被删除';
+                }
+            } catch (\Exception $e) {
+                $text = '记录删除失败' . $e->getMessage();
+            }
+            $bot->sendMessage($message->getFrom()->getId(), $text);
         }
     }
 }
