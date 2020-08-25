@@ -7,7 +7,10 @@ use app\core\models\User;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
+use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
+use TelegramBot\Api\Exception;
+use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Message;
 use Yii;
 use yii\base\BaseObject;
@@ -55,6 +58,24 @@ class TelegramService extends BaseObject
         $model->data = $message->getFrom()->toJson();
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
+        }
+    }
+
+    /**
+     * @param Message $message
+     * @param BotApi $bot
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function callbackQuery(Message $message, BotApi $bot)
+    {
+        Yii::error($message, '1111111');
+        if ($message->getData() == "56") {
+            $bot->sendMessage(
+                $message->getFrom()->getId(),
+                "Hi " . $message->getFrom()->getUsername() . ", you've choosen <b>Option 1</b>",
+                "HTML"
+            );
         }
     }
 }
