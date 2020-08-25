@@ -91,7 +91,8 @@ class TelegramService extends BaseObject
                     $text = '记录删除失败: ' . $e->getMessage();
                 }
             }
-            Yii::error(Json::encode($message), '1111111');
+            Yii::error($message->toJson(), '1111111');
+            $replyToMessageId = $message->getId();
             /** @var BotApi $bot */
             $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
         }
