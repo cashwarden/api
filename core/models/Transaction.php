@@ -38,6 +38,7 @@ use yiier\validators\MoneyValidator;
  *
  * @property-read Category $category
  * @property-read Account $fromAccount
+ * @property-read Record[] $records
  * @property-read Account $toAccount
  */
 class Transaction extends \yii\db\ActiveRecord
@@ -228,6 +229,11 @@ class Transaction extends \yii\db\ActiveRecord
     public function getFromAccount()
     {
         return $this->hasOne(Account::class, ['id' => 'from_account_id']);
+    }
+
+    public function getRecords()
+    {
+        return $this->hasMany(Record::class, ['transaction_id' => 'id']);
     }
 
     public function getToAccount()

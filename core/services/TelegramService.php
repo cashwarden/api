@@ -67,20 +67,28 @@ class TelegramService extends BaseObject
      * @param Client $bot
      * @throws \Throwable
      */
-    public function callbackQuery(CallbackQuery $message, Client $bot)
+    public function callbackQuery(CallbackQuery $message, Client $bot, $replyToMessageId = null)
     {
         $data = Json::decode($message->getData());
         if (data_get($data, 'action') == 'delete') {
             $text = '记录删除失败';
-            try {
-                if ($model = Transaction::find()->where(data_get($data, 'id'))->one()->delete()) {
+            /** @var Transaction $model */
+            if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    foreach ($model->records as $record) {
+                        $record->delete();
+                    }
                     $text = '记录成功被删除';
+                    $transaction->commit();
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $text = '记录成功被失败: ' . $e->getMessage();
                 }
-            } catch (\Exception $e) {
-                $text = '记录删除失败: ' . $e->getMessage();
             }
+            $replyToMessageId = $message->getId();
             /** @var BotApi $bot */
-            $bot->sendMessage($message->getFrom()->getId(), $text);
+            $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
         }
     }
 }
