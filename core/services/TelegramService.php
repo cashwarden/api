@@ -80,7 +80,7 @@ class TelegramService extends BaseObject
                     $text = '记录成功被删除';
                 }
             } catch (\Exception $e) {
-                $text = '记录删除失败' . $e->getMessage();
+                $text = '记录删除失败: ' . $e->getMessage();
             }
             $bot->sendMessage($message->getFrom()->getId(), $text);
         }
