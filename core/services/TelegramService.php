@@ -10,8 +10,6 @@ use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
-use TelegramBot\Api\Exception;
-use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Message;
 use Yii;
@@ -66,11 +64,10 @@ class TelegramService extends BaseObject
 
     /**
      * @param CallbackQuery $message
-     * @param BotApi $bot
-     * @throws Exception
-     * @throws InvalidArgumentException|\Throwable
+     * @param Client $bot
+     * @throws \Throwable
      */
-    public function callbackQuery(CallbackQuery $message, BotApi $bot)
+    public function callbackQuery(CallbackQuery $message, Client $bot)
     {
         $data = Json::decode($message->getData());
         if (data_get($data, 'action') == 'delete') {
@@ -82,6 +79,7 @@ class TelegramService extends BaseObject
             } catch (\Exception $e) {
                 $text = '记录删除失败: ' . $e->getMessage();
             }
+            /** @var BotApi $bot */
             $bot->sendMessage($message->getFrom()->getId(), $text);
         }
     }

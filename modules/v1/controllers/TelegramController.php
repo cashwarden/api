@@ -41,7 +41,6 @@ class TelegramController extends ActiveController
 
             $bot->callbackQuery(function (CallbackQuery $message) use ($bot) {
                 $bot->answerCallbackQuery($message->getId(), "Loading...");
-                /** @var BotApi $bot */
                 $this->telegramService->callbackQuery($message, $bot);
             });
 
