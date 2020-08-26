@@ -26,6 +26,7 @@ use yiier\helpers\Setup;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
+ * @property float $amount
  * @property-read Account $account
  * @property-read Category $category
  * @property-read Transaction $transaction
@@ -204,9 +205,6 @@ class Record extends ActiveRecord
         $fields = parent::fields();
         unset($fields['currency_amount_cent'], $fields['user_id'], $fields['amount_cent']);
 
-        $fields['transaction'] = function (self $model) {
-            return $model->transaction;
-        };
 
         $fields['direction'] = function (self $model) {
             return DirectionType::getName($model->direction);
@@ -220,13 +218,17 @@ class Record extends ActiveRecord
             return Setup::toYuan($model->amount_cent);
         };
 
-        $fields['category'] = function (self $model) {
-            return $model->category;
-        };
-
-        $fields['account'] = function (self $model) {
-            return $model->account;
-        };
+//        $fields['transaction'] = function (self $model) {
+//            return $model->transaction;
+//        };
+//
+//        $fields['category'] = function (self $model) {
+//            return $model->category;
+//        };
+//
+//        $fields['account'] = function (self $model) {
+//            return $model->account;
+//        };
 
         $fields['created_at'] = function (self $model) {
             return DateHelper::datetimeToIso8601($model->created_at);

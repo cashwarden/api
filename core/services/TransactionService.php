@@ -11,6 +11,8 @@ use app\core\types\DirectionType;
 use app\core\types\TransactionType;
 use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
+use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
 class TransactionService
@@ -136,6 +138,33 @@ class TransactionService
             throw new InternalException($e->getMessage());
         }
     }
+
+    /**
+     * @param Record[] $records
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public function formatRecords(array $records)
+    {
+        $items = [];
+        foreach ($records as $record) {
+            $key = DateHelper::convert($record->date, 'date');
+            $items[$key]['record'][] = $record;
+            $items[$key]['date'] = $key;
+            $items[$key]['out'] = 0;
+            $items[$key]['in'] = 0;
+            if ($record->direction === DirectionType::OUT) {
+                $items[$key]['record_out_amount_cent'][] = $record->amount_cent;
+                $items[$key]['out'] = Setup::toYuan(array_sum($items[$key]['record_out_amount_cent']));
+            }
+            if ($record->direction === DirectionType::IN) {
+                $items[$key]['record_in_amount_cent'][] = $record->amount_cent;
+                $items[$key]['in'] = Setup::toYuan(array_sum($items[$key]['record_in_amount_cent']));
+            }
+        }
+        return $items;
+    }
+
 
     /**
      * @param Account $account
