@@ -151,13 +151,15 @@ class TransactionService
             $key = DateHelper::convert($record->date, 'date');
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
-            if ($record->direction === DirectionType::OUT) {
-                $items[$key]['record_out_amount_cent'][] = $record->amount_cent;
-                $items[$key]['out'] = Setup::toYuan(array_sum($items[$key]['record_out_amount_cent']));
-            }
-            if ($record->direction === DirectionType::IN) {
-                $items[$key]['record_in_amount_cent'][] = $record->amount_cent;
-                $items[$key]['in'] = Setup::toYuan(array_sum($items[$key]['record_in_amount_cent']));
+            if ($record->transaction_id) {
+                if ($record->direction === DirectionType::OUT) {
+                    $items[$key]['record_out_amount_cent'][] = $record->amount_cent;
+                    $items[$key]['out'] = Setup::toYuan(array_sum($items[$key]['record_out_amount_cent']));
+                }
+                if ($record->direction === DirectionType::IN) {
+                    $items[$key]['record_in_amount_cent'][] = $record->amount_cent;
+                    $items[$key]['in'] = Setup::toYuan(array_sum($items[$key]['record_in_amount_cent']));
+                }
             }
         }
         return $items;
