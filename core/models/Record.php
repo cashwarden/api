@@ -218,17 +218,17 @@ class Record extends ActiveRecord
             return Setup::toYuan($model->amount_cent);
         };
 
-//        $fields['transaction'] = function (self $model) {
-//            return $model->transaction;
-//        };
-//
-//        $fields['category'] = function (self $model) {
-//            return $model->category;
-//        };
-//
-//        $fields['account'] = function (self $model) {
-//            return $model->account;
-//        };
+        $fields['transaction'] = function (self $model) {
+            return $model->transaction;
+        };
+
+        $fields['category'] = function (self $model) {
+            return $model->category;
+        };
+
+        $fields['account'] = function (self $model) {
+            return $model->account;
+        };
 
         $fields['created_at'] = function (self $model) {
             return DateHelper::datetimeToIso8601($model->created_at);

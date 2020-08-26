@@ -149,10 +149,8 @@ class TransactionService
         $items = [];
         foreach ($records as $record) {
             $key = DateHelper::convert($record->date, 'date');
-            $items[$key]['record'][] = $record;
+            $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
-            $items[$key]['out'] = 0;
-            $items[$key]['in'] = 0;
             if ($record->direction === DirectionType::OUT) {
                 $items[$key]['record_out_amount_cent'][] = $record->amount_cent;
                 $items[$key]['out'] = Setup::toYuan(array_sum($items[$key]['record_out_amount_cent']));
