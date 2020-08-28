@@ -22,6 +22,7 @@ use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\db\Exception as DBException;
 use yii\helpers\Json;
+use yiier\graylog\Log;
 use yiier\helpers\Setup;
 
 class TelegramService extends BaseObject
@@ -76,8 +77,8 @@ class TelegramService extends BaseObject
      */
     public function callbackQuery(CallbackQuery $message, Client $bot)
     {
+        /** @var BotApi $bot */
         $data = Json::decode($message->getData());
-        $text = '操作失败';
         switch (data_get($data, 'action')) {
             case TelegramAction::RECORD_DELETE:
                 /** @var Transaction $model */
@@ -89,22 +90,26 @@ class TelegramService extends BaseObject
                         }
                         $text = '记录成功被删除';
                         $transaction->commit();
+                        $bot->editMessageText(
+                            $message->getFrom()->getId(),
+                            $message->getMessage()->getMessageId(),
+                            $text
+                        );
                     } catch (\Exception $e) {
                         $transaction->rollBack();
-                        $text = '记录删除失败: ' . $e->getMessage();
+                        Log::error('删除记录失败', ['model' => $model->attributes, 'e' => (string)$e]);
                     }
                 } else {
                     $text = '删除失败，记录已被删除或者不存在';
+                    $replyToMessageId = $message->getMessage()->getMessageId();
+                    $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
                 }
-                $replyToMessageId = $message->getMessage()->getMessageId();
-                /** @var BotApi $bot */
-                $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
+
                 break;
             case TelegramAction::TRANSACTION_RATING:
                 $id = data_get($data, 'id');
                 if ($this->transactionService->updateRating($id, data_get($data, 'value'))) {
                     $replyMarkup = $this->getRecordMarkup(Transaction::findOne($id));
-                    /** @var BotApi $bot */
                     $bot->editMessageReplyMarkup(
                         $message->getFrom()->getId(),
                         $message->getMessage()->getMessageId(),
@@ -113,7 +118,6 @@ class TelegramService extends BaseObject
                 } else {
                     $text = '评分失败，记录已被删除或者不存在';
                     $replyToMessageId = $message->getMessage()->getMessageId();
-                    /** @var BotApi $bot */
                     $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
                 }
 
