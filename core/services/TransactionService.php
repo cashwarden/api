@@ -3,6 +3,7 @@
 namespace app\core\services;
 
 use app\core\exceptions\InternalException;
+use app\core\helpers\ArrayHelper;
 use app\core\models\Account;
 use app\core\models\Record;
 use app\core\models\Transaction;
@@ -12,6 +13,7 @@ use app\core\types\TransactionType;
 use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
+use yiier\graylog\Log;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
@@ -120,12 +122,15 @@ class TransactionService
                 }
             );
 
+            $model->date = $this->getDateByDesc($description);
+
             $model->tags = $this->getDataByDesc($rules, 'then_tags');
             $model->status = $this->getDataByDesc($rules, 'then_transaction_status');
             $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
 
             $model->currency_amount = $this->getAmountByDesc($description);
             $model->currency_code = user('base_currency_code');
+            dd($model->attributes);
             if (!$model->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
             }
@@ -170,6 +175,7 @@ class TransactionService
      * @param Account $account
      * @return bool
      * @throws \yii\db\Exception
+     * @throws InvalidConfigException
      */
     public static function createAdjustRecord(Account $account)
     {
@@ -185,7 +191,7 @@ class TransactionService
         $model->transaction_id = 0;
         $model->category_id = CategoryService::getAdjustCategoryId();
         $model->currency_code = $account->currency_code;
-        $model->date = date('Y-m-d');
+        $model->date = Yii::$app->formatter->asDate('now');
         if (!$model->save()) {
             Yii::error(
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
@@ -219,7 +225,7 @@ class TransactionService
      * @return null|int|string
      * @throws Exception
      */
-    public function getDataByDesc(array $rules, string $field, $callback = null)
+    private function getDataByDesc(array $rules, string $field, $callback = null)
     {
         foreach ($rules as $rule) {
             if ($data = data_get($rule->toArray(), $field)) {
@@ -237,5 +243,49 @@ class TransactionService
     {
         $userId = Yii::$app->user->id;
         return (int)data_get(AccountService::getDefaultAccount($userId), 'id', 0);
+    }
+
+    /**
+     * @param string $description
+     * @return string date Y-m-d
+     * @throws InvalidConfigException
+     */
+    private function getDateByDesc(string $description): string
+    {
+        if (ArrayHelper::strPosArr($description, ['昨天', '昨日']) !== false) {
+            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 1);
+        }
+
+        if (ArrayHelper::strPosArr($description, ['前天']) !== false) {
+            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 2);
+        }
+
+        if (ArrayHelper::strPosArr($description, ['大前天']) !== false) {
+            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 3);
+        }
+
+        try {
+            preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $description, $matches);
+            if (($m = data_get($matches, '1.0')) && $d = data_get($matches, '3.0')) {
+                $currMonth = Yii::$app->formatter->asDate('now', 'php:m');
+                $y = Yii::$app->formatter->asDate($m > $currMonth ? strtotime('-1 year') : time(), 'php:Y');
+                $m = sprintf("%02d", $m);
+                $d = sprintf("%02d", $d);
+                return "{$y}-{$m}-{$d}";
+            }
+
+            preg_match_all('!([0-9]+)(号|日)!', $description, $matches);
+            if ($d = data_get($matches, '1.0')) {
+                $y = Yii::$app->formatter->asDate(time(), 'php:Y');
+                $currDay = Yii::$app->formatter->asDate('now', 'php:d');
+                $m = Yii::$app->formatter->asDate($d > $currDay ? strtotime('-1 month') : time(), 'php:m');
+                $d = sprintf("%02d", $d);
+                return "{$y}-{$m}-{$d}";
+            }
+        } catch (Exception $e) {
+            Log::warning('未识别到日期', $description);
+        }
+
+        return Yii::$app->formatter->asDate('now');
     }
 }

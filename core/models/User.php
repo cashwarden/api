@@ -39,13 +39,14 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
      */
     public function behaviors()
     {
         return [
             [
                 'class' => TimestampBehavior::class,
-                'value' => date('Y-m-d H:i:s'),
+                'value' => Yii::$app->formatter->asDatetime('now')
             ],
         ];
     }

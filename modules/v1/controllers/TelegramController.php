@@ -132,17 +132,18 @@ class TelegramController extends ActiveController
                             ]
                         ]
                     );
-                    $text = "记账成功\n";
-                    $text .= '交易类型：' . TransactionType::getName($model->type) . "\n";
+                    $text = "记账成功😄" . "\n";
+                    $text .= '交易类目： #' . $model->category->name . "\n";
+                    $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";
                     if (in_array($model->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
                         $fromAccountName = $model->fromAccount->name;
                         $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
-                        $text .= "支付账户： {$fromAccountName} （余额：{$fromAccountBalance}）\n";
+                        $text .= "支付账户： #{$fromAccountName} （余额：{$fromAccountBalance}）\n";
                     }
                     if (in_array($model->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
                         $toAccountName = $model->toAccount->name;
                         $toAccountBalance = Setup::toYuan($model->toAccount->balance_cent);
-                        $text .= "收款账户： {$toAccountName} （余额：{$toAccountBalance}）\n";
+                        $text .= "收款账户： #{$toAccountName} （余额：{$toAccountBalance}）\n";
                     }
                     $text .= '金额：' . Setup::toYuan($model->amount_cent);
                 } catch (\Exception $e) {
