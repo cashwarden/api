@@ -103,13 +103,20 @@ class TelegramService extends BaseObject
             case TelegramAction::TRANSACTION_RATING:
                 $id = data_get($data, 'id');
                 if ($this->transactionService->updateRating($id, data_get($data, 'value'))) {
-                    $text = '评分成功';
+                    $replyMarkup = $this->getRecordMarkup(Transaction::findOne($id));
+                    /** @var BotApi $bot */
+                    $bot->editMessageReplyMarkup(
+                        $message->getFrom()->getId(),
+                        $message->getMessage()->getMessageId(),
+                        $replyMarkup
+                    );
                 } else {
                     $text = '评分失败，记录已被删除或者不存在';
+                    $replyToMessageId = $message->getMessage()->getMessageId();
+                    /** @var BotApi $bot */
+                    $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
                 }
-                $replyMarkup = $this->getRecordMarkup(Transaction::findOne($id));
-                /** @var BotApi $bot */
-                $bot->sendMessage($message->getFrom()->getId(), $text, null, false, null, $replyMarkup);
+
                 break;
             default:
                 # code...
