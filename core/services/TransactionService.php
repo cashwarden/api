@@ -27,10 +27,10 @@ class TransactionService
     public static function createUpdateRecord(Transaction $transaction)
     {
         $data = [];
-        if (in_array($transaction->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
+        if (in_array($transaction->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
             array_push($data, ['direction' => DirectionType::OUT, 'account_id' => $transaction->from_account_id]);
         }
-        if (in_array($transaction->type, [TransactionType::IN, TransactionType::TRANSFER])) {
+        if (in_array($transaction->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
             array_push($data, ['direction' => DirectionType::IN, 'account_id' => $transaction->to_account_id]);
         }
         $model = new Record();
@@ -63,7 +63,7 @@ class TransactionService
     {
         $type = $transaction->type;
         if (data_get($changedAttributes, 'type') && $transaction->type !== TransactionType::TRANSFER) {
-            $direction = $type == TransactionType::IN ? DirectionType::OUT : DirectionType::IN;
+            $direction = $type == TransactionType::INCOME ? DirectionType::OUT : DirectionType::IN;
             Record::find()->where([
                 'transaction_id' => $transaction->id,
                 'direction' => $direction
@@ -89,12 +89,12 @@ class TransactionService
                 $rules,
                 'then_transaction_type',
                 function () {
-                    return TransactionType::getName(TransactionType::OUT);
+                    return TransactionType::getName(TransactionType::EXPENSES);
                 }
             );
             $transactionType = TransactionType::toEnumValue($model->type);
 
-            if (in_array($transactionType, [TransactionType::OUT, TransactionType::TRANSFER])) {
+            if (in_array($transactionType, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
                 $model->from_account_id = $this->getDataByDesc(
                     $rules,
                     'then_from_account_id',
@@ -103,7 +103,7 @@ class TransactionService
             }
 
 
-            if (in_array($transactionType, [TransactionType::IN, TransactionType::TRANSFER])) {
+            if (in_array($transactionType, [TransactionType::INCOME, TransactionType::TRANSFER])) {
                 $model->to_account_id = $this->getDataByDesc(
                     $rules,
                     'then_to_account_id',

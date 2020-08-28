@@ -65,8 +65,8 @@ class Transaction extends \yii\db\ActiveRecord
     {
         return [
             self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
-            TransactionType::getName(TransactionType::IN) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
-            TransactionType::getName(TransactionType::OUT) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+            TransactionType::getName(TransactionType::INCOME) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+            TransactionType::getName(TransactionType::EXPENSES) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
             TransactionType::getName(TransactionType::TRANSFER) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
         ];
     }
@@ -105,7 +105,7 @@ class Transaction extends \yii\db\ActiveRecord
                 'to_account_id',
                 'required',
                 'on' => [
-                    TransactionType::getName(TransactionType::IN),
+                    TransactionType::getName(TransactionType::INCOME),
                     TransactionType::getName(TransactionType::TRANSFER),
                 ]
             ],
@@ -113,7 +113,7 @@ class Transaction extends \yii\db\ActiveRecord
                 'from_account_id',
                 'required',
                 'on' => [
-                    TransactionType::getName(TransactionType::OUT),
+                    TransactionType::getName(TransactionType::EXPENSES),
                     TransactionType::getName(TransactionType::TRANSFER),
                 ]
             ],

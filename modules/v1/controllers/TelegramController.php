@@ -5,6 +5,8 @@ namespace app\modules\v1\controllers;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
+use app\core\types\TelegramAction;
+use app\core\types\TransactionRating;
 use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
@@ -97,20 +99,47 @@ class TelegramController extends ActiveController
                         [
                             [
                                 [
-                                    'text' => 'Delete',
-                                    'callback_data' => Json::encode(['action' => 'delete', 'id' => $model->id]),
+                                    'text' => '🚮删除',
+                                    'callback_data' => Json::encode([
+                                        'action' => TelegramAction::RECORD_DELETE,
+                                        'id' => $model->id
+                                    ]),
+                                ],
+                                [
+                                    'text' => '😍' . TransactionRating::texts()[TransactionRating::MUST],
+                                    'callback_data' => Json::encode([
+                                        'action' => TelegramAction::TRANSACTION_RATING,
+                                        'id' => $model->id,
+                                        'value' => TransactionRating::MUST
+                                    ]),
+                                ],
+                                [
+                                    'text' => '😐' . TransactionRating::texts()[TransactionRating::NEED],
+                                    'callback_data' => Json::encode([
+                                        'action' => TelegramAction::TRANSACTION_RATING,
+                                        'id' => $model->id,
+                                        'value' => TransactionRating::NEED
+                                    ]),
+                                ],
+                                [
+                                    'text' => '💩' . TransactionRating::texts()[TransactionRating::WANT],
+                                    'callback_data' => Json::encode([
+                                        'action' => TelegramAction::TRANSACTION_RATING,
+                                        'id' => $model->id,
+                                        'value' => TransactionRating::WANT
+                                    ]),
                                 ]
                             ]
                         ]
                     );
                     $text = "记账成功\n";
                     $text .= '交易类型：' . TransactionType::getName($model->type) . "\n";
-                    if (in_array($model->type, [TransactionType::OUT, TransactionType::TRANSFER])) {
+                    if (in_array($model->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
                         $fromAccountName = $model->fromAccount->name;
                         $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
                         $text .= "支付账户： {$fromAccountName} （余额：{$fromAccountBalance}）\n";
                     }
-                    if (in_array($model->type, [TransactionType::IN, TransactionType::TRANSFER])) {
+                    if (in_array($model->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
                         $toAccountName = $model->toAccount->name;
                         $toAccountBalance = Setup::toYuan($model->toAccount->balance_cent);
                         $text .= "收款账户： {$toAccountName} （余额：{$toAccountBalance}）\n";

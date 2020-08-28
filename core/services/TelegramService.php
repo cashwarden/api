@@ -8,6 +8,7 @@ use app\core\models\User;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
+use app\core\types\TelegramAction;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
@@ -67,34 +68,51 @@ class TelegramService extends BaseObject
     /**
      * @param CallbackQuery $message
      * @param Client $bot
-     * @param null $replyToMessageId
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws \Throwable
      */
-    public function callbackQuery(CallbackQuery $message, Client $bot, $replyToMessageId = null)
+    public function callbackQuery(CallbackQuery $message, Client $bot)
     {
         $data = Json::decode($message->getData());
-        if (data_get($data, 'action') == 'delete') {
-            /** @var Transaction $model */
-            if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-                    foreach ($model->records as $record) {
-                        $record->delete();
+        $text = '操作失败';
+        switch (data_get($data, 'action')) {
+            case TelegramAction::RECORD_DELETE:
+                /** @var Transaction $model */
+                if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
+                    $transaction = Yii::$app->db->beginTransaction();
+                    try {
+                        foreach ($model->records as $record) {
+                            $record->delete();
+                        }
+                        $text = '记录成功被删除';
+                        $transaction->commit();
+                    } catch (\Exception $e) {
+                        $transaction->rollBack();
+                        $text = '记录删除失败: ' . $e->getMessage();
                     }
-                    $text = '记录成功被删除';
-                    $transaction->commit();
-                } catch (\Exception $e) {
-                    $transaction->rollBack();
-                    $text = '记录删除失败: ' . $e->getMessage();
+                } else {
+                    $text = '删除失败，记录已被删除或者不存在';
                 }
-            } else {
-                $text = '删除失败，记录已被删除或者不存在';
-            }
-            $replyToMessageId = $message->getMessage()->getMessageId();
-            /** @var BotApi $bot */
-            $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
+                break;
+            case TelegramAction::TRANSACTION_RATING:
+                /** @var Transaction $model */
+                if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
+                    $model->rating = data_get($data, 'value');
+                    if ($model->save()) {
+                        $text = '评分成功';
+                    }
+                } else {
+                    $text = '评分失败，记录已被删除或者不存在';
+                }
+                break;
+            default:
+                # code...
+                break;
         }
+
+        $replyToMessageId = $message->getMessage()->getMessageId();
+        /** @var BotApi $bot */
+        $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
     }
 }
