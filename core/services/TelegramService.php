@@ -129,7 +129,7 @@ class TelegramService extends BaseObject
         $tests = TransactionRating::texts();
         $rating = [];
         foreach (TransactionRating::names() as $key => $name) {
-            $rating[TransactionRating::MUST] = null;
+            $rating[$key] = null;
         }
         if ($model->rating) {
             $rating[$model->rating] = 1;
