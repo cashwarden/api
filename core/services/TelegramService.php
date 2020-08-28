@@ -144,7 +144,7 @@ class TelegramService extends BaseObject
                 ]),
             ],
             [
-                'text' => '😐' . $tests[TransactionRating::NEED] . $rating[TransactionRating::MUST],
+                'text' => '😐' . $tests[TransactionRating::NEED] . $rating[TransactionRating::NEED],
                 'callback_data' => Json::encode([
                     'action' => TelegramAction::TRANSACTION_RATING,
                     'id' => $model->id,
@@ -152,7 +152,7 @@ class TelegramService extends BaseObject
                 ]),
             ],
             [
-                'text' => '💩' . $tests[TransactionRating::WANT] . $rating[TransactionRating::MUST],
+                'text' => '💩' . $tests[TransactionRating::WANT] . $rating[TransactionRating::WANT],
                 'callback_data' => Json::encode([
                     'action' => TelegramAction::TRANSACTION_RATING,
                     'id' => $model->id,
