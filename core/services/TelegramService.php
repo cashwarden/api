@@ -98,6 +98,7 @@ class TelegramService extends BaseObject
             case TelegramAction::TRANSACTION_RATING:
                 /** @var Transaction $model */
                 if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
+                    $model->load($model->toArray(), '');
                     $model->rating = data_get($data, 'value');
                     if ($model->save()) {
                         $text = '评分成功';
