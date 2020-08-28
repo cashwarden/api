@@ -7,6 +7,7 @@ use app\core\models\Transaction;
 use app\core\traits\FixDataTrait;
 use app\core\types\RecordSource;
 use app\core\types\TransactionType;
+use Yii;
 use yii\console\Controller;
 
 class FixController extends Controller
@@ -34,7 +35,7 @@ class FixController extends Controller
                 $source = data_get($transaction, 'description') ? RecordSource::TELEGRAM : RecordSource::WEB;
                 $transactionType = data_get($transaction, 'type') ?: TransactionType::ADJUST;
 
-                $date = current(explode(' ', $item->date));
+                $date = Yii::$app->formatter->asDate(strtotime($item->date));
                 try {
                     $this->count += Record::updateAll(
                         ['source' => $source, 'transaction_type' => $transactionType, 'date' => $date],
@@ -56,7 +57,7 @@ class FixController extends Controller
             function (Transaction $item) {
                 try {
                     $this->count += Transaction::updateAll(
-                        ['date' => current(explode(' ', $item->date))],
+                        ['date' => Yii::$app->formatter->asDate(strtotime($item->date))],
                         ['id' => $item->id]
                     );
                 } catch (\Exception $e) {

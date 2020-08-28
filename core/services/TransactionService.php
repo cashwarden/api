@@ -14,7 +14,6 @@ use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
 use yiier\graylog\Log;
-use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
 class TransactionService
@@ -155,7 +154,7 @@ class TransactionService
     {
         $items = [];
         foreach ($records as $record) {
-            $key = DateHelper::convert($record->date, 'date');
+            $key = Yii::$app->formatter->asDate(strtotime($record->date));
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
             if ($record->transaction_id) {
