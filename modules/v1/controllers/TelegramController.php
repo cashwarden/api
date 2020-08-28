@@ -5,6 +5,7 @@ namespace app\modules\v1\controllers;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
+use app\core\types\RecordSource;
 use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
@@ -95,7 +96,7 @@ class TelegramController extends ActiveController
                         $message->getFrom()->getId()
                     );
                     \Yii::$app->user->setIdentity($user);
-                    $model = $this->transactionService->createByDesc($message->getText());
+                    $model = $this->transactionService->createByDesc($message->getText(), RecordSource::TELEGRAM);
                     $keyboard = $this->telegramService->getRecordMarkup($model);
                     $text = "记账成功😄" . "\n";
                     $text .= '交易类目： #' . $model->category->name . "\n";

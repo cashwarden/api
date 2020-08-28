@@ -48,6 +48,7 @@ class TransactionService
             $_model->currency_amount_cent = $transaction->currency_amount_cent;
             $_model->currency_code = $transaction->currency_code;
             $_model->date = $transaction->date;
+            $_model->transaction_type = $transaction->type;
             $_model->load($datum, '');
             if (!$_model->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($_model->firstErrors));
@@ -76,11 +77,12 @@ class TransactionService
 
     /**
      * @param string $description
+     * @param null|int $source
      * @return Transaction
      * @throws InternalException
      * @throws \Throwable
      */
-    public function createByDesc(string $description): Transaction
+    public function createByDesc(string $description, $source = null): Transaction
     {
         $model = new Transaction();
         try {
@@ -133,6 +135,7 @@ class TransactionService
             if (!$model->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
             }
+            $source ? Record::updateAll(['source' => $source], ['transaction_id' => $model->id]) : null;
             return $model;
         } catch (Exception $e) {
             Yii::error(

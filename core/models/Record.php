@@ -4,6 +4,7 @@ namespace app\core\models;
 
 use app\core\services\AccountService;
 use app\core\types\DirectionType;
+use app\core\types\RecordSource;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -16,6 +17,7 @@ use yiier\helpers\Setup;
  * @property int $id
  * @property int $user_id
  * @property int $account_id
+ * @property int $transaction_type
  * @property int $category_id
  * @property int $amount_cent
  * @property int $currency_amount_cent
@@ -23,6 +25,7 @@ use yiier\helpers\Setup;
  * @property int|null $transaction_id
  * @property int $direction
  * @property string $date
+ * @property int $source
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -74,10 +77,11 @@ class Record extends ActiveRecord
                 [
                     'user_id',
                     'account_id',
+                    'transaction_type',
                     'category_id',
                     'currency_amount_cent',
                     'currency_code',
-                    'direction'
+                    'direction',
                 ],
                 'required'
             ],
@@ -85,6 +89,7 @@ class Record extends ActiveRecord
                 [
                     'user_id',
                     'account_id',
+                    'transaction_type',
                     'category_id',
                     'amount_cent',
                     'currency_amount_cent',
@@ -94,6 +99,7 @@ class Record extends ActiveRecord
                 'integer'
             ],
             ['direction', 'in', 'range' => [DirectionType::IN, DirectionType::OUT]],
+            ['source', 'in', 'range' => array_keys(RecordSource::names())],
             [['date'], 'safe'],
         ];
     }
@@ -107,6 +113,7 @@ class Record extends ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
             'account_id' => Yii::t('app', 'Account ID'),
+            'transaction_type' => Yii::t('app', 'Transaction Type'),
             'category_id' => Yii::t('app', 'Category ID'),
             'amount_cent' => Yii::t('app', 'Amount Cent'),
             'currency_amount_cent' => Yii::t('app', 'Currency Amount Cent'),
@@ -114,6 +121,7 @@ class Record extends ActiveRecord
             'transaction_id' => Yii::t('app', 'Transaction ID'),
             'direction' => Yii::t('app', 'Direction'),
             'date' => Yii::t('app', 'Date'),
+            'source' => Yii::t('app', 'Source'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -143,6 +151,7 @@ class Record extends ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            $this->source = $this->source ?: RecordSource::WEB;
             if (!$this->amount_cent) {
                 if ($this->currency_code == user('base_currency_code')) {
                     $this->amount_cent = $this->currency_amount_cent;
