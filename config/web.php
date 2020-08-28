@@ -39,13 +39,6 @@ $config = [
             'class' => \sizeg\jwt\Jwt::class,
             'key' => env('JWT_SECRET'),
         ],
-        'formatter' => [
-            'dateFormat' => 'yyyy-MM-dd',
-            'datetimeFormat' => 'yyyy-MM-dd HH:mm:ss',
-            'decimalSeparator' => ',',
-            'thousandSeparator' => ' ',
-            'currencyCode' => 'CNY',
-        ],
         'user' => [
             'identityClass' => User::class,
             'enableAutoLogin' => true,
