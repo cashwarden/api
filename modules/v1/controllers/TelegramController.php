@@ -135,7 +135,7 @@ class TelegramController extends ActiveController
                     $text = "记账成功😄" . "\n";
                     $text .= '交易类目： #' . $model->category->name . "\n";
                     $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";
-                    $date = str_replace('-', '', $model->date); // for telegram tag
+                    $date = (string)str_replace('-', '', $model->date); // for telegram tag
                     $text .= "交易时间： #{$date}\n";
                     if (in_array($model->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
                         $fromAccountName = $model->fromAccount->name;
