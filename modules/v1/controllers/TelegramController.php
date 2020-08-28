@@ -5,15 +5,11 @@ namespace app\modules\v1\controllers;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
-use app\core\types\TelegramAction;
-use app\core\types\TransactionRating;
 use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
-use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
-use yii\helpers\Json;
 use yiier\graylog\Log;
 use yiier\helpers\Setup;
 use yiier\helpers\StringHelper;
@@ -43,6 +39,11 @@ class TelegramController extends ActiveController
 
             $bot->callbackQuery(function (CallbackQuery $message) use ($bot) {
                 $bot->answerCallbackQuery($message->getId(), "Loading...");
+                $user = $this->userService->getUserByClientId(
+                    AuthClientType::TELEGRAM,
+                    $message->getFrom()->getId()
+                );
+                \Yii::$app->user->setIdentity($user);
                 $this->telegramService->callbackQuery($message, $bot);
             });
 
@@ -95,43 +96,7 @@ class TelegramController extends ActiveController
                     );
                     \Yii::$app->user->setIdentity($user);
                     $model = $this->transactionService->createByDesc($message->getText());
-                    $keyboard = new InlineKeyboardMarkup(
-                        [
-                            [
-                                [
-                                    'text' => '🚮删除',
-                                    'callback_data' => Json::encode([
-                                        'action' => TelegramAction::RECORD_DELETE,
-                                        'id' => $model->id
-                                    ]),
-                                ],
-                                [
-                                    'text' => '😍' . TransactionRating::texts()[TransactionRating::MUST],
-                                    'callback_data' => Json::encode([
-                                        'action' => TelegramAction::TRANSACTION_RATING,
-                                        'id' => $model->id,
-                                        'value' => TransactionRating::MUST
-                                    ]),
-                                ],
-                                [
-                                    'text' => '😐' . TransactionRating::texts()[TransactionRating::NEED],
-                                    'callback_data' => Json::encode([
-                                        'action' => TelegramAction::TRANSACTION_RATING,
-                                        'id' => $model->id,
-                                        'value' => TransactionRating::NEED
-                                    ]),
-                                ],
-                                [
-                                    'text' => '💩' . TransactionRating::texts()[TransactionRating::WANT],
-                                    'callback_data' => Json::encode([
-                                        'action' => TelegramAction::TRANSACTION_RATING,
-                                        'id' => $model->id,
-                                        'value' => TransactionRating::WANT
-                                    ]),
-                                ]
-                            ]
-                        ]
-                    );
+                    $keyboard = $this->telegramService->getRecordMarkup($model);
                     $text = "记账成功😄" . "\n";
                     $text .= '交易类目： #' . $model->category->name . "\n";
                     $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";

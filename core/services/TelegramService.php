@@ -9,11 +9,13 @@ use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use app\core\types\TelegramAction;
+use app\core\types\TransactionRating;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\CallbackQuery;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use Yii;
 use yii\base\BaseObject;
@@ -94,21 +96,71 @@ class TelegramService extends BaseObject
                 } else {
                     $text = '删除失败，记录已被删除或者不存在';
                 }
+                $replyToMessageId = $message->getMessage()->getMessageId();
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
                 break;
             case TelegramAction::TRANSACTION_RATING:
-                if ($this->transactionService->updateRating(data_get($data, 'id'), data_get($data, 'value'))) {
+                $id = data_get($data, 'id');
+                if ($this->transactionService->updateRating($id, data_get($data, 'value'))) {
                     $text = '评分成功';
                 } else {
                     $text = '评分失败，记录已被删除或者不存在';
                 }
+                $replyMarkup = $this->getRecordMarkup(Transaction::findOne($id));
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getFrom()->getId(), $text, null, false, null, $replyMarkup);
                 break;
             default:
                 # code...
                 break;
         }
+    }
 
-        $replyToMessageId = $message->getMessage()->getMessageId();
-        /** @var BotApi $bot */
-        $bot->sendMessage($message->getFrom()->getId(), $text, null, false, $replyToMessageId);
+    public function getRecordMarkup(Transaction $model)
+    {
+        $tests = TransactionRating::texts();
+        $rating = [];
+        foreach (TransactionRating::names() as $key => $name) {
+            $rating[TransactionRating::MUST] = null;
+        }
+        if ($model->rating) {
+            $rating[$model->rating] = 1;
+        }
+        $items = [
+            [
+                'text' => '🚮删除',
+                'callback_data' => Json::encode([
+                    'action' => TelegramAction::RECORD_DELETE,
+                    'id' => $model->id
+                ]),
+            ],
+            [
+                'text' => '😍' . $tests[TransactionRating::MUST] . $rating[TransactionRating::MUST],
+                'callback_data' => Json::encode([
+                    'action' => TelegramAction::TRANSACTION_RATING,
+                    'id' => $model->id,
+                    'value' => TransactionRating::MUST
+                ]),
+            ],
+            [
+                'text' => '😐' . $tests[TransactionRating::NEED] . $rating[TransactionRating::MUST],
+                'callback_data' => Json::encode([
+                    'action' => TelegramAction::TRANSACTION_RATING,
+                    'id' => $model->id,
+                    'value' => TransactionRating::NEED
+                ]),
+            ],
+            [
+                'text' => '💩' . $tests[TransactionRating::WANT] . $rating[TransactionRating::MUST],
+                'callback_data' => Json::encode([
+                    'action' => TelegramAction::TRANSACTION_RATING,
+                    'id' => $model->id,
+                    'value' => TransactionRating::WANT
+                ]),
+            ]
+        ];
+
+        return new InlineKeyboardMarkup([$items]);
     }
 }
