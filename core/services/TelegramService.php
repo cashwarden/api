@@ -96,13 +96,8 @@ class TelegramService extends BaseObject
                 }
                 break;
             case TelegramAction::TRANSACTION_RATING:
-                /** @var Transaction $model */
-                if ($model = Transaction::find()->where(['id' => data_get($data, 'id')])->one()) {
-                    $model->load($model->toArray(), '');
-                    $model->rating = data_get($data, 'value');
-                    if ($model->save()) {
-                        $text = '评分成功';
-                    }
+                if ($this->transactionService->updateRating(data_get($data, 'id'), data_get($data, 'value'))) {
+                    $text = '评分成功';
                 } else {
                     $text = '评分失败，记录已被删除或者不存在';
                 }

@@ -169,6 +169,19 @@ class TransactionService
         return $items;
     }
 
+    /**
+     * @param int $id
+     * @param int $rating
+     * @return int
+     * @throws InvalidConfigException
+     */
+    public function updateRating(int $id, int $rating)
+    {
+        return Transaction::updateAll(
+            ['rating' => $rating, 'updated_at' => Yii::$app->formatter->asDatetime('now')],
+            ['id' => $id]
+        );
+    }
 
     /**
      * @param Account $account
