@@ -130,7 +130,6 @@ class TransactionService
 
             $model->currency_amount = $this->getAmountByDesc($description);
             $model->currency_code = user('base_currency_code');
-            dd($model->attributes);
             if (!$model->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
             }
