@@ -88,12 +88,12 @@ class AccountService
     {
         $in = Record::find()->where([
             'account_id' => $accountId,
-            'direction' => DirectionType::IN,
+            'direction' => DirectionType::INCOME,
         ])->sum('currency_amount_cent');
 
         $out = Record::find()->where([
             'account_id' => $accountId,
-            'direction' => DirectionType::OUT,
+            'direction' => DirectionType::EXPENSE,
         ])->sum('currency_amount_cent');
 
         return ($in - $out) ?: 0;

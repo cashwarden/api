@@ -98,7 +98,7 @@ class Record extends ActiveRecord
                 ],
                 'integer'
             ],
-            ['direction', 'in', 'range' => [DirectionType::IN, DirectionType::OUT]],
+            ['direction', 'in', 'range' => [DirectionType::INCOME, DirectionType::EXPENSE]],
             ['source', 'in', 'range' => array_keys(RecordSource::names())],
             [['date'], 'safe'],
         ];

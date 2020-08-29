@@ -29,10 +29,10 @@ class TransactionService
     {
         $data = [];
         if (in_array($transaction->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
-            array_push($data, ['direction' => DirectionType::OUT, 'account_id' => $transaction->from_account_id]);
+            array_push($data, ['direction' => DirectionType::EXPENSE, 'account_id' => $transaction->from_account_id]);
         }
         if (in_array($transaction->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
-            array_push($data, ['direction' => DirectionType::IN, 'account_id' => $transaction->to_account_id]);
+            array_push($data, ['direction' => DirectionType::INCOME, 'account_id' => $transaction->to_account_id]);
         }
         $model = new Record();
         foreach ($data as $datum) {
@@ -65,7 +65,7 @@ class TransactionService
     {
         $type = $transaction->type;
         if (data_get($changedAttributes, 'type') && $transaction->type !== TransactionType::TRANSFER) {
-            $direction = $type == TransactionType::INCOME ? DirectionType::OUT : DirectionType::IN;
+            $direction = $type == TransactionType::INCOME ? DirectionType::EXPENSE : DirectionType::INCOME;
             Record::find()->where([
                 'transaction_id' => $transaction->id,
                 'direction' => $direction
@@ -158,11 +158,12 @@ class TransactionService
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
             if ($record->transaction_id) {
-                if ($record->direction === DirectionType::OUT) {
+                // todo 计算有待优化
+                if ($record->direction === DirectionType::EXPENSE) {
                     $items[$key]['record_out_amount_cent'][] = $record->amount_cent;
                     $items[$key]['out'] = Setup::toYuan(array_sum($items[$key]['record_out_amount_cent']));
                 }
-                if ($record->direction === DirectionType::IN) {
+                if ($record->direction === DirectionType::INCOME) {
                     $items[$key]['record_in_amount_cent'][] = $record->amount_cent;
                     $items[$key]['in'] = Setup::toYuan(array_sum($items[$key]['record_in_amount_cent']));
                 }
@@ -198,7 +199,7 @@ class TransactionService
             return false;
         }
         $model = new Record();
-        $model->direction = $diff > 0 ? DirectionType::IN : DirectionType::OUT;
+        $model->direction = $diff > 0 ? DirectionType::INCOME : DirectionType::EXPENSE;
         $model->currency_amount_cent = abs($diff);
         $model->user_id = $account->user_id;
         $model->account_id = $account->id;
