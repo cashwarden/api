@@ -4,6 +4,7 @@ namespace app\core\helpers;
 
 use app\core\exceptions\InvalidArgumentException;
 use app\core\types\BaseType;
+use yii\base\InvalidConfigException;
 
 class SearchHelper
 {
@@ -12,6 +13,7 @@ class SearchHelper
      * @param $typeClassName
      * @return string
      * @throws InvalidArgumentException
+     * @throws InvalidConfigException
      */
     public static function stringToInt(string $searchStr, $typeClassName)
     {
