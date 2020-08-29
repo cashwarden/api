@@ -2,8 +2,11 @@
 
 namespace app\modules\v1\controllers;
 
+use app\core\exceptions\InvalidArgumentException;
+use app\core\helpers\SearchHelper;
 use app\core\models\Record;
 use app\core\traits\ServiceTrait;
+use app\core\types\TransactionType;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
@@ -28,7 +31,8 @@ class RecordController extends ActiveController
 
     /**
      * @return ActiveDataProvider
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|InvalidArgumentException
+     * @throws \Exception
      */
     public function prepareDataProvider()
     {
@@ -40,7 +44,12 @@ class RecordController extends ActiveController
             'pageSize' => $this->getPageSize()
         ]);
 
-        $dataProvider = $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $params = Yii::$app->request->queryParams;
+        if ($type = data_get($params, 'transaction_type')) {
+            $params['transaction_type'] = SearchHelper::stringToInt($type, TransactionType::class);
+        }
+
+        $dataProvider = $searchModel->search(['SearchModel' => $params]);
         $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
 
         $dataProvider->setModels($this->transactionService->formatRecords($dataProvider->getModels()));
