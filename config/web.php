@@ -68,7 +68,7 @@ $config = [
                 "POST <module>/reset-token" => '<module>/user/reset-token',
                 "GET <module>/users/auth-clients" => '<module>/user/get-auth-clients',
                 "GET <module>/transactions/types" => '<module>/transaction/types',
-                "GET <module>/records/statistics" => '<module>/record/statistics',
+                "GET <module>/records/overview" => '<module>/record/overview',
 
                 [
                     'class' => 'yii\rest\UrlRule',

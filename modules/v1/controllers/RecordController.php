@@ -64,7 +64,7 @@ class RecordController extends ActiveController
      * @return array
      * @throws \Exception
      */
-    public function actionStatistics()
+    public function actionOverview()
     {
         $items = [];
         foreach (StatisticsHelper::getItems() as $item) {
