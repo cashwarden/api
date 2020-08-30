@@ -57,12 +57,11 @@ class RuleService
     {
         $models = Rule::find()
             ->where(['user_id' => \Yii::$app->user->id, 'status' => RuleStatus::ACTIVE])
-            ->orderBy(['id' => SORT_DESC])
+            ->orderBy(['sort' => SORT_ASC, 'id' => SORT_DESC])
             ->all();
         $rules = [];
         /** @var Rule $model */
         foreach ($models as $model) {
-//            dump(ArrayHelper::strPosArr($desc, $model->if_keywords));
             if (ArrayHelper::strPosArr($desc, $model->if_keywords) !== false) {
                 array_push($rules, $model);
             }
