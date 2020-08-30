@@ -204,7 +204,7 @@ class Record extends ActiveRecord
                 $record->delete();
             }
         }
-        $this->account_id ?: AccountService::updateAccountBalance($this->account_id);
+        $this->account_id ? AccountService::updateAccountBalance($this->account_id) : null;
     }
 
     /**
