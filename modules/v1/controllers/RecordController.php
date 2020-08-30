@@ -74,6 +74,6 @@ class RecordController extends ActiveController
             $items[$key]['text'] = $item;
         }
 
-        return $items;
+        return array_values($items);
     }
 }
