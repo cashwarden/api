@@ -25,6 +25,12 @@ return [
     'Want' => '享乐',
     'Need' => '可选',
 
+    'Current month' => '本月',
+    'Yesterday' => '昨天',
+    'Today' => '今天',
+    'Grand total' => '累计',
+
+
     'Base Currency Code' => '基础货币',
     'Food and drink' => '餐饮食品',
     'Home life' => '居家生活',

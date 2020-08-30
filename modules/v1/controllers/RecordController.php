@@ -67,9 +67,11 @@ class RecordController extends ActiveController
     public function actionOverview()
     {
         $items = [];
-        foreach (StatisticsHelper::getItems() as $item) {
-            $date = StatisticsService::getDateRange($item);
-            $items[$item] = $this->statisticsService->getRecordOverviewByDate($date);
+        foreach (StatisticsHelper::texts() as $key => $item) {
+            $date = StatisticsService::getDateRange($key);
+            $items[$key]['overview'] = $this->statisticsService->getRecordOverviewByDate($date);
+            $items[$key]['key'] = $key;
+            $items[$key]['text'] = $item;
         }
 
         return $items;

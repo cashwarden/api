@@ -54,7 +54,7 @@ class StatisticsService extends BaseObject
                 $time = strtotime('-1 day');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp($time)];
                 break;
-            case StatisticsHelper::MONTH:
+            case StatisticsHelper::CURRENT_MONTH:
                 $time = $formatter->asDate('now', 'php:01-m-Y');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp()];
                 break;
