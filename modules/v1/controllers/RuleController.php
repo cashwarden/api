@@ -18,7 +18,8 @@ class RuleController extends ActiveController
     use ServiceTrait;
 
     public $modelClass = Rule::class;
-
+    public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
+    public $partialMatchAttributes = ['name'];
 
     /**
      * @param int $id

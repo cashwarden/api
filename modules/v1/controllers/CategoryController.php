@@ -10,4 +10,5 @@ use app\core\models\Category;
 class CategoryController extends ActiveController
 {
     public $modelClass = Category::class;
+    public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
 }

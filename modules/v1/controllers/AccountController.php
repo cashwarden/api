@@ -20,6 +20,7 @@ class AccountController extends ActiveController
 
     public $modelClass = Account::class;
     public $noAuthActions = [];
+    public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
 
     public function actions()
     {

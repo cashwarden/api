@@ -11,10 +11,16 @@ use yii\web\ForbiddenHttpException;
 use yiier\helpers\SearchModel;
 use yiier\helpers\Setup;
 
+/**
+ *
+ * @property-read int $pageSize
+ */
 class ActiveController extends \yii\rest\ActiveController
 {
     protected const MAX_PAGE_SIZE = 100;
     protected const DEFAULT_PAGE_SIZE = 20;
+    public $defaultOrder = ['id' => SORT_DESC];
+    public $partialMatchAttributes = [];
 
     /**
      * 不参与校验的 actions
@@ -67,9 +73,10 @@ class ActiveController extends \yii\rest\ActiveController
     {
         $modelClass = $this->modelClass;
         $searchModel = new SearchModel([
-            'defaultOrder' => ['id' => SORT_DESC],
+            'defaultOrder' => $this->defaultOrder,
             'model' => $modelClass,
             'scenario' => 'default',
+            'partialMatchAttributes' => $this->partialMatchAttributes,
             'pageSize' => $this->getPageSize()
         ]);
 

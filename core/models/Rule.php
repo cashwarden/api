@@ -27,6 +27,7 @@ use yiier\validators\ArrayValidator;
  * @property int|null $then_reimbursement_status
  * @property string|null|array $then_tags Multiple choice use,
  * @property int|null $status
+ * @property int|null $sort
  * @property string|null $created_at
  * @property string|null $updated_at
  */
@@ -61,7 +62,7 @@ class Rule extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'if_keywords', 'then_transaction_type'], 'required'],
-            [['user_id', 'then_category_id', 'then_from_account_id', 'then_to_account_id'], 'integer'],
+            [['user_id', 'then_category_id', 'then_from_account_id', 'then_to_account_id', 'sort'], 'integer'],
             ['status', 'in', 'range' => RuleStatus::names()],
             ['then_transaction_type', 'in', 'range' => TransactionType::names()],
             ['then_reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
@@ -89,6 +90,7 @@ class Rule extends \yii\db\ActiveRecord
             'then_reimbursement_status' => Yii::t('app', 'Then Reimbursement Status'),
             'then_tags' => Yii::t('app', 'Then Tags'),
             'status' => Yii::t('app', 'Status'),
+            'sort' => Yii::t('app', 'Sort'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
