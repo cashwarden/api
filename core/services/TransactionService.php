@@ -204,6 +204,7 @@ class TransactionService
         $model->user_id = $account->user_id;
         $model->account_id = $account->id;
         $model->transaction_id = 0;
+        $model->transaction_type = TransactionType::ADJUST;
         $model->category_id = CategoryService::getAdjustCategoryId();
         $model->currency_code = $account->currency_code;
         $model->date = Yii::$app->formatter->asDate('now');
