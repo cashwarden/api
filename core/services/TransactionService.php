@@ -28,7 +28,7 @@ class TransactionService
     public static function createUpdateRecord(Transaction $transaction)
     {
         $data = [];
-        if (in_array($transaction->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
+        if (in_array($transaction->type, [TransactionType::EXPENSE, TransactionType::TRANSFER])) {
             array_push($data, ['direction' => DirectionType::EXPENSE, 'account_id' => $transaction->from_account_id]);
         }
         if (in_array($transaction->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
@@ -92,12 +92,12 @@ class TransactionService
                 $rules,
                 'then_transaction_type',
                 function () {
-                    return TransactionType::getName(TransactionType::EXPENSES);
+                    return TransactionType::getName(TransactionType::EXPENSE);
                 }
             );
             $transactionType = TransactionType::toEnumValue($model->type);
 
-            if (in_array($transactionType, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
+            if (in_array($transactionType, [TransactionType::EXPENSE, TransactionType::TRANSFER])) {
                 $model->from_account_id = $this->getDataByDesc(
                     $rules,
                     'then_from_account_id',

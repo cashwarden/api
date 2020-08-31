@@ -102,7 +102,7 @@ class TelegramController extends ActiveController
                     $text .= '交易类目： #' . $model->category->name . "\n";
                     $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";
                     $text .= "交易时间： {$model->date}\n"; // todo add tag
-                    if (in_array($model->type, [TransactionType::EXPENSES, TransactionType::TRANSFER])) {
+                    if (in_array($model->type, [TransactionType::EXPENSE, TransactionType::TRANSFER])) {
                         $fromAccountName = $model->fromAccount->name;
                         $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
                         $text .= "支付账户： #{$fromAccountName} （余额：{$fromAccountBalance}）\n";

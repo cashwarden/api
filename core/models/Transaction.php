@@ -66,7 +66,7 @@ class Transaction extends \yii\db\ActiveRecord
         return [
             self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
             TransactionType::getName(TransactionType::INCOME) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
-            TransactionType::getName(TransactionType::EXPENSES) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
+            TransactionType::getName(TransactionType::EXPENSE) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
             TransactionType::getName(TransactionType::TRANSFER) => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
         ];
     }
@@ -114,7 +114,7 @@ class Transaction extends \yii\db\ActiveRecord
                 'from_account_id',
                 'required',
                 'on' => [
-                    TransactionType::getName(TransactionType::EXPENSES),
+                    TransactionType::getName(TransactionType::EXPENSE),
                     TransactionType::getName(TransactionType::TRANSFER),
                 ]
             ],
@@ -137,7 +137,7 @@ class Transaction extends \yii\db\ActiveRecord
             ['currency_amount', 'compare', 'compareValue' => 0, 'operator' => '>'],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
 
-            [['date'], 'safe'],
+            [['date'], 'datetime', 'format' => 'php:Y-m-d'],
             [['currency_code'], 'string', 'max' => 3],
             [['description', 'remark', 'image'], 'string', 'max' => 255],
             ['tags', ArrayValidator::class],

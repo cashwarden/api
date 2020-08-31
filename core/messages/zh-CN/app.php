@@ -15,7 +15,7 @@ return [
     'Credit Card' => '信用卡',
     'Saving Account' => '储蓄账户',
     'Investment Account' => '投资账户',
-    'Expenses' => '支出',
+    'Expense' => '支出',
     'Income' => '收入',
     'Transfer' => '转账',
     'Adjust Balance' => '调整余额',

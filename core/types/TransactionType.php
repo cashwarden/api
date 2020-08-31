@@ -6,7 +6,7 @@ use Yii;
 
 class TransactionType extends BaseType
 {
-    public const EXPENSES = 1;
+    public const EXPENSE = 1;
     public const INCOME = 2;
     public const TRANSFER = 3;
     public const ADJUST = 4;
@@ -14,7 +14,7 @@ class TransactionType extends BaseType
     public static function names(): array
     {
         return [
-            self::EXPENSES => 'expenses',
+            self::EXPENSE => 'expense',
             self::INCOME => 'income',
             self::TRANSFER => 'transfer',
             self::ADJUST => 'adjust',
@@ -24,7 +24,7 @@ class TransactionType extends BaseType
     public static function texts(): array
     {
         return [
-            self::EXPENSES => Yii::t('app', 'Expenses'),
+            self::EXPENSE => Yii::t('app', 'Expense'),
             self::INCOME => Yii::t('app', 'Income'),
             self::TRANSFER => Yii::t('app', 'Transfer'),
             self::ADJUST => Yii::t('app', 'Adjust'),
