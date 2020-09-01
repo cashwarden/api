@@ -62,7 +62,7 @@ class RuleService
         $rules = [];
         /** @var Rule $model */
         foreach ($models as $model) {
-            if (ArrayHelper::strPosArr($desc, $model->if_keywords) !== false) {
+            if (ArrayHelper::strPosArr($desc, explode(',', $model->if_keywords)) !== false) {
                 array_push($rules, $model);
             }
         }
