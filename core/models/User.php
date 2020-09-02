@@ -204,6 +204,11 @@ class User extends ActiveRecord implements IdentityInterface
             return DateHelper::datetimeToIso8601($model->created_at);
         };
 
+        $fields['avatar'] = function (self $model) {
+            $avatar = md5($model->avatar);
+            return "http://gravatar.com/avatar/{$avatar}?s=48";
+        };
+
         $fields['updated_at'] = function (self $model) {
             return DateHelper::datetimeToIso8601($model->updated_at);
         };
