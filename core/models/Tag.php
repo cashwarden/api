@@ -50,10 +50,9 @@ class Tag extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['user_id', 'count'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
             [['color'], 'string', 'max' => 7],
             [['name'], 'string', 'max' => 60],
-            [['user_id', 'name'], 'unique'],
+            ['name', 'unique', 'targetAttribute' => ['user_id', 'name']],
         ];
     }
 

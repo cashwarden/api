@@ -60,9 +60,9 @@ class Category extends \yii\db\ActiveRecord
             [['transaction_type', 'name', 'icon_name'], 'required'],
             [['user_id', 'status', 'default', 'sort'], 'integer'],
             ['transaction_type', 'in', 'range' => TransactionType::names()],
-            [['created_at', 'updated_at'], 'safe'],
             [['name', 'icon_name'], 'string', 'max' => 120],
             ['color', 'in', 'range' => ColorType::items()],
+            ['name', 'unique', 'targetAttribute' => ['user_id', 'name']],
         ];
     }
 
