@@ -10,5 +10,6 @@ use app\core\models\Tag;
 class TagController extends ActiveController
 {
     public $modelClass = Tag::class;
+    public $defaultOrder = ['count' => SORT_DESC, 'id' => SORT_DESC];
     public $partialMatchAttributes = ['name'];
 }
