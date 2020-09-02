@@ -57,7 +57,7 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['transaction_type', 'name', 'color', 'icon_name'], 'required'],
+            [['transaction_type', 'name', 'icon_name'], 'required'],
             [['user_id', 'status', 'default', 'sort'], 'integer'],
             ['transaction_type', 'in', 'range' => TransactionType::names()],
             [['created_at', 'updated_at'], 'safe'],
@@ -96,6 +96,8 @@ class Category extends \yii\db\ActiveRecord
         if (parent::beforeSave($insert)) {
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
+                $ran = ColorType::items();
+                $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
             }
             $this->transaction_type = TransactionType::toEnumValue($this->transaction_type);
             return true;
