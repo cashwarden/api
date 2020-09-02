@@ -1,0 +1,11 @@
+grumphp:
+    tasks:
+        phpcs:
+            standard: PSR12
+            ignore_patterns:
+                - ./web/*
+                - ./migrations/*,
+                - ./vendor/*
+                - ./runtime/*
+                - ./requirements.php
+                - ./_ide_helper.php
