@@ -18,6 +18,8 @@ class CategoryController extends ActiveController
 {
     public $modelClass = Category::class;
     public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
+    public $partialMatchAttributes = ['name'];
+
 
     /**
      * @return ActiveDataProvider
@@ -31,6 +33,7 @@ class CategoryController extends ActiveController
             'defaultOrder' => $this->defaultOrder,
             'model' => $modelClass,
             'scenario' => 'default',
+            'partialMatchAttributes' => $this->partialMatchAttributes,
             'pageSize' => $this->getPageSize()
         ]);
 
