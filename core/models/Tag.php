@@ -2,6 +2,7 @@
 
 namespace app\core\models;
 
+use app\core\types\ColorType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yiier\helpers\DateHelper;
@@ -47,7 +48,7 @@ class Tag extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['color', 'name'], 'required'],
+            [['name'], 'required'],
             [['user_id', 'count'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['color'], 'string', 'max' => 7],
@@ -80,6 +81,8 @@ class Tag extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
+                $ran = ColorType::items();
+                $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
                 $this->user_id = Yii::$app->user->id;
             }
             return true;
