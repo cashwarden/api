@@ -21,12 +21,6 @@ class JoinRequest extends \yii\base\Model
             [['username', 'email'], 'trim'],
             [['username', 'email', 'base_currency_code'], 'required'],
 
-            [
-                'username',
-                'match',
-                'pattern' => '/^[a-z]\w*$/i',
-                'message' => t('app', '{attribute} can only be numbers and letters.')
-            ],
             ['username', 'unique', 'targetClass' => User::class],
             ['username', 'string', 'min' => 4, 'max' => 60],
 
