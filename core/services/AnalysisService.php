@@ -8,6 +8,7 @@ use app\core\models\Record;
 use app\core\types\DirectionType;
 use Yii;
 use yii\base\BaseObject;
+use yii\base\InvalidConfigException;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
@@ -45,7 +46,6 @@ class AnalysisService extends BaseObject
             $conditions = ['between', 'date', $date[0], $date[1]];
         }
         $userId = \Yii::$app->user->id;
-
         $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType];
         $categories = Category::find()->where($baseConditions)->asArray()->all();
 
@@ -59,6 +59,30 @@ class AnalysisService extends BaseObject
             $items[$key]['y'] = $sum ? (float)Setup::toYuan($sum) : 0;
         }
 
+        return $items;
+    }
+
+    /**
+     * @param string $dateStr
+     * @param int $transactionType
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public function getRecordStatisticalData(string $dateStr, int $transactionType)
+    {
+        $dates = AnalysisHelper::getEveryDayByMonth($dateStr);
+        $userId = \Yii::$app->user->id;
+        $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType];
+        $items = [];
+        foreach ($dates as $key => $date) {
+            $items[$key]['x'] = sprintf("%02d", $key + 1);
+            $conditions = ['between', 'date', $date[0], $date[1]];
+            $sum = Record::find()
+                ->where($baseConditions)
+                ->andWhere($conditions)
+                ->sum('amount_cent');
+            $items[$key]['y'] = $sum ? (float)Setup::toYuan($sum) : 0;
+        }
         return $items;
     }
 
@@ -87,7 +111,7 @@ class AnalysisService extends BaseObject
         }
 
         return array_map(function ($i) use ($formatter) {
-            return $formatter->asDatetime($i, 'php:Y-m-d');
+            return $formatter->asDatetime($i);
         }, $date);
     }
 }

@@ -3,8 +3,8 @@
 namespace app\modules\v1\controllers;
 
 use app\core\exceptions\InvalidArgumentException;
-use app\core\helpers\SearchHelper;
 use app\core\helpers\AnalysisHelper;
+use app\core\helpers\SearchHelper;
 use app\core\models\Record;
 use app\core\services\AnalysisService;
 use app\core\traits\ServiceTrait;
@@ -75,5 +75,22 @@ class RecordController extends ActiveController
         }
 
         return array_values($items);
+    }
+
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
+    public function actionAnalysis()
+    {
+        $transactionType = request('transaction_type', TransactionType::getName(TransactionType::EXPENSE));
+        $date = request('date', Yii::$app->formatter->asDatetime('now'));
+
+        return $this->analysisService->getRecordStatisticalData(
+            $date,
+            TransactionType::toEnumValue($transactionType)
+        );
     }
 }
