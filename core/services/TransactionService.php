@@ -154,7 +154,7 @@ class TransactionService
     {
         $items = [];
         foreach ($records as $record) {
-            $key = Yii::$app->formatter->asDate(strtotime($record->date));
+            $key = Yii::$app->formatter->asDatetime(strtotime($record->date));
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
             if ($record->transaction_id) {
@@ -207,7 +207,7 @@ class TransactionService
         $model->transaction_type = TransactionType::ADJUST;
         $model->category_id = CategoryService::getAdjustCategoryId();
         $model->currency_code = $account->currency_code;
-        $model->date = Yii::$app->formatter->asDate('now');
+        $model->date = Yii::$app->formatter->asDatetime('now');
         if (!$model->save()) {
             Yii::error(
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
@@ -269,39 +269,52 @@ class TransactionService
     private function getDateByDesc(string $description): string
     {
         if (ArrayHelper::strPosArr($description, ['昨天', '昨日']) !== false) {
-            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 1);
+            return $this->getCreateRecordDate(time() - 3600 * 24 * 1);
         }
 
         if (ArrayHelper::strPosArr($description, ['前天']) !== false) {
-            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 2);
+            return $this->getCreateRecordDate(time() - 3600 * 24 * 2);
         }
 
         if (ArrayHelper::strPosArr($description, ['大前天']) !== false) {
-            return Yii::$app->formatter->asDate(time() - 3600 * 24 * 3);
+            return $this->getCreateRecordDate(time() - 3600 * 24 * 3);
         }
 
         try {
+            $time = $this->getCreateRecordDate('now', 'H:i');
             preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $description, $matches);
             if (($m = data_get($matches, '1.0')) && $d = data_get($matches, '3.0')) {
-                $currMonth = Yii::$app->formatter->asDate('now', 'php:m');
-                $y = Yii::$app->formatter->asDate($m > $currMonth ? strtotime('-1 year') : time(), 'php:Y');
+                $currMonth = Yii::$app->formatter->asDatetime('now', 'php:m');
+                $y = Yii::$app->formatter->asDatetime($m > $currMonth ? strtotime('-1 year') : time(), 'php:Y');
                 $m = sprintf("%02d", $m);
                 $d = sprintf("%02d", $d);
-                return "{$y}-{$m}-{$d}";
+                return "{$y}-{$m}-{$d} {$time}";
             }
 
             preg_match_all('!([0-9]+)(号|日)!', $description, $matches);
             if ($d = data_get($matches, '1.0')) {
-                $y = Yii::$app->formatter->asDate(time(), 'php:Y');
-                $currDay = Yii::$app->formatter->asDate('now', 'php:d');
-                $m = Yii::$app->formatter->asDate($d > $currDay ? strtotime('-1 month') : time(), 'php:m');
+                $y = Yii::$app->formatter->asDatetime(time(), 'php:Y');
+                $currDay = Yii::$app->formatter->asDatetime('now', 'php:d');
+                $m = Yii::$app->formatter->asDatetime($d > $currDay ? strtotime('-1 month') : time(), 'php:m');
                 $d = sprintf("%02d", $d);
-                return "{$y}-{$m}-{$d}";
+                return "{$y}-{$m}-{$d} {$time}";
             }
         } catch (Exception $e) {
             Log::warning('未识别到日期', $description);
         }
 
-        return Yii::$app->formatter->asDate('now');
+        return $this->getCreateRecordDate();
+    }
+
+
+    /**
+     * @param string $value
+     * @param string $format
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function getCreateRecordDate(string $value = 'now', string $format = 'php:Y-m-d H:i')
+    {
+        return Yii::$app->formatter->asDatetime($value, $format);
     }
 }

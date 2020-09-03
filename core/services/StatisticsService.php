@@ -55,13 +55,13 @@ class StatisticsService extends BaseObject
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp($time)];
                 break;
             case StatisticsHelper::CURRENT_MONTH:
-                $time = $formatter->asDate('now', 'php:01-m-Y');
+                $time = $formatter->asDatetime('now', 'php:01-m-Y');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp()];
                 break;
         }
 
         return array_map(function ($i) use ($formatter) {
-            return $formatter->asDate($i);
+            return $formatter->asDatetime($i, 'php:Y-m-d');
         }, $date);
     }
 }

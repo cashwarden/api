@@ -57,7 +57,6 @@ class Account extends \yii\db\ActiveRecord
     public function transactions()
     {
         return [
-            self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
             self::SCENARIO_CREDIT_CARD => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
         ];
     }

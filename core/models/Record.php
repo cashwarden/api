@@ -100,7 +100,7 @@ class Record extends ActiveRecord
             ],
             ['direction', 'in', 'range' => [DirectionType::INCOME, DirectionType::EXPENSE]],
             ['source', 'in', 'range' => array_keys(RecordSource::names())],
-            [['date'], 'safe'],
+            [['date'], 'datetime', 'format' => 'php:Y-m-d H:i'],
         ];
     }
 
@@ -238,6 +238,10 @@ class Record extends ActiveRecord
 
         $fields['account'] = function (self $model) {
             return $model->account;
+        };
+
+        $fields['date'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->date);
         };
 
         $fields['created_at'] = function (self $model) {

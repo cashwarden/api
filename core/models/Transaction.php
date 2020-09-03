@@ -137,7 +137,7 @@ class Transaction extends \yii\db\ActiveRecord
             ['currency_amount', 'compare', 'compareValue' => 0, 'operator' => '>'],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
 
-            [['date'], 'datetime', 'format' => 'php:Y-m-d'],
+            [['date'], 'datetime', 'format' => 'php:Y-m-d H:i'],
             [['currency_code'], 'string', 'max' => 3],
             [['description', 'remark', 'image'], 'string', 'max' => 255],
             ['tags', ArrayValidator::class],
@@ -272,6 +272,10 @@ class Transaction extends \yii\db\ActiveRecord
 
         $fields['status'] = function (self $model) {
             return TransactionStatus::getName($model->status);
+        };
+
+        $fields['date'] = function (self $model) {
+            return DateHelper::datetimeToIso8601($model->date);
         };
 
         $fields['created_at'] = function (self $model) {
