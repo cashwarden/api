@@ -74,11 +74,6 @@ class SiteController extends Controller
                             'icon' => 'anticon-database',
                         ],
                         [
-                            'text' => '仪表盘',
-                            'link' => '/dashboard',
-                            'icon' => 'anticon-dashboard',
-                        ],
-                        [
                             'text' => '设置',
                             'icon' => 'anticon-setting',
                             'children' => [
