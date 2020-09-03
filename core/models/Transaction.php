@@ -2,6 +2,7 @@
 
 namespace app\core\models;
 
+use app\core\services\TagService;
 use app\core\services\TransactionService;
 use app\core\types\ReimbursementStatus;
 use app\core\types\TransactionStatus;
@@ -190,8 +191,6 @@ class Transaction extends \yii\db\ActiveRecord
                 ReimbursementStatus::NONE : ReimbursementStatus::toEnumValue($this->reimbursement_status);
             $this->status = is_null($this->status) ?
                 TransactionStatus::DONE : TransactionStatus::toEnumValue($this->status);
-
-            $this->tags = $this->tags ? implode(',', $this->tags) : null;
             $this->type = TransactionType::toEnumValue($this->type);
 
             $this->currency_amount_cent = Setup::toFen($this->currency_amount);
@@ -201,6 +200,13 @@ class Transaction extends \yii\db\ActiveRecord
                 // $this->amount_cent = $this->currency_amount_cent;
                 // todo 计算汇率
             }
+
+            $this->tags ? TransactionService::createTags($this->tags) : null;
+            if ($this->description) {
+                $this->tags = array_merge((array)$this->tags, TransactionService::matchTagsByDesc($this->description));
+            }
+
+            $this->tags = $this->tags ? implode(',', $this->tags) : null;
             return true;
         } else {
             return false;
@@ -217,8 +223,13 @@ class Transaction extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
         TransactionService::createUpdateRecord($this);
+
         if (!$insert) {
             TransactionService::deleteRecord($this, $changedAttributes);
+        }
+        $oldTags = data_get($changedAttributes, 'tags', '');
+        if ($tags = $this->tags . $oldTags) {
+            TagService::updateCounters(explode(',', $tags));
         }
     }
 

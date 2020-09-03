@@ -6,17 +6,22 @@ use app\core\exceptions\InternalException;
 use app\core\helpers\ArrayHelper;
 use app\core\models\Account;
 use app\core\models\Record;
+use app\core\models\Tag;
 use app\core\models\Transaction;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
 use Exception;
 use Yii;
+use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yiier\graylog\Log;
 use yiier\helpers\Setup;
 
-class TransactionService
+/**
+ * @property-read int $accountIdByDesc
+ */
+class TransactionService extends BaseObject
 {
     use ServiceTrait;
 
@@ -75,19 +80,19 @@ class TransactionService
 
 
     /**
-     * @param string $description
+     * @param string $desc
      * @param null|int $source
      * @return Transaction
      * @throws InternalException
      * @throws \Throwable
      */
-    public function createByDesc(string $description, $source = null): Transaction
+    public function createByDesc(string $desc, $source = null): Transaction
     {
         $model = new Transaction();
         try {
-            $model->description = $description;
+            $model->description = $desc;
             $model->user_id = Yii::$app->user->id;
-            $rules = $this->getRuleService()->getRulesByDesc($description);
+            $rules = $this->getRuleService()->getRulesByDesc($desc);
             $model->type = $this->getDataByDesc(
                 $rules,
                 'then_transaction_type',
@@ -123,13 +128,13 @@ class TransactionService
                 }
             );
 
-            $model->date = $this->getDateByDesc($description);
+            $model->date = $this->getDateByDesc($desc);
 
             $model->tags = $this->getDataByDesc($rules, 'then_tags');
             $model->status = $this->getDataByDesc($rules, 'then_transaction_status');
             $model->reimbursement_status = $this->getDataByDesc($rules, 'then_reimbursement_status');
 
-            $model->currency_amount = $this->getAmountByDesc($description);
+            $model->currency_amount = $this->getAmountByDesc($desc);
             $model->currency_code = user('base_currency_code');
             if (!$model->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
@@ -218,6 +223,43 @@ class TransactionService
         return true;
     }
 
+
+    /**
+     * @param string $desc
+     * @return array
+     * @throws Exception
+     */
+    public static function matchTagsByDesc(string $desc): array
+    {
+        if ($tags = TagService::getTagNames()) {
+            $tags = implode('|', $tags);
+            preg_match_all("!({$tags})!", $desc, $matches);
+            return data_get($matches, '0', []);
+        }
+        return [];
+    }
+
+    /**
+     * @param array $tags
+     * @throws InvalidConfigException
+     */
+    public static function createTags(array $tags)
+    {
+        $has = Tag::find()
+            ->select('name')
+            ->where(['user_id' => Yii::$app->user->id, 'name' => $tags])
+            ->column();
+        /** @var TagService $tagService */
+        $tagService = Yii::createObject(TagService::class);
+        foreach (array_diff($tags, $has) as $item) {
+            try {
+                $tagService->create(['name' => $item]);
+            } catch (Exception $e) {
+                Log::error('add tag fail', [$item, (string)$e]);
+            }
+        }
+    }
+
     /**
      * @param string $desc
      * @return mixed|null
@@ -262,27 +304,27 @@ class TransactionService
     }
 
     /**
-     * @param string $description
+     * @param string $desc
      * @return string date Y-m-d
      * @throws InvalidConfigException
      */
-    private function getDateByDesc(string $description): string
+    private function getDateByDesc(string $desc): string
     {
-        if (ArrayHelper::strPosArr($description, ['昨天', '昨日']) !== false) {
+        if (ArrayHelper::strPosArr($desc, ['昨天', '昨日']) !== false) {
             return $this->getCreateRecordDate(time() - 3600 * 24 * 1);
         }
 
-        if (ArrayHelper::strPosArr($description, ['前天']) !== false) {
+        if (ArrayHelper::strPosArr($desc, ['前天']) !== false) {
             return $this->getCreateRecordDate(time() - 3600 * 24 * 2);
         }
 
-        if (ArrayHelper::strPosArr($description, ['大前天']) !== false) {
+        if (ArrayHelper::strPosArr($desc, ['大前天']) !== false) {
             return $this->getCreateRecordDate(time() - 3600 * 24 * 3);
         }
 
         try {
             $time = $this->getCreateRecordDate('now', 'H:i');
-            preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $description, $matches);
+            preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $desc, $matches);
             if (($m = data_get($matches, '1.0')) && $d = data_get($matches, '3.0')) {
                 $currMonth = Yii::$app->formatter->asDatetime('now', 'php:m');
                 $y = Yii::$app->formatter->asDatetime($m > $currMonth ? strtotime('-1 year') : time(), 'php:Y');
@@ -291,7 +333,7 @@ class TransactionService
                 return "{$y}-{$m}-{$d} {$time}";
             }
 
-            preg_match_all('!([0-9]+)(号|日)!', $description, $matches);
+            preg_match_all('!([0-9]+)(号|日)!', $desc, $matches);
             if ($d = data_get($matches, '1.0')) {
                 $y = Yii::$app->formatter->asDatetime(time(), 'php:Y');
                 $currDay = Yii::$app->formatter->asDatetime('now', 'php:d');
@@ -300,7 +342,7 @@ class TransactionService
                 return "{$y}-{$m}-{$d} {$time}";
             }
         } catch (Exception $e) {
-            Log::warning('未识别到日期', $description);
+            Log::warning('未识别到日期', $desc);
         }
 
         return $this->getCreateRecordDate();

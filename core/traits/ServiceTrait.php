@@ -12,6 +12,7 @@ use app\core\services\AccountService;
 use app\core\services\CategoryService;
 use app\core\services\RuleService;
 use app\core\services\StatisticsService;
+use app\core\services\TagService;
 use app\core\services\TelegramService;
 use app\core\services\TransactionService;
 use app\core\services\UserService;
@@ -27,6 +28,7 @@ use yii\base\InvalidConfigException;
  * @property RuleService $ruleService
  * @property TelegramService $telegramService
  * @property StatisticsService $statisticsService
+ * @property TagService $tagService
  */
 trait ServiceTrait
 {
@@ -113,6 +115,18 @@ trait ServiceTrait
             return Yii::createObject(StatisticsService::class);
         } catch (InvalidConfigException $e) {
             return new StatisticsService();
+        }
+    }
+
+    /**
+     * @return TagService|object
+     */
+    public function getTagService()
+    {
+        try {
+            return Yii::createObject(TagService::class);
+        } catch (InvalidConfigException $e) {
+            return new TagService();
         }
     }
 }
