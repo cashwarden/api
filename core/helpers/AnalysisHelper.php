@@ -4,7 +4,7 @@ namespace app\core\helpers;
 
 use Yii;
 
-class StatisticsHelper
+class AnalysisHelper
 {
     public const TODAY = 'today';
     public const YESTERDAY = 'yesterday';

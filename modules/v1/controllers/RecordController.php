@@ -4,9 +4,9 @@ namespace app\modules\v1\controllers;
 
 use app\core\exceptions\InvalidArgumentException;
 use app\core\helpers\SearchHelper;
-use app\core\helpers\StatisticsHelper;
+use app\core\helpers\AnalysisHelper;
 use app\core\models\Record;
-use app\core\services\StatisticsService;
+use app\core\services\AnalysisService;
 use app\core\traits\ServiceTrait;
 use app\core\types\TransactionType;
 use Yii;
@@ -67,9 +67,9 @@ class RecordController extends ActiveController
     public function actionOverview()
     {
         $items = [];
-        foreach (StatisticsHelper::texts() as $key => $item) {
-            $date = StatisticsService::getDateRange($key);
-            $items[$key]['overview'] = $this->statisticsService->getRecordOverviewByDate($date);
+        foreach (AnalysisHelper::texts() as $key => $item) {
+            $date = AnalysisService::getDateRange($key);
+            $items[$key]['overview'] = $this->analysisService->getRecordOverviewByDate($date);
             $items[$key]['key'] = $key;
             $items[$key]['text'] = $item;
         }

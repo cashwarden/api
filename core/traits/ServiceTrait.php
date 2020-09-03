@@ -9,9 +9,9 @@
 namespace app\core\traits;
 
 use app\core\services\AccountService;
+use app\core\services\AnalysisService;
 use app\core\services\CategoryService;
 use app\core\services\RuleService;
-use app\core\services\StatisticsService;
 use app\core\services\TagService;
 use app\core\services\TelegramService;
 use app\core\services\TransactionService;
@@ -27,7 +27,7 @@ use yii\base\InvalidConfigException;
  * @property CategoryService $categoryService
  * @property RuleService $ruleService
  * @property TelegramService $telegramService
- * @property StatisticsService $statisticsService
+ * @property AnalysisService $analysisService
  * @property TagService $tagService
  */
 trait ServiceTrait
@@ -107,14 +107,14 @@ trait ServiceTrait
     }
 
     /**
-     * @return StatisticsService|object
+     * @return AnalysisService|object
      */
-    public function getStatisticsService()
+    public function getAnalysisService()
     {
         try {
-            return Yii::createObject(StatisticsService::class);
+            return Yii::createObject(AnalysisService::class);
         } catch (InvalidConfigException $e) {
-            return new StatisticsService();
+            return new AnalysisService();
         }
     }
 

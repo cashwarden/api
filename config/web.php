@@ -69,6 +69,7 @@ $config = [
                 "GET <module>/users/auth-clients" => '<module>/user/get-auth-clients',
                 "GET <module>/transactions/types" => '<module>/transaction/types',
                 "GET <module>/records/overview" => '<module>/record/overview',
+                "GET <module>/categories/analysis" => '<module>/category/analysis',
 
                 [
                     'class' => 'yii\rest\UrlRule',

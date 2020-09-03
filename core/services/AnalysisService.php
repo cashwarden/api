@@ -2,7 +2,8 @@
 
 namespace app\core\services;
 
-use app\core\helpers\StatisticsHelper;
+use app\core\helpers\AnalysisHelper;
+use app\core\models\Category;
 use app\core\models\Record;
 use app\core\types\DirectionType;
 use Yii;
@@ -10,7 +11,7 @@ use yii\base\BaseObject;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
-class StatisticsService extends BaseObject
+class AnalysisService extends BaseObject
 {
     public function getRecordOverviewByDate(array $date): array
     {
@@ -36,6 +37,31 @@ class StatisticsService extends BaseObject
         return $items;
     }
 
+    public function getCategoryStatisticalData(array $date, int $transactionType)
+    {
+        $conditions = [];
+        $items = [];
+        if (count($date) == 2) {
+            $conditions = ['between', 'date', $date[0], $date[1]];
+        }
+        $userId = \Yii::$app->user->id;
+
+        $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType];
+        $categories = Category::find()->where($baseConditions)->asArray()->all();
+
+        foreach ($categories as $key => $category) {
+            $items[$key]['x'] = $category['name'];
+            $sum = Record::find()
+                ->where($baseConditions)
+                ->andWhere(['category_id' => $category['id']])
+                ->andWhere($conditions)
+                ->sum('amount_cent');
+            $items[$key]['y'] = $sum ? (float)Setup::toYuan($sum) : 0;
+        }
+
+        return $items;
+    }
+
 
     /**
      * @param $key
@@ -47,14 +73,14 @@ class StatisticsService extends BaseObject
         $formatter = Yii::$app->formatter;
         $date = [];
         switch ($key) {
-            case StatisticsHelper::TODAY:
+            case AnalysisHelper::TODAY:
                 $date = [DateHelper::beginTimestamp(), DateHelper::endTimestamp()];
                 break;
-            case StatisticsHelper::YESTERDAY:
+            case AnalysisHelper::YESTERDAY:
                 $time = strtotime('-1 day');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp($time)];
                 break;
-            case StatisticsHelper::CURRENT_MONTH:
+            case AnalysisHelper::CURRENT_MONTH:
                 $time = $formatter->asDatetime('now', 'php:01-m-Y');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp()];
                 break;
