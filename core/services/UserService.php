@@ -128,7 +128,7 @@ class UserService
                 'type' => AccountType::getName(AccountType::GENERAL_ACCOUNT),
                 'user_id' => $user->id,
                 'currency_balance' => 0,
-                'default' => Account::DEFAULT,
+                'default' => (bool)Account::DEFAULT,
                 'currency_code' => $user->base_currency_code
             ]);
             if (!$account->save()) {
