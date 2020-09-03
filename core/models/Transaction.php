@@ -206,7 +206,7 @@ class Transaction extends \yii\db\ActiveRecord
                 $this->tags = array_merge((array)$this->tags, TransactionService::matchTagsByDesc($this->description));
             }
 
-            $this->tags = $this->tags ? implode(',', $this->tags) : null;
+            $this->tags = $this->tags ? implode(',', array_unique($this->tags)) : null;
             return true;
         } else {
             return false;
@@ -228,8 +228,10 @@ class Transaction extends \yii\db\ActiveRecord
             TransactionService::deleteRecord($this, $changedAttributes);
         }
         $oldTags = data_get($changedAttributes, 'tags', '');
-        if ($tags = $this->tags . $oldTags) {
-            TagService::updateCounters(explode(',', $tags));
+
+        $tags = explode(',', $this->tags) + explode(',', $oldTags);
+        if ($tags = array_unique($tags)) {
+            TagService::updateCounters($tags);
         }
     }
 
