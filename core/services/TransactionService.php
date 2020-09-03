@@ -159,7 +159,7 @@ class TransactionService extends BaseObject
     {
         $items = [];
         foreach ($records as $record) {
-            $key = Yii::$app->formatter->asDatetime(strtotime($record->date));
+            $key = Yii::$app->formatter->asDatetime(strtotime($record->date), 'php:Ymd');
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
             if ($record->transaction_id) {
