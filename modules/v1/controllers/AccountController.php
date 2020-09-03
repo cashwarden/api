@@ -88,7 +88,7 @@ class AccountController extends ActiveController
     /**
      * @return array
      */
-    public function actionStatistics()
+    public function actionOverview()
     {
         $balanceCentSum = Account::find()
             ->where(['user_id' => Yii::$app->user->id, 'exclude_from_stats' => false])
