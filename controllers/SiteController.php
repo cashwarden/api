@@ -43,4 +43,70 @@ class SiteController extends Controller
         }
         return [];
     }
+
+    public function actionData()
+    {
+        return [
+            'app' => [
+                'name' => Yii::$app->name,
+                'description' => params('seoDescription'),
+                'keywords' => params('seoKeywords'),
+                'google_analytics' => params('googleAnalyticsAU')
+            ],
+            'menu' => [
+                [
+                    'text' => 'Main',
+                    'group' => false,
+                    'children' => [
+                        [
+                            'text' => '仪表盘',
+                            'link' => '/dashboard',
+                            'icon' => 'anticon-dashboard',
+                        ],
+                        [
+                            'text' => '账号',
+                            'link' => '/account/index',
+                            'icon' => 'anticon-account-book',
+                        ],
+                        [
+                            'text' => '记录',
+                            'link' => '/record/index',
+                            'icon' => 'anticon-database',
+                        ],
+                        [
+                            'text' => '仪表盘',
+                            'link' => '/dashboard',
+                            'icon' => 'anticon-dashboard',
+                        ],
+                        [
+                            'text' => '设置',
+                            'icon' => 'anticon-setting',
+                            'children' => [
+                                [
+                                    'text' => '个人设置',
+                                    'link' => '/settings/personal',
+                                    'icon' => 'anticon-user',
+                                ],
+                                [
+                                    'text' => '分类设置',
+                                    'link' => '/settings/categories',
+                                    'icon' => 'anticon-appstore',
+                                ],
+                                [
+                                    'text' => '标签设置',
+                                    'link' => '/settings/tags',
+                                    'icon' => 'anticon-appstore',
+                                ],
+                                [
+                                    'text' => '规则设置',
+                                    'link' => '/settings/rules',
+                                    'icon' => 'anticon-group',
+                                ]
+                            ]
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
 }

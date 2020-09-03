@@ -71,6 +71,7 @@ $config = [
                 "GET <module>/records/overview" => '<module>/record/overview',
                 "GET <module>/categories/analysis" => '<module>/category/analysis',
                 "GET <module>/records/analysis" => '<module>/record/analysis',
+                "GET <module>/site-config" => '/site/data',
 
                 [
                     'class' => 'yii\rest\UrlRule',
