@@ -45,4 +45,7 @@ return [
     'Work income' => '工作收入',
     'Investment income' => '投资收入',
     'Other income' => '其他收入',
+
+
+    'The {attribute} has been used.' => '{attribute} 已经被使用。'
 ];

@@ -62,7 +62,12 @@ class Category extends \yii\db\ActiveRecord
             ['transaction_type', 'in', 'range' => TransactionType::names()],
             [['name', 'icon_name'], 'string', 'max' => 120],
             ['color', 'in', 'range' => ColorType::items()],
-            ['name', 'unique', 'targetAttribute' => ['user_id', 'name']],
+            [
+                'name',
+                'unique',
+                'targetAttribute' => ['user_id', 'name'],
+                'message' => Yii::t('app', 'The {attribute} has been used.')
+            ],
         ];
     }
 
@@ -86,6 +91,16 @@ class Category extends \yii\db\ActiveRecord
         ];
     }
 
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            $this->user_id = Yii::$app->user->id;
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * @param bool $insert
      * @return bool
@@ -95,7 +110,6 @@ class Category extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->user_id = Yii::$app->user->id;
                 $ran = ColorType::items();
                 $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
             }

@@ -109,6 +109,12 @@ class Account extends \yii\db\ActiveRecord
             ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
             ['default', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
             ['currency_code', 'in', 'range' => CurrencyCode::getKeys()],
+            [
+                'name',
+                'unique',
+                'targetAttribute' => ['user_id', 'name'],
+                'message' => Yii::t('app', 'The {attribute} has been used.')
+            ],
         ];
     }
 

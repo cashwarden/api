@@ -40,7 +40,7 @@ class AccountService
     {
         try {
             $account->user_id = Yii::$app->user->id;
-            if (!$account->save(false)) {
+            if (!$account->save()) {
                 throw new \yii\db\Exception(Setup::errorMessage($account->firstErrors));
             }
         } catch (Exception $e) {

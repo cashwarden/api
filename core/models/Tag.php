@@ -52,7 +52,12 @@ class Tag extends \yii\db\ActiveRecord
             [['user_id', 'count'], 'integer'],
             [['color'], 'string', 'max' => 7],
             [['name'], 'string', 'max' => 60],
-            ['name', 'unique', 'targetAttribute' => ['user_id', 'name']],
+            [
+                'name',
+                'unique',
+                'targetAttribute' => ['user_id', 'name'],
+                'message' => Yii::t('app', 'The {attribute} has been used.')
+            ],
         ];
     }
 
@@ -72,6 +77,15 @@ class Tag extends \yii\db\ActiveRecord
         ];
     }
 
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            $this->user_id = Yii::$app->user->id;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param bool $insert
      * @return bool
@@ -82,7 +96,6 @@ class Tag extends \yii\db\ActiveRecord
             if ($insert) {
                 $ran = ColorType::items();
                 $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
-                $this->user_id = Yii::$app->user->id;
             }
             return true;
         } else {
