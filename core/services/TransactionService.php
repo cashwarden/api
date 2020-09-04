@@ -212,7 +212,7 @@ class TransactionService extends BaseObject
         $model->transaction_type = TransactionType::ADJUST;
         $model->category_id = CategoryService::getAdjustCategoryId();
         $model->currency_code = $account->currency_code;
-        $model->date = Yii::$app->formatter->asDatetime('now');
+        $model->date = self::getCreateRecordDate();
         if (!$model->save()) {
             Yii::error(
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
@@ -311,19 +311,19 @@ class TransactionService extends BaseObject
     private function getDateByDesc(string $desc): string
     {
         if (ArrayHelper::strPosArr($desc, ['昨天', '昨日']) !== false) {
-            return $this->getCreateRecordDate(time() - 3600 * 24 * 1);
+            return self::getCreateRecordDate(time() - 3600 * 24 * 1);
         }
 
         if (ArrayHelper::strPosArr($desc, ['前天']) !== false) {
-            return $this->getCreateRecordDate(time() - 3600 * 24 * 2);
+            return self::getCreateRecordDate(time() - 3600 * 24 * 2);
         }
 
         if (ArrayHelper::strPosArr($desc, ['大前天']) !== false) {
-            return $this->getCreateRecordDate(time() - 3600 * 24 * 3);
+            return self::getCreateRecordDate(time() - 3600 * 24 * 3);
         }
 
         try {
-            $time = $this->getCreateRecordDate('now', 'H:i');
+            $time = self::getCreateRecordDate('now', 'H:i');
             preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $desc, $matches);
             if (($m = data_get($matches, '1.0')) && $d = data_get($matches, '3.0')) {
                 $currMonth = Yii::$app->formatter->asDatetime('now', 'php:m');
@@ -345,7 +345,7 @@ class TransactionService extends BaseObject
             Log::warning('未识别到日期', $desc);
         }
 
-        return $this->getCreateRecordDate();
+        return self::getCreateRecordDate();
     }
 
 
@@ -355,7 +355,7 @@ class TransactionService extends BaseObject
      * @return string
      * @throws InvalidConfigException
      */
-    public function getCreateRecordDate(string $value = 'now', string $format = 'php:Y-m-d H:i')
+    public static function getCreateRecordDate(string $value = 'now', string $format = 'php:Y-m-d H:i')
     {
         return Yii::$app->formatter->asDatetime($value, $format);
     }

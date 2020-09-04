@@ -190,7 +190,7 @@ class Account extends \yii\db\ActiveRecord
         }
         if ($this->default) {
             Account::updateAll(
-                ['default' => self::NO_DEFAULT, 'updated_at' => date('Y-m-d H:i:s')],
+                ['default' => self::NO_DEFAULT, 'updated_at' => Yii::$app->formatter->asDatetime('now')],
                 ['and', ['user_id' => $this->user_id, 'default' => self::DEFAULT], ['!=', 'id', $this->id]]
             );
         }
