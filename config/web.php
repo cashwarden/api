@@ -57,6 +57,7 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'hostInfo' => getenv('APP_URL'),
             'rules' => [
                 "POST <module>/<alias:login|join>" => '<module>/user/<alias>',
                 "POST <module>/token/refresh" => '<module>/user/refresh-token',
@@ -72,7 +73,7 @@ $config = [
                 "GET <module>/categories/analysis" => '<module>/category/analysis',
                 "GET <module>/records/analysis" => '<module>/record/analysis',
                 "GET <module>/site-config" => '/site/data',
-
+                "GET health-check" => 'site/health-check',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [
@@ -84,7 +85,6 @@ $config = [
                         'v1/transaction',
                     ]
                 ],
-                "GET health-check" => 'site/health-check',
                 '<module>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
             ],
         ],
