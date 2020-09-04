@@ -2,6 +2,7 @@
 
 namespace app\modules\v1\controllers;
 
+use app\core\actions\CreateAction;
 use app\core\exceptions\InvalidArgumentException;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
@@ -63,6 +64,7 @@ class ActiveController extends \yii\rest\ActiveController
     {
         $actions = parent::actions();
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+        $actions['create']['class'] = CreateAction::class;
         return $actions;
     }
 
