@@ -5,6 +5,8 @@ namespace app\core\services;
 use app\core\exceptions\InternalException;
 use app\core\models\Account;
 use app\core\models\Record;
+use app\core\models\Rule;
+use app\core\models\Transaction;
 use app\core\types\DirectionType;
 use Exception;
 use Yii;
@@ -13,6 +15,22 @@ use yiier\helpers\Setup;
 
 class AccountService
 {
+    public static function afterDelete(Account $account)
+    {
+        $baseConditions = ['user_id' => Yii::$app->user->id];
+        Record::deleteAll($baseConditions + ['account_id' => $account->id]);
+        Transaction::deleteAll([
+            'and',
+            $baseConditions,
+            ['or', ['from_account_id' => $account->id], ['to_account_id' => $account->id]]
+        ]);
+        Rule::deleteAll([
+            'and',
+            $baseConditions,
+            ['or', ['then_from_account_id' => $account->id], ['then_to_account_id' => $account->id]]
+        ]);
+    }
+
     /**
      * @param Account $account
      * @return Account

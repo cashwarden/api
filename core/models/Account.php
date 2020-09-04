@@ -3,6 +3,7 @@
 namespace app\core\models;
 
 use app\core\exceptions\InvalidArgumentException;
+use app\core\services\AccountService;
 use app\core\services\TransactionService;
 use app\core\types\AccountType;
 use app\core\types\ColorType;
@@ -57,6 +58,7 @@ class Account extends \yii\db\ActiveRecord
     public function transactions()
     {
         return [
+            self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
             self::SCENARIO_CREDIT_CARD => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
         ];
     }
@@ -194,6 +196,12 @@ class Account extends \yii\db\ActiveRecord
                 ['and', ['user_id' => $this->user_id, 'default' => self::DEFAULT], ['!=', 'id', $this->id]]
             );
         }
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        AccountService::afterDelete($this);
     }
 
     /**
