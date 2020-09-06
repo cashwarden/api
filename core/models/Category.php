@@ -132,6 +132,10 @@ class Category extends \yii\db\ActiveRecord
             return TransactionType::getName($model->transaction_type);
         };
 
+        $fields['transaction_type_text'] = function (self $model) {
+            return data_get(TransactionType::texts(), $model->transaction_type);
+        };
+
         $fields['created_at'] = function (self $model) {
             return DateHelper::datetimeToIso8601($model->created_at);
         };

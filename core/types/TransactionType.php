@@ -27,7 +27,7 @@ class TransactionType extends BaseType
             self::EXPENSE => Yii::t('app', 'Expense'),
             self::INCOME => Yii::t('app', 'Income'),
             self::TRANSFER => Yii::t('app', 'Transfer'),
-            self::ADJUST => Yii::t('app', 'Adjust'),
+            self::ADJUST => Yii::t('app', 'Adjust Balance'),
         ];
     }
 }

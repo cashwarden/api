@@ -134,6 +134,10 @@ class Rule extends \yii\db\ActiveRecord
             return TransactionType::getName($model->then_transaction_type);
         };
 
+        $fields['then_transaction_type_text'] = function (self $model) {
+            return data_get(TransactionType::texts(), $model->then_transaction_type);
+        };
+
         $fields['then_tags'] = function (self $model) {
             return $model->then_tags ? explode(',', $model->then_tags) : [];
         };
