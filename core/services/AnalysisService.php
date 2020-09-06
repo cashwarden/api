@@ -23,7 +23,7 @@ class AnalysisService extends BaseObject
         }
         $conditions = array_merge(
             $conditions,
-            ['transaction_type', [TransactionType::EXPENSE, TransactionType::INCOME]]
+            ['transaction_type' => [TransactionType::EXPENSE, TransactionType::INCOME]]
         );
         $userId = \Yii::$app->user->id;
         $sum = Record::find()
