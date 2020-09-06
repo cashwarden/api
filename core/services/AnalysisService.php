@@ -6,6 +6,7 @@ use app\core\helpers\AnalysisHelper;
 use app\core\models\Category;
 use app\core\models\Record;
 use app\core\types\DirectionType;
+use app\core\types\TransactionType;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
@@ -20,6 +21,10 @@ class AnalysisService extends BaseObject
         if (count($date) == 2) {
             $conditions = ['between', 'date', $date[0], $date[1]];
         }
+        $conditions = array_merge(
+            $conditions,
+            ['transaction_type', [TransactionType::EXPENSE, TransactionType::INCOME]]
+        );
         $userId = \Yii::$app->user->id;
         $sum = Record::find()
             ->where(['user_id' => $userId, 'direction' => DirectionType::INCOME])
