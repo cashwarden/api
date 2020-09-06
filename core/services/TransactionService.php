@@ -15,6 +15,7 @@ use Exception;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
+use yii\db\Expression;
 use yiier\graylog\Log;
 use yiier\helpers\Setup;
 
@@ -358,5 +359,19 @@ class TransactionService extends BaseObject
     public static function getCreateRecordDate(string $value = 'now', string $format = 'php:Y-m-d H:i')
     {
         return Yii::$app->formatter->asDatetime($value, $format);
+    }
+
+
+    /**
+     * @param string $tag
+     * @param int $userId
+     * @return bool|int|string|null
+     */
+    public static function countTransactionByTag(string $tag, int $userId)
+    {
+        return Transaction::find()
+            ->where(['user_id' => $userId])
+            ->andWhere(new Expression('FIND_IN_SET(:tag, tags)'))->addParams([':tag' => $tag])
+            ->count();
     }
 }

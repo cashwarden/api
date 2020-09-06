@@ -2,6 +2,9 @@
 
 namespace app\core\models;
 
+use app\core\exceptions\CannotOperateException;
+use app\core\services\TagService;
+use app\core\services\TransactionService;
 use app\core\types\ColorType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -101,6 +104,32 @@ class Tag extends \yii\db\ActiveRecord
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     * @throws \yii\db\Exception|\Throwable
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($oldName = data_get($changedAttributes, 'name', '')) {
+            TagService::updateTagName($oldName, $this->name);
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws CannotOperateException
+     */
+    public function beforeDelete()
+    {
+        if (TransactionService::countTransactionByTag($this->name, $this->user_id)) {
+            throw new CannotOperateException(Yii::t('app', 'Cannot be deleted because it has been used.'));
+        }
+        return parent::beforeDelete();
     }
 
     /**

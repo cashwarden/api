@@ -5,7 +5,7 @@ namespace app\core\exceptions;
 use Yii;
 use yii\web\HttpException;
 
-class InvalidArgumentException extends HttpException
+class CannotOperateException extends HttpException
 {
     /**
      * Constructor.
@@ -15,10 +15,10 @@ class InvalidArgumentException extends HttpException
      */
     public function __construct(
         $message = '',
-        $code = ErrorCodes::INVALID_ARGUMENT_ERROR,
+        $code = ErrorCodes::CANNOT_OPERATE_ERROR,
         \Exception $previous = null
     ) {
-        $message = $message ?: Yii::t('app/error', ErrorCodes::INVALID_ARGUMENT_ERROR);
+        $message = $message ?: Yii::t('app/error', ErrorCodes::CANNOT_OPERATE_ERROR);
         parent::__construct(200, $message, $code, $previous);
     }
 }
