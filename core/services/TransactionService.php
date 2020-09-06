@@ -2,6 +2,7 @@
 
 namespace app\core\services;
 
+use app\core\exceptions\CannotOperateException;
 use app\core\exceptions\InternalException;
 use app\core\helpers\ArrayHelper;
 use app\core\models\Account;
@@ -109,8 +110,10 @@ class TransactionService extends BaseObject
                     'then_from_account_id',
                     [$this, 'getAccountIdByDesc']
                 );
+                if (!$model->from_account_id) {
+                    throw new CannotOperateException(Yii::t('app', 'Default account not found.'));
+                }
             }
-
 
             if (in_array($transactionType, [TransactionType::INCOME, TransactionType::TRANSFER])) {
                 $model->to_account_id = $this->getDataByDesc(
@@ -118,6 +121,9 @@ class TransactionService extends BaseObject
                     'then_to_account_id',
                     [$this, 'getAccountIdByDesc']
                 );
+                if (!$model->to_account_id) {
+                    throw new CannotOperateException(Yii::t('app', 'Default account not found.'));
+                }
             }
 
             $model->category_id = $this->getDataByDesc(
