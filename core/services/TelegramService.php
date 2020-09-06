@@ -66,6 +66,7 @@ class TelegramService extends BaseObject
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
         }
+        User::updateAll(['password_reset_token' => null], ['id' => $user->id]);
     }
 
     /**
