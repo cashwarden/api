@@ -21,19 +21,21 @@ class AnalysisService extends BaseObject
         if (count($date) == 2) {
             $conditions = ['between', 'date', $date[0], $date[1]];
         }
-        $conditions = array_merge(
-            $conditions,
-            ['transaction_type' => [TransactionType::EXPENSE, TransactionType::INCOME]]
-        );
         $userId = \Yii::$app->user->id;
+        $baseConditions = [
+            'user_id' => $userId,
+            'transaction_type' => [TransactionType::EXPENSE, TransactionType::INCOME]
+        ];
         $sum = Record::find()
-            ->where(['user_id' => $userId, 'direction' => DirectionType::INCOME])
+            ->where($baseConditions)
+            ->andWhere(['direction' => DirectionType::INCOME])
             ->andWhere($conditions)
             ->sum('amount_cent');
         $items['income'] = $sum ? (float)Setup::toYuan($sum) : 0;
 
         $sum = Record::find()
-            ->where(['user_id' => $userId, 'direction' => DirectionType::EXPENSE])
+            ->where($baseConditions)
+            ->andWhere(['direction' => DirectionType::EXPENSE])
             ->andWhere($conditions)
             ->sum('amount_cent');
         $items['expense'] = $sum ? (float)Setup::toYuan($sum) : 0;
