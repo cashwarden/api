@@ -23,6 +23,7 @@ class RecordController extends ActiveController
     public $modelClass = Record::class;
     public $noAuthActions = [];
     public $partialMatchAttributes = ['name'];
+    public $defaultOrder = ['date' => SORT_DESC, 'id' => SORT_DESC];
     public $stringToIntAttributes = ['transaction_type' => TransactionType::class];
 
     public function actions()
