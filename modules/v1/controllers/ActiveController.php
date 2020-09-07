@@ -3,10 +3,14 @@
 namespace app\modules\v1\controllers;
 
 use app\core\actions\CreateAction;
+use app\core\exceptions\InternalException;
 use app\core\exceptions\InvalidArgumentException;
+use app\core\helpers\SearchHelper;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\filters\Cors;
 use yii\web\ForbiddenHttpException;
 use yiier\helpers\SearchModel;
@@ -22,6 +26,7 @@ class ActiveController extends \yii\rest\ActiveController
     protected const DEFAULT_PAGE_SIZE = 20;
     public $defaultOrder = ['id' => SORT_DESC];
     public $partialMatchAttributes = [];
+    public $stringToIntAttributes = [];
 
     /**
      * 不参与校验的 actions
@@ -69,7 +74,11 @@ class ActiveController extends \yii\rest\ActiveController
     }
 
     /**
-     * @return \yii\data\ActiveDataProvider
+     * @return ActiveDataProvider
+     * @throws InvalidArgumentException
+     * @throws InternalException
+     * @throws InvalidConfigException
+     * @throws \Exception
      */
     public function prepareDataProvider()
     {
@@ -82,7 +91,14 @@ class ActiveController extends \yii\rest\ActiveController
             'pageSize' => $this->getPageSize()
         ]);
 
-        $dataProvider = $searchModel->search(['SearchModel' => Yii::$app->request->queryParams]);
+        $params = Yii::$app->request->queryParams;
+        foreach ($this->stringToIntAttributes as $attribute => $className) {
+            if ($type = data_get($params, $attribute)) {
+                $params[$attribute] = SearchHelper::stringToInt($type, $className);
+            }
+        }
+
+        $dataProvider = $searchModel->search(['SearchModel' => $params]);
         $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
         return $dataProvider;
     }

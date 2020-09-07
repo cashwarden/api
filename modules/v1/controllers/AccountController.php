@@ -21,6 +21,8 @@ class AccountController extends ActiveController
     public $modelClass = Account::class;
     public $noAuthActions = [];
     public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
+    public $partialMatchAttributes = ['name'];
+    public $stringToIntAttributes = ['type' => AccountType::class];
 
     public function actions()
     {
