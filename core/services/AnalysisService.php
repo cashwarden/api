@@ -40,7 +40,7 @@ class AnalysisService extends BaseObject
             ->sum('amount_cent');
         $items['expense'] = $sum ? (float)Setup::toYuan($sum) : 0;
 
-        $items['surplus'] = (float)bccomp($items['income'], $items['expense'], 2);
+        $items['surplus'] = (float)bcsub($items['income'], $items['expense'], 2);
 
         return $items;
     }
