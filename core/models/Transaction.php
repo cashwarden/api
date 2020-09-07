@@ -135,7 +135,13 @@ class Transaction extends \yii\db\ActiveRecord
             ['type', 'in', 'range' => TransactionType::names()],
             ['reimbursement_status', 'in', 'range' => ReimbursementStatus::names()],
             ['status', 'in', 'range' => TransactionStatus::names()],
-            ['currency_amount', 'compare', 'compareValue' => 0, 'operator' => '>'],
+            [
+                'currency_amount',
+                'compare',
+                'compareValue' => 0,
+                'operator' => '>',
+                'message' => Yii::t('app', 'Accounting failed, the amount must be greater than 0.')
+            ],
             [['amount', 'currency_amount'], MoneyValidator::class], //todo message
 
             [['date'], 'datetime', 'format' => 'php:Y-m-d H:i'],

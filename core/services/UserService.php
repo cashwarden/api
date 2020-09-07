@@ -295,6 +295,7 @@ class UserService
      */
     public function getUserByClientId(int $type, string $clientId): User
     {
+        /** @var AuthClient $model */
         $model = AuthClient::find()->where(['type' => $type, 'client_id' => $clientId])->one();
         return $model->user;
     }

@@ -2,10 +2,12 @@
 
 namespace app\modules\v1\controllers;
 
+use app\core\helpers\ArrayHelper;
 use app\core\services\TelegramService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
 use app\core\types\RecordSource;
+use app\core\types\TelegramKeyword;
 use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
@@ -44,8 +46,10 @@ class TelegramController extends ActiveController
                     AuthClientType::TELEGRAM,
                     $message->getFrom()->getId()
                 );
-                \Yii::$app->user->setIdentity($user);
-                $this->telegramService->callbackQuery($message, $bot);
+                if ($user) {
+                    \Yii::$app->user->setIdentity($user);
+                    $this->telegramService->callbackQuery($message, $bot);
+                }
             });
 
             $bot->command('ping', function (Message $message) use ($bot) {
@@ -57,20 +61,33 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), 'pong!', null, false, null, $keyboard);
             });
 
-            $bot->on(function (Update $Update) use ($bot) {
-                $message = $Update->getMessage();
-                /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), "hi");
-            }, function (Update $message) {
-                if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
-                    return true;
+            $bot->command(ltrim(TelegramKeyword::START, '/'), function (Message $message) use ($bot) {
+                $text = "您还未绑定账号，请先访问「个人设置」中的「账号绑定」进行绑定账号，然后才能快速记账。";
+                $user = $this->userService->getUserByClientId(
+                    AuthClientType::TELEGRAM,
+                    $message->getFrom()->getId()
+                );
+                if ($user) {
+                    $text = '欢迎回来👏';
                 }
-                return false;
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), $text);
             });
+
+//            $bot->on(function (Update $Update) use ($bot) {
+//                $message = $Update->getMessage();
+//                /** @var BotApi $bot */
+//                $bot->sendMessage($message->getChat()->getId(), "hi");
+//            }, function (Update $message) {
+//                if ($message->getMessage() && $message->getMessage()->getText() == '/login') {
+//                    return true;
+//                }
+//                return false;
+//            });
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
-                $token = StringHelper::after('/bind/', $message->getText());
+                $token = StringHelper::after(TelegramKeyword::BIND . '/', $message->getText());
                 try {
                     $user = $this->userService->getUserByResetToken($token);
                     $this->telegramService->bind($user, $token, $message);
@@ -81,7 +98,8 @@ class TelegramController extends ActiveController
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), $text);
             }, function (Update $message) {
-                if ($message->getMessage() && strpos($message->getMessage()->getText(), '/bind') === 0) {
+                $msg = $message->getMessage();
+                if ($msg && strpos($msg->getText(), TelegramKeyword::BIND) === 0) {
                     return true;
                 }
                 return false;
@@ -120,7 +138,7 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), $text, null, false, null, $keyboard);
             }, function (Update $message) {
                 if ($message->getMessage()) {
-                    if (strpos($message->getMessage()->getText(), '/bind') === 0) {
+                    if (ArrayHelper::strPosArr($message->getMessage()->getText(), TelegramKeyword::items()) === 0) {
                         return false;
                     }
                     return true;
