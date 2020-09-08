@@ -169,7 +169,8 @@ class TransactionService extends BaseObject
             $key = Yii::$app->formatter->asDatetime(strtotime($record->date), 'php:Y-m-d');
             $items[$key]['records'][] = $record;
             $items[$key]['date'] = $key;
-            if (in_array($record->transaction_type, [TransactionType::EXPENSE, TransactionType::INCOME])) {
+            $types = [TransactionType::EXPENSE, TransactionType::INCOME];
+            if (in_array($record->transaction_type, $types)) {
                 // todo 计算有待优化
                 if ($record->direction === DirectionType::EXPENSE) {
                     $items[$key]['record_out_amount_cent'][] = $record->amount_cent;

@@ -97,6 +97,7 @@ class ActiveController extends \yii\rest\ActiveController
                 $params[$attribute] = SearchHelper::stringToInt($type, $className);
             }
         }
+        unset($params['sort']);
 
         $dataProvider = $searchModel->search(['SearchModel' => $params]);
         $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);

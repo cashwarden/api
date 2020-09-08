@@ -22,10 +22,8 @@ class AnalysisService extends BaseObject
             $conditions = ['between', 'date', $date[0], $date[1]];
         }
         $userId = \Yii::$app->user->id;
-        $baseConditions = [
-            'user_id' => $userId,
-            'transaction_type' => [TransactionType::EXPENSE, TransactionType::INCOME]
-        ];
+        $types = [TransactionType::EXPENSE, TransactionType::INCOME];
+        $baseConditions = ['user_id' => $userId, 'transaction_type' => $types];
         $sum = Record::find()
             ->where($baseConditions)
             ->andWhere(['direction' => DirectionType::INCOME])
