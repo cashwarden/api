@@ -330,7 +330,7 @@ class TransactionService extends BaseObject
         }
 
         try {
-            $time = self::getCreateRecordDate('now', 'H:i');
+            $time = self::getCreateRecordDate('now', 'php:H:i');
             preg_match_all('!([0-9]+)(月)([0-9]+)(号|日)!', $desc, $matches);
             if (($m = data_get($matches, '1.0')) && $d = data_get($matches, '3.0')) {
                 $currMonth = Yii::$app->formatter->asDatetime('now', 'php:m');
