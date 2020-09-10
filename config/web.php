@@ -83,6 +83,7 @@ $config = [
                         'v1/tag',
                         'v1/record',
                         'v1/transaction',
+                        'v1/recurrence',
                     ]
                 ],
                 '<module>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',

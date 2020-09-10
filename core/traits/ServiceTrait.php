@@ -11,6 +11,7 @@ namespace app\core\traits;
 use app\core\services\AccountService;
 use app\core\services\AnalysisService;
 use app\core\services\CategoryService;
+use app\core\services\RecurrenceService;
 use app\core\services\RuleService;
 use app\core\services\TagService;
 use app\core\services\TelegramService;
@@ -29,6 +30,7 @@ use yii\base\InvalidConfigException;
  * @property TelegramService $telegramService
  * @property AnalysisService $analysisService
  * @property TagService $tagService
+ * @property RecurrenceService $recurrenceService
  */
 trait ServiceTrait
 {
@@ -127,6 +129,18 @@ trait ServiceTrait
             return Yii::createObject(TagService::class);
         } catch (InvalidConfigException $e) {
             return new TagService();
+        }
+    }
+
+    /**
+     * @return RecurrenceService|object
+     */
+    public function getRecurrenceService()
+    {
+        try {
+            return Yii::createObject(RecurrenceService::class);
+        } catch (InvalidConfigException $e) {
+            return new RecurrenceService();
         }
     }
 }

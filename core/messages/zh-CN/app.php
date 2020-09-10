@@ -51,4 +51,5 @@ return [
     'Cannot be deleted because it has been used.' => '不能被删除，因为已经被使用。',
     'Default account not found.' => '未找到默认账号',
     'Accounting failed, the amount must be greater than 0.' => '记账失败，金额必须大于0。',
+    'The {attribute} not found.' => '{attribute} 未找到。',
 ];

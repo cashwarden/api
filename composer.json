@@ -27,7 +27,8 @@
         "mis/yii2-ide-helper": "^1.0",
         "telegram-bot/api": "^2.3",
         "ext-json": "*",
-        "ext-bcmath": "*"
+        "ext-bcmath": "*",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

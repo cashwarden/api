@@ -4,6 +4,7 @@ namespace app\core\models;
 
 use app\core\services\TagService;
 use app\core\services\TransactionService;
+use app\core\types\RecordSource;
 use app\core\types\ReimbursementStatus;
 use app\core\types\TransactionStatus;
 use app\core\types\TransactionType;
@@ -48,6 +49,11 @@ class Transaction extends \yii\db\ActiveRecord
      * @var integer
      */
     public $amount;
+
+    /**
+     * @var string
+     */
+    public $source;
 
     /**
      * @var integer
@@ -148,7 +154,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['currency_code'], 'string', 'max' => 3],
             [['description', 'remark', 'image'], 'string', 'max' => 255],
             ['tags', ArrayValidator::class],
-
+            ['source', 'in', 'range' => array_keys(RecordSource::names())],
         ];
     }
 
@@ -200,13 +206,12 @@ class Transaction extends \yii\db\ActiveRecord
             $this->type = TransactionType::toEnumValue($this->type);
 
             $this->currency_amount_cent = Setup::toFen($this->currency_amount);
-            if ($this->currency_code == user('base_currency_code')) {
+            if ($this->currency_code == Yii::$app->user->identity['base_currency_code']) {
                 $this->amount_cent = $this->currency_amount_cent;
             } else {
                 // $this->amount_cent = $this->currency_amount_cent;
                 // todo 计算汇率
             }
-
             $this->tags ? TransactionService::createTags($this->tags) : null;
             if ($this->description) {
                 $this->tags = array_merge((array)$this->tags, TransactionService::matchTagsByDesc($this->description));

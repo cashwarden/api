@@ -11,12 +11,14 @@ use app\core\models\Tag;
 use app\core\models\Transaction;
 use app\core\traits\ServiceTrait;
 use app\core\types\DirectionType;
+use app\core\types\RecordSource;
 use app\core\types\TransactionType;
 use Exception;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
+use yii\web\NotFoundHttpException;
 use yiier\graylog\Log;
 use yiier\helpers\Setup;
 
@@ -54,6 +56,7 @@ class TransactionService extends BaseObject
             $_model->currency_amount_cent = $transaction->currency_amount_cent;
             $_model->currency_code = $transaction->currency_code;
             $_model->date = $transaction->date;
+            $_model->source = $transaction->source;
             $_model->transaction_type = $transaction->type;
             $_model->load($datum, '');
             if (!$_model->save()) {
@@ -80,6 +83,25 @@ class TransactionService extends BaseObject
         }
     }
 
+    /**
+     * @param int $id
+     * @param int $userId
+     * @throws NotFoundHttpException
+     * @throws Exception
+     */
+    public function copy(int $id, int $userId = 0): void
+    {
+        $model = $this->findCurrentOne($id, $userId);
+        $transaction = new Transaction();
+        $values = $model->toArray();
+        unset($values['date']);
+        $transaction->date = Yii::$app->formatter->asDatetime('now', 'php:Y-m-d H:i');
+        $transaction->source = RecordSource::CRONTAB;
+        $transaction->load($values, '');
+        if (!$transaction->save(false)) {
+            throw new Exception(Setup::errorMessage($transaction->firstErrors));
+        }
+    }
 
     /**
      * @param string $desc
@@ -343,11 +365,10 @@ class TransactionService extends BaseObject
 
             preg_match_all('!([0-9]+)(号|日)!', $desc, $matches);
             if ($d = data_get($matches, '1.0')) {
-                $y = Yii::$app->formatter->asDatetime(time(), 'php:Y');
                 $currDay = Yii::$app->formatter->asDatetime('now', 'php:d');
-                $m = Yii::$app->formatter->asDatetime($d > $currDay ? strtotime('-1 month') : time(), 'php:m');
+                $m = Yii::$app->formatter->asDatetime($d > $currDay ? strtotime('-1 month') : time(), 'php:Y-m');
                 $d = sprintf("%02d", $d);
-                return "{$y}-{$m}-{$d} {$time}";
+                return "{$m}-{$d} {$time}";
             }
         } catch (Exception $e) {
             Log::warning('未识别到日期', $desc);
@@ -380,5 +401,20 @@ class TransactionService extends BaseObject
             ->where(['user_id' => $userId])
             ->andWhere(new Expression('FIND_IN_SET(:tag, tags)'))->addParams([':tag' => $tag])
             ->count();
+    }
+
+    /**
+     * @param int $id
+     * @param int $userId
+     * @return Transaction|object
+     * @throws NotFoundHttpException
+     */
+    public static function findCurrentOne(int $id, int $userId = 0): Transaction
+    {
+        $userId = $userId ?: Yii::$app->user->id;
+        if (!$model = Transaction::find()->where(['id' => $id, 'user_id' => $userId])->one()) {
+            throw new NotFoundHttpException('No data found');
+        }
+        return $model;
     }
 }
