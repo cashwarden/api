@@ -2,6 +2,7 @@
 
 namespace app\core\services;
 
+use app\core\exceptions\InvalidArgumentException;
 use app\core\exceptions\ThirdPartyServiceErrorException;
 use app\core\helpers\HolidayHelper;
 use app\core\models\Recurrence;
@@ -27,14 +28,20 @@ class RecurrenceService extends BaseObject
      * @param string $status
      * @return Recurrence
      * @throws Exception
+     * @throws InvalidConfigException
      * @throws NotFoundHttpException
+     * @throws InvalidArgumentException
      */
     public function updateStatus(int $id, string $status): Recurrence
     {
         $model = $this->findCurrentOne($id);
         $model->load($model->toArray(), '');
+        if (RecurrenceStatus::ACTIVE == RecurrenceStatus::toEnumValue($status)) {
+            $model->started_at = strtotime($model->started_at) > time() ? $model->started_at : 'now';
+        }
+        $model->started_at = Yii::$app->formatter->asDate($model->started_at);
         $model->status = $status;
-        if (!$model->save(false)) {
+        if (!$model->save()) {
             throw new Exception(Setup::errorMessage($model->firstErrors));
         }
         return $model;

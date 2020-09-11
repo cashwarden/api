@@ -64,7 +64,7 @@ class SiteController extends Controller
                             'icon' => 'anticon-dashboard',
                         ],
                         [
-                            'text' => '账号',
+                            'text' => '账户',
                             'link' => '/account/index',
                             'icon' => 'anticon-account-book',
                         ],
@@ -72,6 +72,11 @@ class SiteController extends Controller
                             'text' => '记录',
                             'link' => '/record/index',
                             'icon' => 'anticon-database',
+                        ],
+                        [
+                            'text' => '定时',
+                            'link' => '/recurrence/index',
+                            'icon' => 'anticon-field-time',
                         ],
                         [
                             'text' => '设置',

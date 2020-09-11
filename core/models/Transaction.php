@@ -266,6 +266,11 @@ class Transaction extends \yii\db\ActiveRecord
         return $this->hasOne(Account::class, ['id' => 'to_account_id']);
     }
 
+    public function extraFields()
+    {
+        return ['toAccount', 'fromAccount', 'category'];
+    }
+
     /**
      * @return array
      */
@@ -284,6 +289,10 @@ class Transaction extends \yii\db\ActiveRecord
 
         $fields['type'] = function (self $model) {
             return TransactionType::getName($model->type);
+        };
+
+        $fields['type_text'] = function (self $model) {
+            return data_get(TransactionType::texts(), $model->type);
         };
 
         $fields['tags'] = function (self $model) {

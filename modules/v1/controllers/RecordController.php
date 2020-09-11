@@ -8,6 +8,7 @@ use app\core\helpers\AnalysisHelper;
 use app\core\models\Record;
 use app\core\services\AnalysisService;
 use app\core\traits\ServiceTrait;
+use app\core\types\RecordSource;
 use app\core\types\TransactionType;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -80,5 +81,19 @@ class RecordController extends ActiveController
             $date,
             TransactionType::toEnumValue($transactionType)
         );
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function actionSources()
+    {
+        $items = [];
+        $names = RecordSource::names();
+        foreach ($names as $key => $name) {
+            $items[] = ['type' => $key, 'name' => $name];
+        }
+        return $items;
     }
 }

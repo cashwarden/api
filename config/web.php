@@ -72,6 +72,10 @@ $config = [
                 "GET <module>/records/overview" => '<module>/record/overview',
                 "GET <module>/categories/analysis" => '<module>/category/analysis',
                 "GET <module>/records/analysis" => '<module>/record/analysis',
+                "GET <module>/records/sources" => '<module>/record/sources',
+                "PUT <module>/recurrences/<id:\d+>/status" => '<module>/recurrence/update-status',
+                "GET <module>/recurrences/frequencies" => '<module>/recurrence/frequency-types',
+
                 "GET <module>/site-config" => '/site/data',
                 "GET health-check" => 'site/health-check',
                 [

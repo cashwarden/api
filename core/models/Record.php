@@ -236,6 +236,10 @@ class Record extends ActiveRecord
             return $model->category;
         };
 
+        $fields['source_text'] = function (self $model) {
+            return RecordSource::getName($model->source);
+        };
+
         $fields['account'] = function (self $model) {
             return $model->account;
         };

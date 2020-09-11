@@ -18,7 +18,7 @@ class m200909_030624_create_recurrence_table extends Migration
             'name' => $this->string()->notNull(),
             'frequency' => $this->tinyInteger()->notNull(),
             'interval' => $this->tinyInteger()->defaultValue(1),
-            'schedule' => $this->text(),
+            'schedule' => $this->string(),
             'transaction_id' => $this->integer()->notNull(),
             'started_at' => $this->timestamp()->defaultValue(null),
             'execution_date' => $this->timestamp()->defaultValue(null),

@@ -27,6 +27,8 @@ use yiier\helpers\DateHelper;
  * @property int|null $status
  * @property string|null $created_at
  * @property string|null $updated_at
+ *
+ * @property-read Transaction $transaction
  */
 class Recurrence extends \yii\db\ActiveRecord
 {
@@ -59,7 +61,6 @@ class Recurrence extends \yii\db\ActiveRecord
     public function beforeValidate()
     {
         if (parent::beforeValidate()) {
-            $this->started_at = Yii::$app->formatter->asDatetime($this->started_at ?: 'now', 'php:Y-m-d');
             $this->execution_date = $this->execution_date ?
                 Yii::$app->formatter->asDatetime($this->execution_date, 'php:Y-m-d') : null;
             return true;
@@ -163,6 +164,7 @@ class Recurrence extends \yii\db\ActiveRecord
             if ($insert) {
                 $this->user_id = Yii::$app->user->id;
             }
+            $this->started_at = Yii::$app->formatter->asDatetime($this->started_at ?: 'now', 'php:Y-m-d');
             $this->frequency = RecurrenceFrequency::toEnumValue($this->frequency);
             $this->status = is_null($this->status) ?
                 RecurrenceStatus::ACTIVE : RecurrenceStatus::toEnumValue($this->status);
@@ -172,6 +174,12 @@ class Recurrence extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    public function getTransaction()
+    {
+        return $this->hasOne(Transaction::class, ['id' => 'transaction_id']);
+    }
+
 
     /**
      * @return array
@@ -187,6 +195,10 @@ class Recurrence extends \yii\db\ActiveRecord
 
         $fields['frequency'] = function (self $model) {
             return RecurrenceFrequency::getName($model->frequency);
+        };
+
+        $fields['frequency_text'] = function (self $model) {
+            return data_get(RecurrenceFrequency::texts(), $model->frequency);
         };
 
         $fields['started_at'] = function (self $model) {
