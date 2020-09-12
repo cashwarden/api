@@ -61,7 +61,7 @@ class TelegramService extends BaseObject
             $model = new AuthClient();
             $model->load($conditions, '');
         }
-        $model->client_username = (string)$message->getFrom()->getUsername();
+        $model->client_username = (string)($message->getFrom()->getUsername() ?: $message->getFrom()->getFirstName());
         $model->client_id = (string)$message->getFrom()->getId();
         $model->data = $message->toJson();
         if (!$model->save()) {
