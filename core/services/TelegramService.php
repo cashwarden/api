@@ -10,6 +10,7 @@ use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use app\core\types\TelegramAction;
 use app\core\types\TransactionRating;
+use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
@@ -178,10 +179,11 @@ class TelegramService extends BaseObject
 
     /**
      * @param string $messageText
+     * @param null $keyboard
      * @param int $userId
      * @return void
      */
-    public function sendMessage(string $messageText, int $userId = 0): void
+    public function sendMessage(string $messageText, $keyboard = null, int $userId = 0): void
     {
         $userId = $userId ?: Yii::$app->user->id;
         $telegram = AuthClient::find()->select('data')->where([
@@ -195,9 +197,30 @@ class TelegramService extends BaseObject
         $bot = TelegramService::newClient();
         /** @var BotApi $bot */
         try {
-            $bot->sendMessage($telegram, $messageText);
+            $bot->sendMessage($telegram->chat->id, $messageText, null, false, null, $keyboard);
         } catch (InvalidArgumentException $e) {
         } catch (Exception $e) {
         }
+    }
+
+
+    public function getMessageTextByTransaction(Transaction $model, string $title = '记账成功')
+    {
+        $text = "{$title}\n";
+        $text .= '交易类目： #' . $model->category->name . "\n";
+        $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";
+        $text .= "交易时间： {$model->date}\n"; // todo add tag
+        if (in_array($model->type, [TransactionType::EXPENSE, TransactionType::TRANSFER])) {
+            $fromAccountName = $model->fromAccount->name;
+            $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
+            $text .= "支付账户： #{$fromAccountName} （余额：{$fromAccountBalance}）\n";
+        }
+        if (in_array($model->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
+            $toAccountName = $model->toAccount->name;
+            $toAccountBalance = Setup::toYuan($model->toAccount->balance_cent);
+            $text .= "收款账户： #{$toAccountName} （余额：{$toAccountBalance}）\n";
+        }
+        $text .= '金额：' . Setup::toYuan($model->amount_cent);
+        return $text;
     }
 }

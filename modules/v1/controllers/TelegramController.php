@@ -8,13 +8,11 @@ use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientType;
 use app\core\types\RecordSource;
 use app\core\types\TelegramKeyword;
-use app\core\types\TransactionType;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
-use yiier\helpers\Setup;
 use yiier\helpers\StringHelper;
 
 class TelegramController extends ActiveController
@@ -116,21 +114,7 @@ class TelegramController extends ActiveController
                     \Yii::$app->user->setIdentity($user);
                     $model = $this->transactionService->createByDesc($message->getText(), RecordSource::TELEGRAM);
                     $keyboard = $this->telegramService->getRecordMarkup($model);
-                    $text = "记账成功😄" . "\n";
-                    $text .= '交易类目： #' . $model->category->name . "\n";
-                    $text .= '交易类型： #' . TransactionType::texts()[$model->type] . "\n";
-                    $text .= "交易时间： {$model->date}\n"; // todo add tag
-                    if (in_array($model->type, [TransactionType::EXPENSE, TransactionType::TRANSFER])) {
-                        $fromAccountName = $model->fromAccount->name;
-                        $fromAccountBalance = Setup::toYuan($model->fromAccount->balance_cent);
-                        $text .= "支付账户： #{$fromAccountName} （余额：{$fromAccountBalance}）\n";
-                    }
-                    if (in_array($model->type, [TransactionType::INCOME, TransactionType::TRANSFER])) {
-                        $toAccountName = $model->toAccount->name;
-                        $toAccountBalance = Setup::toYuan($model->toAccount->balance_cent);
-                        $text .= "收款账户： #{$toAccountName} （余额：{$toAccountBalance}）\n";
-                    }
-                    $text .= '金额：' . Setup::toYuan($model->amount_cent);
+                    $text = $this->telegramService->getMessageTextByTransaction($model);
                 } catch (\Exception $e) {
                     $text = $e->getMessage();
                 }

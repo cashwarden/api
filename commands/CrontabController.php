@@ -33,6 +33,9 @@ class CrontabController extends Controller
             foreach ($items as $item) {
                 \Yii::$app->user->setIdentity(User::findOne($item['user_id']));
                 if ($t = $this->transactionService->copy($item['transaction_id'], $item['user_id'])) {
+                    $keyboard = $this->telegramService->getRecordMarkup($t);
+                    $text = $this->telegramService->getMessageTextByTransaction($t, '定时记账成功');
+                    $this->telegramService->sendMessage($text, $keyboard);
                     $this->stdout("定时记账成功，transaction_id：{$t->id}\n");
                 }
             }
