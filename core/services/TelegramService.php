@@ -194,10 +194,13 @@ class TelegramService extends BaseObject
             return;
         }
         $telegram = Json::decode($telegram);
+        if (empty($telegram['chat']['id'])) {
+            return;
+        }
         $bot = TelegramService::newClient();
         /** @var BotApi $bot */
         try {
-            $bot->sendMessage($telegram->chat->id, $messageText, null, false, null, $keyboard);
+            $bot->sendMessage($telegram['chat']['id'], $messageText, null, false, null, $keyboard);
         } catch (InvalidArgumentException $e) {
         } catch (Exception $e) {
         }
