@@ -86,10 +86,11 @@ class TransactionService extends BaseObject
     /**
      * @param int $id
      * @param int $userId
+     * @return Transaction
      * @throws NotFoundHttpException
      * @throws Exception
      */
-    public function copy(int $id, int $userId = 0): void
+    public function copy(int $id, int $userId = 0)
     {
         $model = $this->findCurrentOne($id, $userId);
         $transaction = new Transaction();
@@ -101,6 +102,7 @@ class TransactionService extends BaseObject
         if (!$transaction->save(false)) {
             throw new Exception(Setup::errorMessage($transaction->firstErrors));
         }
+        return $transaction;
     }
 
     /**

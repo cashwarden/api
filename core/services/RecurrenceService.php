@@ -6,7 +6,6 @@ use app\core\exceptions\InvalidArgumentException;
 use app\core\exceptions\ThirdPartyServiceErrorException;
 use app\core\helpers\HolidayHelper;
 use app\core\models\Recurrence;
-use app\core\models\User;
 use app\core\traits\SendRequestTrait;
 use app\core\traits\ServiceTrait;
 use app\core\types\RecurrenceFrequency;
@@ -60,33 +59,6 @@ class RecurrenceService extends BaseObject
         }
         return $model;
     }
-
-
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotFoundHttpException
-     */
-    public function createRecords()
-    {
-        $items = Recurrence::find()
-            ->where(['status' => RecurrenceStatus::ACTIVE])
-            ->andWhere(['execution_date' => Yii::$app->formatter->asDatetime('now', 'php:Y-m-d')])
-            ->asArray()
-            ->all();
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            foreach ($items as $item) {
-                \Yii::$app->user->setIdentity(User::findOne($item['user_id']));
-                $this->transactionService->copy($item['transaction_id'], $item['user_id']);
-            }
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            throw $e;
-        }
-    }
-
 
     /**
      * @param Recurrence $recurrence

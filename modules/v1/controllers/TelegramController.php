@@ -153,9 +153,4 @@ class TelegramController extends ActiveController
         }
         return '';
     }
-
-    public function actionBind()
-    {
-        dd(\Yii::$app->request->queryParams);
-    }
 }

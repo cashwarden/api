@@ -62,7 +62,7 @@ class TelegramService extends BaseObject
         }
         $model->client_username = (string)$message->getFrom()->getUsername();
         $model->client_id = (string)$message->getFrom()->getId();
-        $model->data = $message->getFrom()->toJson();
+        $model->data = $message->toJson();
         if (!$model->save()) {
             throw new DBException(Setup::errorMessage($model->firstErrors));
         }
@@ -174,5 +174,30 @@ class TelegramService extends BaseObject
         ];
 
         return new InlineKeyboardMarkup([$items]);
+    }
+
+    /**
+     * @param string $messageText
+     * @param int $userId
+     * @return void
+     */
+    public function sendMessage(string $messageText, int $userId = 0): void
+    {
+        $userId = $userId ?: Yii::$app->user->id;
+        $telegram = AuthClient::find()->select('data')->where([
+            'user_id' => $userId,
+            'type' => AuthClientType::TELEGRAM
+        ])->scalar();
+        if (!$telegram) {
+            return;
+        }
+        $telegram = Json::decode($telegram);
+        $bot = TelegramService::newClient();
+        /** @var BotApi $bot */
+        try {
+            $bot->sendMessage($telegram, $messageText);
+        } catch (InvalidArgumentException $e) {
+        } catch (Exception $e) {
+        }
     }
 }
