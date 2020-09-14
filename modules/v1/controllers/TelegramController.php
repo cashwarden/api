@@ -93,7 +93,7 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
-                $type = ltrim($message, '/');
+                $type = ltrim($message->getText(), '/');
                 $text = $this->telegramService->getReportTextByType($type);
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), $text);
