@@ -122,7 +122,10 @@ class TransactionService extends BaseObject
             $model->type = $this->getDataByDesc(
                 $rules,
                 'then_transaction_type',
-                function () {
+                function () use ($desc) {
+                    if (ArrayHelper::strPosArr($desc, ['收到', '收入']) !== false) {
+                        return TransactionType::getName(TransactionType::INCOME);
+                    }
                     return TransactionType::getName(TransactionType::EXPENSE);
                 }
             );
