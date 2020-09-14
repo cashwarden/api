@@ -6,6 +6,7 @@ use app\core\models\AuthClient;
 use app\core\models\Transaction;
 use app\core\models\User;
 use app\core\traits\ServiceTrait;
+use app\core\types\AnalysisDateType;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
 use app\core\types\ReportType;
@@ -250,10 +251,16 @@ class TelegramService extends BaseObject
     {
         $recordOverview = $this->analysisService->recordOverview;
         $title = data_get($recordOverview, "{$type}.text");
-        $text = "统计报告\n";
-        $text .= $title . '支出：' . data_get($recordOverview, "{$type}.overview.expense", 0) . "\n";
-        $text .= $title . '收入：' . data_get($recordOverview, "{$type}.overview.income", 0) . "\n";
-        $text .= $title . '结余：' . data_get($recordOverview, "{$type}.overview.surplus", 0) . "\n";
+
+        $text = "收支报告\n";
+        $expense = data_get($recordOverview, "{$type}.overview.expense", 0);
+        $income = data_get($recordOverview, "{$type}.overview.income", 0);
+        $text .= "{$title}统计：已支出{$expense}，已收入{$income}\n";
+
+        $type = AnalysisDateType::CURRENT_MONTH;
+        $expense = data_get($recordOverview, "{$type}.overview.expense", 0);
+        $income = data_get($recordOverview, "{$type}.overview.income", 0);
+        $text .= "{$title}统计：已支出{$expense}，已收入{$income}\n";
 
         return $text;
     }
