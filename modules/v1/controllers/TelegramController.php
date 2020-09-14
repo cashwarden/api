@@ -51,13 +51,22 @@ class TelegramController extends ActiveController
                 }
             });
 
-            $bot->command(ltrim(TelegramKeyword::CMD, '/'), function (Message $message) use ($bot) {
+            $bot->command(ltrim(TelegramKeyword::REPORT, '/'), function (Message $message) use ($bot) {
                 $keyboard = new ReplyKeyboardMarkup(
                     [[TelegramKeyword::TODAY, TelegramKeyword::YESTERDAY, TelegramKeyword::LAST_MONTH]],
                     true
                 );
                 /** @var BotApi $bot */
-                $bot->sendMessage($message->getChat()->getId(), '', null, false, null, $keyboard);
+                $bot->sendMessage($message->getChat()->getId(), '请选择统计范围', null, false, null, $keyboard);
+            });
+
+            $bot->command(ltrim(TelegramKeyword::CMD, '/'), function (Message $message) use ($bot) {
+                $keyboard = new ReplyKeyboardMarkup(
+                    [[TelegramKeyword::REPORT]],
+                    true
+                );
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), '请选择指令', null, false, null, $keyboard);
             });
 
             $bot->command('ping', function (Message $message) use ($bot) {
