@@ -4,9 +4,7 @@ namespace app\modules\v1\controllers;
 
 use app\core\exceptions\InternalException;
 use app\core\exceptions\InvalidArgumentException;
-use app\core\helpers\AnalysisHelper;
 use app\core\models\Record;
-use app\core\services\AnalysisService;
 use app\core\traits\ServiceTrait;
 use app\core\types\RecordSource;
 use app\core\types\TransactionType;
@@ -55,15 +53,7 @@ class RecordController extends ActiveController
      */
     public function actionOverview()
     {
-        $items = [];
-        foreach (AnalysisHelper::texts() as $key => $item) {
-            $date = AnalysisService::getDateRange($key);
-            $items[$key]['overview'] = $this->analysisService->getRecordOverviewByDate($date);
-            $items[$key]['key'] = $key;
-            $items[$key]['text'] = $item;
-        }
-
-        return array_values($items);
+        return array_values($this->analysisService->recordOverview);
     }
 
 

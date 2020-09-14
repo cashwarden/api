@@ -1,12 +1,12 @@
 <?php
 
-namespace app\core\helpers;
+namespace app\core\types;
 
 use Yii;
 use yii\base\InvalidConfigException;
 use yiier\helpers\DateHelper;
 
-class AnalysisHelper
+class AnalysisDateType
 {
     public const TODAY = 'today';
     public const YESTERDAY = 'yesterday';

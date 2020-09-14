@@ -2,9 +2,9 @@
 
 namespace app\core\services;
 
-use app\core\helpers\AnalysisHelper;
 use app\core\models\Category;
 use app\core\models\Record;
+use app\core\types\AnalysisDateType;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
 use Yii;
@@ -13,8 +13,29 @@ use yii\base\InvalidConfigException;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
+/**
+ *
+ * @property-read array $recordOverview
+ */
 class AnalysisService extends BaseObject
 {
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getRecordOverview(): array
+    {
+        $items = [];
+        foreach (AnalysisDateType::texts() as $key => $item) {
+            $date = AnalysisService::getDateRange($key);
+            $items[$key]['overview'] = $this->getRecordOverviewByDate($date);
+            $items[$key]['key'] = $key;
+            $items[$key]['text'] = $item;
+        }
+
+        return $items;
+    }
+
     public function getRecordOverviewByDate(array $date): array
     {
         $conditions = [];
@@ -75,7 +96,7 @@ class AnalysisService extends BaseObject
      */
     public function getRecordStatisticalData(string $dateStr, int $transactionType)
     {
-        $dates = AnalysisHelper::getEveryDayByMonth($dateStr);
+        $dates = AnalysisDateType::getEveryDayByMonth($dateStr);
         $userId = \Yii::$app->user->id;
         $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType];
         $items = [];
@@ -102,14 +123,14 @@ class AnalysisService extends BaseObject
         $formatter = Yii::$app->formatter;
         $date = [];
         switch ($key) {
-            case AnalysisHelper::TODAY:
+            case AnalysisDateType::TODAY:
                 $date = [DateHelper::beginTimestamp(), DateHelper::endTimestamp()];
                 break;
-            case AnalysisHelper::YESTERDAY:
+            case AnalysisDateType::YESTERDAY:
                 $time = strtotime('-1 day');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp($time)];
                 break;
-            case AnalysisHelper::CURRENT_MONTH:
+            case AnalysisDateType::CURRENT_MONTH:
                 $time = $formatter->asDatetime('now', 'php:01-m-Y');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp()];
                 break;

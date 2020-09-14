@@ -8,6 +8,7 @@ use app\core\models\User;
 use app\core\traits\ServiceTrait;
 use app\core\types\AuthClientStatus;
 use app\core\types\AuthClientType;
+use app\core\types\ReportType;
 use app\core\types\TelegramAction;
 use app\core\types\TransactionRating;
 use app\core\types\TransactionType;
@@ -224,6 +225,23 @@ class TelegramService extends BaseObject
             $text .= "收款账户： #{$toAccountName} （余额：{$toAccountBalance}）\n";
         }
         $text .= '金额：' . Setup::toYuan($model->amount_cent);
+        return $text;
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     * @throws \Exception
+     */
+    public function getAnalysisTextByTransaction(string $type)
+    {
+        $recordOverview = $this->analysisService->recordOverview;
+        $title = data_get($recordOverview, "{$type}.text");
+        $text = "{$title}\n";
+        $text .= '总支出： #' . data_get($recordOverview, "{$type}.overview.expense", 0) . "\n";
+        $text .= '总收入： #' . data_get($recordOverview, "{$type}.overview.income", 0) . "\n";
+        $text .= '结余： #' . data_get($recordOverview, "{$type}.overview.surplus", 0) . "\n";
+
         return $text;
     }
 }
