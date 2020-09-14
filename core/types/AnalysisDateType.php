@@ -11,6 +11,7 @@ class AnalysisDateType
     public const TODAY = 'today';
     public const YESTERDAY = 'yesterday';
     public const CURRENT_MONTH = 'current_month';
+    public const LAST_MONTH = 'last_month';
     public const GRAND_TOTAL = 'grand_total';
 
     public const EVERY_DAY_OF_MONTH = 'every_day_of_month';

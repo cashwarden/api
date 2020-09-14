@@ -229,18 +229,31 @@ class TelegramService extends BaseObject
     }
 
     /**
+     * @param int $userId
+     * @param string $type
+     * @return void
+     * @throws \Exception
+     */
+    public function sendReport(int $userId, string $type): void
+    {
+        \Yii::$app->user->setIdentity(User::findOne($userId));
+        $text = $this->telegramService->getReportTextByType($type);
+        $this->telegramService->sendMessage($text);
+    }
+
+    /**
      * @param string $type
      * @return string
      * @throws \Exception
      */
-    public function getAnalysisTextByTransaction(string $type)
+    public function getReportTextByType(string $type)
     {
         $recordOverview = $this->analysisService->recordOverview;
         $title = data_get($recordOverview, "{$type}.text");
-        $text = "{$title}\n";
-        $text .= '总支出： #' . data_get($recordOverview, "{$type}.overview.expense", 0) . "\n";
-        $text .= '总收入： #' . data_get($recordOverview, "{$type}.overview.income", 0) . "\n";
-        $text .= '结余： #' . data_get($recordOverview, "{$type}.overview.surplus", 0) . "\n";
+        $text = "统计报告\n";
+        $text .= $title . '支出：' . data_get($recordOverview, "{$type}.overview.expense", 0) . "\n";
+        $text .= $title . '收入：' . data_get($recordOverview, "{$type}.overview.income", 0) . "\n";
+        $text .= $title . '结余：' . data_get($recordOverview, "{$type}.overview.surplus", 0) . "\n";
 
         return $text;
     }

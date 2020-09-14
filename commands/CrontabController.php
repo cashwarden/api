@@ -63,9 +63,7 @@ class CrontabController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
         try {
             foreach ($items as $item) {
-                \Yii::$app->user->setIdentity(User::findOne($item['user_id']));
-                $text = $this->telegramService->getAnalysisTextByTransaction($type);
-                $this->telegramService->sendMessage($text);
+                $this->telegramService->sendReport($item['user_id'], $type);
                 $this->stdout("定时发送报告成功，user_id：{$item['user_id']}\n");
             }
             $transaction->commit();

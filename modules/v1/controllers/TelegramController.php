@@ -11,6 +11,7 @@ use app\core\types\TelegramKeyword;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Message;
+use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 use yiier\graylog\Log;
 use yiier\helpers\StringHelper;
@@ -50,8 +51,17 @@ class TelegramController extends ActiveController
                 }
             });
 
+            $bot->command(ltrim(TelegramKeyword::CMD, '/'), function (Message $message) use ($bot) {
+                $keyboard = new ReplyKeyboardMarkup(
+                    [[TelegramKeyword::TODAY, TelegramKeyword::YESTERDAY, TelegramKeyword::LAST_MONTH]],
+                    true
+                );
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), '', null, false, null, $keyboard);
+            });
+
             $bot->command('ping', function (Message $message) use ($bot) {
-                $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup(
+                $keyboard = new ReplyKeyboardMarkup(
                     [["one", "two", "three"]],
                     true
                 ); // true for one-time keyboard
@@ -70,6 +80,21 @@ class TelegramController extends ActiveController
                 }
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), $text);
+            });
+
+            $bot->on(function (Update $Update) use ($bot) {
+                $message = $Update->getMessage();
+                $type = ltrim($message, '/');
+                $text = $this->telegramService->getReportTextByType($type);
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), $text);
+            }, function (Update $message) {
+                $msg = $message->getMessage();
+                $report = [TelegramKeyword::TODAY, TelegramKeyword::YESTERDAY, TelegramKeyword::LAST_MONTH];
+                if ($msg && in_array($msg->getText(), $report)) {
+                    return true;
+                }
+                return false;
             });
 
 //            $bot->on(function (Update $Update) use ($bot) {
