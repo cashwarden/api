@@ -93,8 +93,17 @@ class TelegramController extends ActiveController
 
             $bot->on(function (Update $Update) use ($bot) {
                 $message = $Update->getMessage();
-                $type = ltrim($message->getText(), '/');
-                $text = $this->telegramService->getReportTextByType($type);
+                $user = $this->userService->getUserByClientId(
+                    AuthClientType::TELEGRAM,
+                    $message->getFrom()->getId()
+                );
+                if ($user) {
+                    \Yii::$app->user->setIdentity($user);
+                    $type = ltrim($message->getText(), '/');
+                    $text = $this->telegramService->getReportTextByType($type);
+                } else {
+                    $text = '请先绑定您的账号';
+                }
                 /** @var BotApi $bot */
                 $bot->sendMessage($message->getChat()->getId(), $text);
             }, function (Update $message) {
