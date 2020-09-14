@@ -255,13 +255,15 @@ class TelegramService extends BaseObject
         $title = data_get($recordOverview, "{$type}.text");
         $expense = data_get($recordOverview, "{$type}.overview.expense", 0);
         $income = data_get($recordOverview, "{$type}.overview.income", 0);
-        $text .= "{$title}统计：已支出 {$expense}，已收入 {$income}\n";
+        $surplus = data_get($recordOverview, "{$type}.overview.surplus", 0);
+        $text .= "{$title}统计：已支出 {$expense}，已收入 {$income}，结余 {$surplus}\n";
 
         $type = AnalysisDateType::CURRENT_MONTH;
         $title = data_get($recordOverview, "{$type}.text");
         $expense = data_get($recordOverview, "{$type}.overview.expense", 0);
         $income = data_get($recordOverview, "{$type}.overview.income", 0);
-        $text .= "{$title}统计：已支出 {$expense}，已收入 {$income}\n";
+        $surplus = data_get($recordOverview, "{$type}.overview.surplus", 0);
+        $text .= "{$title}统计：已支出 {$expense}，已收入 {$income}，结余 {$surplus}\n";
 
         return $text;
     }
