@@ -130,6 +130,11 @@ class AnalysisService extends BaseObject
                 $time = strtotime('-1 day');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp($time)];
                 break;
+            case AnalysisDateType::LAST_MONTH:
+                $beginTime = $formatter->asDatetime(strtotime('-1 month'), 'php:01-m-Y');
+                $endTime = $formatter->asDatetime('now', 'php:01-m-Y');
+                $date = [DateHelper::beginTimestamp($beginTime), DateHelper::endTimestamp($endTime) - 3600 * 24];
+                break;
             case AnalysisDateType::CURRENT_MONTH:
                 $time = $formatter->asDatetime('now', 'php:01-m-Y');
                 $date = [DateHelper::beginTimestamp($time), DateHelper::endTimestamp()];

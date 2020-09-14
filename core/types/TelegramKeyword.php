@@ -8,9 +8,9 @@ class TelegramKeyword
     public const START = '/start';
     public const CMD = '/cmd';
     public const REPORT = '/report';
-    public const TODAY = '/today';
-    public const YESTERDAY = '/yesterday';
-    public const LAST_MONTH = '/last_month';
+    public const TODAY = '/' . AnalysisDateType::TODAY;
+    public const YESTERDAY = '/' . AnalysisDateType::YESTERDAY;
+    public const LAST_MONTH = '/' . AnalysisDateType::LAST_MONTH;
 
     /**
      * @return string[]

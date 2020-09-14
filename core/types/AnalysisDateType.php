@@ -23,6 +23,7 @@ class AnalysisDateType
             self::TODAY,
             self::YESTERDAY,
             self::CURRENT_MONTH,
+            self::LAST_MONTH,
             self::GRAND_TOTAL,
         ];
     }
@@ -33,6 +34,7 @@ class AnalysisDateType
             self::TODAY => Yii::t('app', 'Today'),
             self::YESTERDAY => Yii::t('app', 'Yesterday'),
             self::CURRENT_MONTH => Yii::t('app', 'Current month'),
+            self::LAST_MONTH => Yii::t('app', 'Last month'),
             self::GRAND_TOTAL => Yii::t('app', 'Grand total')
         ];
     }
