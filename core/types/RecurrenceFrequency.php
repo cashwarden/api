@@ -18,7 +18,7 @@ class RecurrenceFrequency extends BaseType
             self::DAY => 'day',
             self::WEEK => 'week',
             self::MONTH => 'month',
-//            self::YEAR => 'year',
+            self::YEAR => 'year',
             self::WORKING_DAY => 'working_day',
             self::LEGAL_WORKING_DAY => 'legal_working_day',
         ];
@@ -30,7 +30,7 @@ class RecurrenceFrequency extends BaseType
             self::DAY => '每天',
             self::WEEK => '每周',
             self::MONTH => '每月',
-//            self::YEAR => '每年',
+            self::YEAR => '每年',
             self::WORKING_DAY => '工作日（周一至周五）',
             self::LEGAL_WORKING_DAY => '法定工作日',
         ];
