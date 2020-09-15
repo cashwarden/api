@@ -22,7 +22,7 @@ class JoinRequest extends \yii\base\Model
             [['username', 'email', 'base_currency_code'], 'required'],
 
             ['username', 'unique', 'targetClass' => User::class],
-            ['username', 'string', 'min' => 4, 'max' => 60],
+            ['username', 'string', 'min' => 3, 'max' => 60],
 
             ['email', 'string', 'min' => 2, 'max' => 120],
             ['email', 'unique', 'targetClass' => User::class],

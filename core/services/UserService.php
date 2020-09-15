@@ -292,11 +292,14 @@ class UserService
      * @param int $type
      * @param string $clientId
      * @return User
+     * @throws Exception
      */
     public function getUserByClientId(int $type, string $clientId): User
     {
         /** @var AuthClient $model */
-        $model = AuthClient::find()->where(['type' => $type, 'client_id' => $clientId])->one();
-        return $model->user;
+        if ($model = AuthClient::find()->where(['type' => $type, 'client_id' => $clientId])->one()) {
+            return $model->user;
+        }
+        throw new Exception('您还未绑定账号，请先访问「个人设置」中的「账号绑定」进行绑定账号，然后才能快速记账。');
     }
 }
