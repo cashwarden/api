@@ -130,7 +130,7 @@ class RecurrenceService extends BaseObject
      * @throws InvalidConfigException
      * @throws ThirdPartyServiceErrorException
      */
-    public static function updateAllLegalWorkingDay()
+    private static function updateAllLegalWorkingDay()
     {
         $items = Recurrence::find()
             ->where(['frequency' => RecurrenceFrequency::LEGAL_WORKING_DAY, 'status' => RecurrenceStatus::ACTIVE])

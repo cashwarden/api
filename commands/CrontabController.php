@@ -2,9 +2,11 @@
 
 namespace app\commands;
 
+use app\core\exceptions\ThirdPartyServiceErrorException;
 use app\core\models\AuthClient;
 use app\core\models\Recurrence;
 use app\core\models\User;
+use app\core\services\RecurrenceService;
 use app\core\traits\ServiceTrait;
 use app\core\types\AnalysisDateType;
 use app\core\types\AuthClientType;
@@ -22,7 +24,7 @@ class CrontabController extends Controller
     /**
      * @throws InvalidConfigException
      * @throws Exception
-     * @throws NotFoundHttpException
+     * @throws NotFoundHttpException|ThirdPartyServiceErrorException
      */
     public function actionRecurrence()
     {
@@ -42,6 +44,7 @@ class CrontabController extends Controller
                     $this->stdout("定时记账成功，transaction_id：{$t->id}\n");
                 }
             }
+            RecurrenceService::updateAllExecutionDate();
             $transaction->commit();
         } catch (\Exception $e) {
             $this->stdout("定时记账失败：{$e->getMessage()}\n");
