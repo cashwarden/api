@@ -30,6 +30,8 @@ use yiier\validators\ArrayValidator;
  * @property int|null $sort
  * @property string|null $created_at
  * @property string|null $updated_at
+ *
+ * @property-read Category $thenCategory
  */
 class Rule extends \yii\db\ActiveRecord
 {
@@ -122,6 +124,11 @@ class Rule extends \yii\db\ActiveRecord
         }
     }
 
+    public function getThenCategory()
+    {
+        return $this->hasOne(Category::class, ['id' => 'then_category_id']);
+    }
+
     /**
      * @return array
      */
@@ -140,6 +147,9 @@ class Rule extends \yii\db\ActiveRecord
 
         $fields['then_tags'] = function (self $model) {
             return $model->then_tags ? explode(',', $model->then_tags) : [];
+        };
+        $fields['thenCategory'] = function (self $model) {
+            return $model->thenCategory;
         };
 
         $fields['if_keywords'] = function (self $model) {
