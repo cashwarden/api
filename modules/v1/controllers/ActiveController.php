@@ -11,6 +11,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveRecord;
 use yii\filters\Cors;
 use yii\web\ForbiddenHttpException;
 use yiier\helpers\SearchModel;
@@ -27,6 +28,7 @@ class ActiveController extends \yii\rest\ActiveController
     public $defaultOrder = ['id' => SORT_DESC];
     public $partialMatchAttributes = [];
     public $stringToIntAttributes = [];
+    public $relations = [];
 
     /**
      * 不参与校验的 actions
@@ -82,16 +84,18 @@ class ActiveController extends \yii\rest\ActiveController
      */
     public function prepareDataProvider()
     {
+        /** @var ActiveRecord $modelClass */
         $modelClass = $this->modelClass;
         $searchModel = new SearchModel([
             'defaultOrder' => $this->defaultOrder,
             'model' => $modelClass,
+            'relations' => $this->relations,
             'scenario' => 'default',
             'partialMatchAttributes' => $this->partialMatchAttributes,
             'pageSize' => $this->getPageSize()
         ]);
 
-        $params = Yii::$app->request->queryParams;
+        $params = $this->formatParams(Yii::$app->request->queryParams);
         foreach ($this->stringToIntAttributes as $attribute => $className) {
             if ($type = data_get($params, $attribute)) {
                 $params[$attribute] = SearchHelper::stringToInt($type, $className);
@@ -100,8 +104,14 @@ class ActiveController extends \yii\rest\ActiveController
         unset($params['sort']);
 
         $dataProvider = $searchModel->search(['SearchModel' => $params]);
-        $dataProvider->query->andWhere(['user_id' => Yii::$app->user->id]);
+        $dataProvider->query->andWhere([$modelClass::tableName() . '.user_id' => Yii::$app->user->id]);
         return $dataProvider;
+    }
+
+
+    protected function formatParams(array $params)
+    {
+        return $params;
     }
 
     /**

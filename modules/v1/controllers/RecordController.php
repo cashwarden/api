@@ -8,6 +8,7 @@ use app\core\models\Record;
 use app\core\traits\ServiceTrait;
 use app\core\types\RecordSource;
 use app\core\types\TransactionType;
+use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
@@ -24,6 +25,7 @@ class RecordController extends ActiveController
     public $partialMatchAttributes = ['name'];
     public $defaultOrder = ['date' => SORT_DESC, 'id' => SORT_DESC];
     public $stringToIntAttributes = ['transaction_type' => TransactionType::class];
+    public $relations = ['transaction' => []];
 
     public function actions()
     {
@@ -42,14 +44,33 @@ class RecordController extends ActiveController
     public function prepareDataProvider()
     {
         $dataProvider = parent::prepareDataProvider();
+        if ($searchKeywords = trim(request('keyword'))) {
+            $dataProvider->query->andWhere(
+                "MATCH(`description`, `tags`, `remark`) AGAINST ('*$searchKeywords*' IN BOOLEAN MODE)"
+            );
+        }
         $dataProvider->setModels($this->transactionService->formatRecords($dataProvider->getModels()));
         return $dataProvider;
     }
 
+    /**
+     * @param array $params
+     * @return array
+     * @throws Exception
+     */
+    protected function formatParams(array $params)
+    {
+        if (($date = explode('~', data_get($params, 'date'))) && count($date) == 2) {
+            $start = $date[0] . ' 00:00:00';
+            $end = $date[1] . ' 23:59:59';
+            $params['date'] = "{$start}~{$end}";
+        }
+        return $params;
+    }
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionOverview()
     {
@@ -60,7 +81,7 @@ class RecordController extends ActiveController
     /**
      * @return array
      * @throws InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionAnalysis()
     {
@@ -75,7 +96,7 @@ class RecordController extends ActiveController
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionSources()
     {
