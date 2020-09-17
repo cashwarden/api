@@ -10,6 +10,7 @@ use app\core\types\RecordSource;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
@@ -246,7 +247,10 @@ class Record extends ActiveRecord
         };
 
         $fields['transaction'] = function (self $model) {
-            return $model->transaction;
+            return ArrayHelper::merge(
+                ArrayHelper::toArray($model->transaction),
+                ['exclude_from_stats' => (bool)$model->exclude_from_stats]
+            );
         };
 
         $fields['category'] = function (self $model) {
