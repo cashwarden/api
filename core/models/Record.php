@@ -157,6 +157,7 @@ class Record extends ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            $this->exclude_from_stats = $this->exclude_from_stats ?: 0;
             $this->source = $this->source ?: RecordSource::WEB;
             if (!$this->amount_cent) {
                 if ($this->currency_code == user('base_currency_code')) {
