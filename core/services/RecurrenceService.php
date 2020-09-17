@@ -105,6 +105,17 @@ class RecurrenceService extends BaseObject
         return $formatter->asDatetime($date, 'php:Y-m-d');
     }
 
+    /**
+     * @param int $transactionId
+     * @param int $userId
+     * @return bool|int|string|null
+     */
+    public static function countByTransactionId(int $transactionId, int $userId)
+    {
+        return Recurrence::find()
+            ->where(['user_id' => $userId, 'transaction_id' => $transactionId])
+            ->count();
+    }
 
     /**
      * @throws InvalidConfigException|ThirdPartyServiceErrorException

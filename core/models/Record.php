@@ -2,7 +2,9 @@
 
 namespace app\core\models;
 
+use app\core\exceptions\CannotOperateException;
 use app\core\services\AccountService;
+use app\core\services\RecurrenceService;
 use app\core\types\DirectionType;
 use app\core\types\RecordSource;
 use Yii;
@@ -183,6 +185,18 @@ class Record extends ActiveRecord
                 AccountService::updateAccountBalance($accountId);
             }
         }
+    }
+
+    /**
+     * @return bool
+     * @throws CannotOperateException
+     */
+    public function beforeDelete()
+    {
+        if (RecurrenceService::countByTransactionId($this->transaction_id, $this->user_id)) {
+            throw new CannotOperateException(Yii::t('app', 'Cannot be deleted because it has been used.'));
+        }
+        return parent::beforeDelete();
     }
 
     /**
