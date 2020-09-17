@@ -28,6 +28,7 @@ use yiier\helpers\Setup;
  * @property int $direction
  * @property string $date
  * @property int $source
+ * @property int $exclude_from_stats
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -103,6 +104,7 @@ class Record extends ActiveRecord
             ['direction', 'in', 'range' => [DirectionType::INCOME, DirectionType::EXPENSE]],
             ['source', 'in', 'range' => array_keys(RecordSource::names())],
             [['date'], 'datetime', 'format' => 'php:Y-m-d H:i'],
+            ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
         ];
     }
 
@@ -124,6 +126,7 @@ class Record extends ActiveRecord
             'direction' => Yii::t('app', 'Direction'),
             'date' => Yii::t('app', 'Date'),
             'source' => Yii::t('app', 'Source'),
+            'exclude_from_stats' => Yii::t('app', 'Exclude From Stats'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -260,6 +263,10 @@ class Record extends ActiveRecord
 
         $fields['date'] = function (self $model) {
             return DateHelper::datetimeToIso8601($model->date);
+        };
+
+        $fields['exclude_from_stats'] = function (self $model) {
+            return (bool)$model->exclude_from_stats;
         };
 
         $fields['created_at'] = function (self $model) {

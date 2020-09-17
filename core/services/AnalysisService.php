@@ -44,7 +44,7 @@ class AnalysisService extends BaseObject
         }
         $userId = \Yii::$app->user->id;
         $types = [TransactionType::EXPENSE, TransactionType::INCOME];
-        $baseConditions = ['user_id' => $userId, 'transaction_type' => $types];
+        $baseConditions = ['user_id' => $userId, 'transaction_type' => $types, 'exclude_from_stats' => false];
         $sum = Record::find()
             ->where($baseConditions)
             ->andWhere(['direction' => DirectionType::INCOME])
@@ -79,7 +79,7 @@ class AnalysisService extends BaseObject
             $items[$key]['x'] = $category['name'];
             $sum = Record::find()
                 ->where($baseConditions)
-                ->andWhere(['category_id' => $category['id']])
+                ->andWhere(['category_id' => $category['id'], 'exclude_from_stats' => false])
                 ->andWhere($conditions)
                 ->sum('amount_cent');
             $items[$key]['y'] = $sum ? (float)Setup::toYuan($sum) : 0;
@@ -98,14 +98,13 @@ class AnalysisService extends BaseObject
     {
         $dates = AnalysisDateType::getEveryDayByMonth($dateStr);
         $userId = \Yii::$app->user->id;
-        $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType];
+        $baseConditions = ['user_id' => $userId, 'transaction_type' => $transactionType, 'exclude_from_stats' => false];
         $items = [];
         foreach ($dates as $key => $date) {
             $items[$key]['x'] = sprintf("%02d", $key + 1);
-            $conditions = ['between', 'date', $date[0], $date[1]];
             $sum = Record::find()
                 ->where($baseConditions)
-                ->andWhere($conditions)
+                ->andWhere(['between', 'date', $date[0], $date[1]])
                 ->sum('amount_cent');
             $items[$key]['y'] = $sum ? (float)Setup::toYuan($sum) : 0;
         }

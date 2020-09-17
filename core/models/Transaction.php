@@ -56,6 +56,11 @@ class Transaction extends \yii\db\ActiveRecord
     public $source;
 
     /**
+     * @var bool
+     */
+    public $exclude_from_stats;
+
+    /**
      * @var integer
      */
     public $currency_amount;
@@ -155,6 +160,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['description', 'remark', 'image'], 'string', 'max' => 255],
             ['tags', ArrayValidator::class],
             ['source', 'in', 'range' => array_keys(RecordSource::names())],
+            ['exclude_from_stats', 'boolean', 'trueValue' => true, 'falseValue' => false, 'strict' => true],
         ];
     }
 
