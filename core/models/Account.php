@@ -222,6 +222,10 @@ class Account extends \yii\db\ActiveRecord
             return AccountType::getName($model->type);
         };
 
+        $fields['icon_name'] = function (self $model) {
+            return AccountType::getName($model->type);
+        };
+
         $fields['type_name'] = function (self $model) {
             return data_get(AccountType::texts(), $model->type);
         };

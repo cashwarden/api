@@ -44,6 +44,27 @@ class SiteController extends Controller
         return [];
     }
 
+
+    public function actionIcons()
+    {
+        return [
+            'food',
+            'home',
+            'bus',
+            'game',
+            'medicine-chest',
+            'clothes',
+            'education',
+            'investment',
+            'baby',
+            'expenses',
+            'work',
+            'income',
+            'transfer',
+            'adjust',
+        ];
+    }
+
     public function actionData()
     {
         return [

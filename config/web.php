@@ -77,6 +77,7 @@ $config = [
                 "GET <module>/recurrences/frequencies" => '<module>/recurrence/frequency-types',
 
                 "GET <module>/site-config" => '/site/data',
+                "GET <module>/<alias:icons>" => '/site/<alias>',
                 "GET health-check" => 'site/health-check',
                 [
                     'class' => 'yii\rest\UrlRule',
