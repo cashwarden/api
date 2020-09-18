@@ -205,8 +205,8 @@ class User extends ActiveRecord implements IdentityInterface
         };
 
         $fields['avatar'] = function (self $model) {
-            $avatar = md5($model->avatar);
-            return "http://gravatar.com/avatar/{$avatar}?s=48";
+            $avatar = md5(strtolower(trim($model->avatar)));
+            return "https://www.gravatar.com/avatar/{$avatar}?s=48";
         };
 
         $fields['updated_at'] = function (self $model) {
