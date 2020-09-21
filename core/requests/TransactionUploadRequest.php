@@ -19,7 +19,7 @@ class TransactionUploadRequest extends \yii\base\Model
                 'skipOnEmpty' => false,
                 'extensions' => 'csv',
                 'checkExtensionByMimeType' => false,
-                'maxSize' => 2 * 1024 * 1024
+                'maxSize' => 1 * 1024 * 1024
             ],
         ];
     }
