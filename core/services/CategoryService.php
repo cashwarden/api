@@ -2,9 +2,12 @@
 
 namespace app\core\services;
 
+use app\core\models\Account;
 use app\core\models\Category;
 use app\core\types\TransactionType;
 use Yii;
+use yii\db\ActiveRecord;
+use yii\web\NotFoundHttpException;
 
 class CategoryService
 {
@@ -25,5 +28,17 @@ class CategoryService
             ->where(['user_id' => $userId, 'transaction_type' => TransactionType::ADJUST])
             ->orderBy(['id' => SORT_ASC])
             ->scalar();
+    }
+
+    /**
+     * @param int $id
+     * @return Account|ActiveRecord|null
+     */
+    public static function findCurrentOne(int $id)
+    {
+        if (!$model = Category::find()->where(['id' => $id, 'user_id' => \Yii::$app->user->id])->one()) {
+            throw new NotFoundHttpException('No data found');
+        }
+        return $model;
     }
 }

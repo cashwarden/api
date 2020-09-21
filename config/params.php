@@ -15,4 +15,6 @@ return [
     'logFilterIgnoredKeys' => env('LOG_FILTER_IGNORED_KEYS', 'password'), // 不记录日志
     'logFilterHideKeys' => env('LOG_FILTER_HIDE_KEYS'), // 用*代替所有数据
     'logFilterHalfHideKeys' => env('LOG_FILTER_HALF_HIDE_KEYS', 'email'), // 部分数据隐藏，只显示头部 20% 和尾部 20% 数据，剩下的用*代替
+    'uploadSavePath' => '@webroot/uploads',
+    'uploadWebPath' => '@web/uploads',
 ];

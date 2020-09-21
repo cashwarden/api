@@ -2,11 +2,14 @@
 
 namespace app\modules\v1\controllers;
 
+use app\core\exceptions\InvalidArgumentException;
 use app\core\models\Transaction;
 use app\core\requests\TransactionCreateByDescRequest;
+use app\core\requests\TransactionUploadRequest;
 use app\core\traits\ServiceTrait;
 use app\core\types\TransactionType;
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * Transaction controller for the `v1` module
@@ -53,5 +56,25 @@ class TransactionController extends ActiveController
             $items[] = ['type' => $name, 'name' => data_get($texts, $key)];
         }
         return $items;
+    }
+
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
+    public function actionUpload()
+    {
+        $fileParam = 'file';
+        $uploadedFile = UploadedFile::getInstanceByName($fileParam);
+        $params = [$fileParam => $uploadedFile];
+        $model = new TransactionUploadRequest();
+        $this->validate($model, $params);
+        $filename = Yii::$app->user->id . 'record.csv';
+        $this->uploadService->uploadRecord($uploadedFile, $filename);
+        $data = $this->transactionService->createByCSV($filename);
+        $this->uploadService->deleteLocalFile($filename);
+        return $data;
     }
 }
