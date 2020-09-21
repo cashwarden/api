@@ -141,7 +141,7 @@ class TransactionService extends BaseObject
 
             if (!$fail) {
                 /** @var Transaction $item */
-                foreach ($items as $item) {
+                foreach (array_reverse($items) as $item) {
                     $item->save();
                     $success++;
                 }
