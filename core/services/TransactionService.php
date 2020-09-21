@@ -73,6 +73,7 @@ class TransactionService extends BaseObject
     {
         $filename = $this->uploadService->getFullFilename($filename);
         $row = $total = $success = $fail = 0;
+        $items = [];
         $model = new Transaction();
         if (($handle = fopen($filename, "r")) !== false) {
             while (($data = fgetcsv($handle)) !== false) {
@@ -122,10 +123,10 @@ class TransactionService extends BaseObject
                     $_model->remark = $newData[6];
 
                     $_model->source = RecordSource::IMPORT;
-                    if (!$_model->save()) {
+                    if (!$_model->validate()) {
                         throw new DBException(Setup::errorMessage($_model->firstErrors));
                     }
-                    $success++;
+                    array_push($items, $_model);
                 } catch (\Exception $e) {
                     Log::error('导入运费失败', [$newData, (string)$e]);
                     $failList[] = [
@@ -137,6 +138,15 @@ class TransactionService extends BaseObject
                 $total++;
             }
             fclose($handle);
+
+            if (!$fail) {
+                /** @var Transaction $item */
+                foreach ($items as $item) {
+                    $item->save();
+                    $success++;
+                }
+            }
+
             return [
                 'total' => $total,
                 'success' => $success,
