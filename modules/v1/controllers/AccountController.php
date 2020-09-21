@@ -59,7 +59,7 @@ class AccountController extends ActiveController
     public function actionUpdate(int $id)
     {
         $params = Yii::$app->request->bodyParams;
-        if (!$model = AccountService::getCurrentUserAccount($id)) {
+        if (!$model = AccountService::findCurrentOne($id)) {
             throw new NotFoundHttpException();
         }
 

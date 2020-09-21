@@ -16,6 +16,7 @@ use app\core\services\RuleService;
 use app\core\services\TagService;
 use app\core\services\TelegramService;
 use app\core\services\TransactionService;
+use app\core\services\UploadService;
 use app\core\services\UserService;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -31,6 +32,7 @@ use yii\base\InvalidConfigException;
  * @property AnalysisService $analysisService
  * @property TagService $tagService
  * @property RecurrenceService $recurrenceService
+ * @property UploadService $uploadService
  */
 trait ServiceTrait
 {
@@ -141,6 +143,18 @@ trait ServiceTrait
             return Yii::createObject(RecurrenceService::class);
         } catch (InvalidConfigException $e) {
             return new RecurrenceService();
+        }
+    }
+
+    /**
+     * @return UploadService|object
+     */
+    public function getUploadService()
+    {
+        try {
+            return Yii::createObject(UploadService::class);
+        } catch (InvalidConfigException $e) {
+            return new UploadService();
         }
     }
 }

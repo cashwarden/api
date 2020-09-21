@@ -6,6 +6,7 @@ use app\core\exceptions\CannotOperateException;
 use app\core\exceptions\InternalException;
 use app\core\helpers\ArrayHelper;
 use app\core\models\Account;
+use app\core\models\Category;
 use app\core\models\Record;
 use app\core\models\Tag;
 use app\core\models\Transaction;
@@ -17,6 +18,7 @@ use Exception;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
+use yii\db\Exception as DBException;
 use yii\db\Expression;
 use yii\web\NotFoundHttpException;
 use yiier\graylog\Log;
@@ -61,10 +63,87 @@ class TransactionService extends BaseObject
             $_model->transaction_type = $transaction->type;
             $_model->load($datum, '');
             if (!$_model->save()) {
-                throw new \yii\db\Exception(Setup::errorMessage($_model->firstErrors));
+                throw new DBException(Setup::errorMessage($_model->firstErrors));
             }
         }
         return true;
+    }
+
+    public function createByCSV($filename)
+    {
+        $filename = $this->uploadService->getFullFilename($filename);
+        $row = $total = $success = $fail = 0;
+        $model = new Transaction();
+        if (($handle = fopen($filename, "r")) !== false) {
+            while (($data = fgetcsv($handle)) !== false) {
+                $row++;
+                // 去除第一行数据
+                if ($row <= 1) {
+                    continue;
+                }
+
+                $num = count($data);
+                $newData = [];
+                for ($c = 0; $c < $num; $c++) {
+                    $newData[$c] = trim($data[$c]);
+                }
+                $_model = clone $model;
+                try {
+                    // 账单日期,类别,收入/支出,金额(CNY),标签（多个英文逗号隔开）,描述,备注,账户
+                    //2020-08-20,餐饮食品,支出,28.9,,买菜28.9,,
+                    $baseConditions = ['user_id' => Yii::$app->user->id];
+                    $_model->date = $newData[0] . ' 00:00';
+                    $_model->category_id = Category::find()->where($baseConditions + ['name' => $newData[1]])->scalar();
+                    if (!$_model->category_id) {
+                        throw new DBException(Yii::t('app', 'Category not found.'));
+                    }
+                    $accountId = Account::find()->where($baseConditions + ['name' => $newData[7]])->scalar();
+                    $accountId = $accountId ?: data_get(AccountService::getDefaultAccount(), 'id');
+                    if (!$accountId) {
+                        throw new DBException(Yii::t('app', 'Default account not found.'));
+                    }
+                    switch ($newData[2]) {
+                        case '收入':
+                            $_model->type = TransactionType::getName(TransactionType::INCOME);
+                            $_model->to_account_id = $accountId;
+                            break;
+                        case '支出':
+                            $_model->type = TransactionType::getName(TransactionType::EXPENSE);
+                            $_model->from_account_id = $accountId;
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
+                    $_model->currency_amount = $newData[3];
+                    $_model->currency_code = 'CNY';
+                    $_model->tags = $newData[4];
+                    $_model->description = $newData[5];
+                    $_model->remark = $newData[6];
+
+                    $_model->source = RecordSource::IMPORT;
+                    if (!$_model->save()) {
+                        throw new DBException(Setup::errorMessage($_model->firstErrors));
+                    }
+                    $success++;
+                } catch (\Exception $e) {
+                    Log::error('导入运费失败', [$newData, (string)$e]);
+                    $failList[] = [
+                        'data' => $newData,
+                        'reason' => $e->getMessage(),
+                    ];
+                    $fail++;
+                }
+                $total++;
+            }
+            fclose($handle);
+            return [
+                'total' => $total,
+                'success' => $success,
+                'fail' => $fail,
+                'fail_list' => $failList ?? []
+            ];
+        }
     }
 
     /**
@@ -172,7 +251,7 @@ class TransactionService extends BaseObject
             $model->currency_amount = $this->getAmountByDesc($desc);
             $model->currency_code = user('base_currency_code');
             if (!$model->save()) {
-                throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
+                throw new DBException(Setup::errorMessage($model->firstErrors));
             }
             $source ? Record::updateAll(['source' => $source], ['transaction_id' => $model->id]) : null;
             return $model;
@@ -254,7 +333,7 @@ class TransactionService extends BaseObject
                 ['request_id' => Yii::$app->requestId->id, $model->attributes, $model->errors],
                 __FUNCTION__
             );
-            throw new \yii\db\Exception(Setup::errorMessage($model->firstErrors));
+            throw new DBException(Setup::errorMessage($model->firstErrors));
         }
         return true;
     }

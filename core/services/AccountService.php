@@ -58,7 +58,7 @@ class AccountService
      * @param int $id
      * @return Account|ActiveRecord|null
      */
-    public static function getCurrentUserAccount(int $id)
+    public static function findCurrentOne(int $id)
     {
         return Account::find()->where(['id' => $id])
             ->andWhere(['user_id' => Yii::$app->user->id])
@@ -82,7 +82,7 @@ class AccountService
      */
     public static function updateAccountBalance(int $accountId): bool
     {
-        if (!$model = self::getCurrentUserAccount($accountId)) {
+        if (!$model = self::findCurrentOne($accountId)) {
             throw new \yii\db\Exception('not found account');
         }
         $model->load($model->toArray(), '');

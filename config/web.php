@@ -69,6 +69,8 @@ $config = [
                 "POST <module>/reset-token" => '<module>/user/reset-token',
                 "GET <module>/users/auth-clients" => '<module>/user/get-auth-clients',
                 "GET <module>/transactions/types" => '<module>/transaction/types',
+                "POST <module>/transactions/upload" => '<module>/transaction/upload',
+
                 "GET <module>/records/overview" => '<module>/record/overview',
                 "GET <module>/categories/analysis" => '<module>/category/analysis',
                 "GET <module>/records/analysis" => '<module>/record/analysis',

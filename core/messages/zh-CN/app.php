@@ -53,4 +53,6 @@ return [
     'Default account not found.' => '未找到默认账号',
     'Accounting failed, the amount must be greater than 0.' => '记账失败，金额必须大于0。',
     'The {attribute} not found.' => '{attribute} 未找到。',
+    'Upload file failed' => '上传文件失败',
+    'Category not found.' => '分类未找到',
 ];
