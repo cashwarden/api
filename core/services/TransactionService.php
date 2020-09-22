@@ -93,7 +93,7 @@ class TransactionService extends BaseObject
                     // 账单日期,类别,收入/支出,金额(CNY),标签（多个英文逗号隔开）,描述,备注,账户
                     //2020-08-20,餐饮食品,支出,28.9,,买菜28.9,,
                     $baseConditions = ['user_id' => Yii::$app->user->id];
-                    $_model->date = $newData[0] . ' 00:00';
+                    $_model->date = Yii::$app->formatter->asDatetime(strtotime($newData[0]), 'php:Y-m-d H:i');
                     $_model->category_id = Category::find()->where($baseConditions + ['name' => $newData[1]])->scalar();
                     if (!$_model->category_id) {
                         throw new DBException(Yii::t('app', 'Category not found.'));
@@ -123,6 +123,7 @@ class TransactionService extends BaseObject
                     $_model->remark = $newData[6];
 
                     $_model->source = RecordSource::IMPORT;
+                    dd($_model->attributes);
                     if (!$_model->validate()) {
                         throw new DBException(Setup::errorMessage($_model->firstErrors));
                     }

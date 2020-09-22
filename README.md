@@ -42,6 +42,7 @@ composer create-project --prefer-dist cashwarden/core-api <rest-api>
 cd <rest-api>
 cp .env.example .env
 chmod 777 -R runtime/
+chmod 777 -R web/uploads/
 php yii generate/key # optional 
 ~~~
 
