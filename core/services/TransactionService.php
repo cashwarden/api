@@ -50,6 +50,7 @@ class TransactionService extends BaseObject
             $conditions = ['transaction_id' => $transaction->id, 'direction' => $datum['direction']];
             if (!$_model = Record::find()->where($conditions)->one()) {
                 $_model = clone $model;
+                $_model->source = $transaction->source;
             }
             $_model->user_id = $transaction->user_id;
             $_model->transaction_id = $transaction->id;
@@ -58,7 +59,6 @@ class TransactionService extends BaseObject
             $_model->currency_amount_cent = $transaction->currency_amount_cent;
             $_model->currency_code = $transaction->currency_code;
             $_model->date = $transaction->date;
-            $_model->source = $transaction->source;
             $_model->exclude_from_stats = $transaction->exclude_from_stats;
             $_model->transaction_type = $transaction->type;
             $_model->load($datum, '');
