@@ -123,7 +123,6 @@ class TransactionService extends BaseObject
                     $_model->remark = $newData[6];
 
                     $_model->source = RecordSource::IMPORT;
-                    dd($_model->attributes);
                     if (!$_model->validate()) {
                         throw new DBException(Setup::errorMessage($_model->firstErrors));
                     }
