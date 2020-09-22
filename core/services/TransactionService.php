@@ -118,7 +118,7 @@ class TransactionService extends BaseObject
                     }
                     $_model->currency_amount = $newData[3];
                     $_model->currency_code = 'CNY';
-                    $_model->tags = $newData[4];
+                    $_model->tags = implode(',', $newData[4]);
                     $_model->description = $newData[5];
                     $_model->remark = $newData[6];
 
