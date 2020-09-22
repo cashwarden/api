@@ -26,6 +26,7 @@ class TagService
     {
         $model = new Tag();
         $model->load($data, '');
+        $model->user_id = Yii::$app->user->id;
         if (!$model->save(false)) {
             throw new Exception(Setup::errorMessage($model->firstErrors));
         }
