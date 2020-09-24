@@ -5,6 +5,7 @@ namespace app\core\services;
 use app\core\exceptions\InternalException;
 use app\core\models\Account;
 use app\core\models\Record;
+use app\core\models\Recurrence;
 use app\core\models\Rule;
 use app\core\models\Transaction;
 use app\core\types\DirectionType;
@@ -19,11 +20,17 @@ class AccountService
     {
         $baseConditions = ['user_id' => Yii::$app->user->id];
         Record::deleteAll($baseConditions + ['account_id' => $account->id]);
-        Transaction::deleteAll([
-            'and',
-            $baseConditions,
-            ['or', ['from_account_id' => $account->id], ['to_account_id' => $account->id]]
-        ]);
+
+        $transactionIds = Transaction::find()
+            ->where([
+                'and',
+                $baseConditions,
+                ['or', ['from_account_id' => $account->id], ['to_account_id' => $account->id]]
+            ])
+            ->column();
+        Transaction::deleteAll($baseConditions + ['id' => $transactionIds]);
+        Recurrence::deleteAll($baseConditions + ['transaction_id' => $transactionIds]);
+
         Rule::deleteAll([
             'and',
             $baseConditions,
