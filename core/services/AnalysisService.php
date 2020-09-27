@@ -2,14 +2,17 @@
 
 namespace app\core\services;
 
+use app\core\exceptions\InvalidArgumentException;
 use app\core\models\Category;
 use app\core\models\Record;
+use app\core\models\Transaction;
 use app\core\types\AnalysisDateType;
 use app\core\types\DirectionType;
 use app\core\types\TransactionType;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
@@ -143,5 +146,133 @@ class AnalysisService extends BaseObject
         return array_map(function ($i) use ($formatter) {
             return $formatter->asDatetime($i);
         }, $date);
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
+    public function byCategory(array $params)
+    {
+        $items = [];
+        $categories = Category::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        $categoriesMap = ArrayHelper::map($categories, 'id', 'name');
+        $recordTableName = Record::tableName();
+        foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
+            $data = $this->getBaseQuery($params)
+                ->select([
+                    "{$recordTableName}.category_id",
+                    "SUM({$recordTableName}.currency_amount_cent) AS currency_amount_cent"
+                ])
+                ->andWhere(['transaction_type' => $type])
+                ->groupBy("{$recordTableName}.category_id")
+                ->asArray()
+                ->all();
+            $k = TransactionType::getName($type);
+            $items['total'][$k] = 0;
+            $items[$k] = [];
+            foreach ($data as $key => $value) {
+                $v['category_name'] = data_get($categoriesMap, $value['category_id'], 0);
+                $v['currency_amount'] = (float)Setup::toYuan($value['currency_amount_cent']);
+                $items['total'][$k] += $v['currency_amount'];
+                $items[$k][] = $v;
+            }
+        }
+        $items['total']['surplus'] = (float)bcsub(
+            data_get($items['total'], TransactionType::getName(TransactionType::INCOME), 0),
+            data_get($items['total'], TransactionType::getName(TransactionType::EXPENSE), 0),
+            2
+        );
+
+        return $items;
+    }
+
+    /**
+     * @param array $params
+     * @param string $format
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
+    public function byDate(array $params, string $format)
+    {
+        $items = [];
+        $recordTableName = Record::tableName();
+        foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
+            $data = $this->getBaseQuery($params)
+                ->select([
+                    "DATE_FORMAT({$recordTableName}.date, '{$format}') as date",
+                    "SUM({$recordTableName}.currency_amount_cent) AS currency_amount_cent"
+                ])
+                ->andWhere(['transaction_type' => $type])
+                ->groupBy('date')
+                ->asArray()
+                ->all();
+
+            $k = TransactionType::getName($type);
+            $items['total'][$k] = 0;
+            $items[$k] = [];
+            foreach ($data as $key => $value) {
+                $v['date'] = $value['date'];
+                $v['currency_amount'] = (float)Setup::toYuan($value['currency_amount_cent']);
+                $items['total'][$k] += $v['currency_amount'];
+                $items[$k][] = $v;
+            }
+        }
+        $items['total']['surplus'] = (float)bcsub(
+            data_get($items['total'], TransactionType::getName(TransactionType::INCOME), 0),
+            data_get($items['total'], TransactionType::getName(TransactionType::EXPENSE), 0),
+            2
+        );
+
+        return $items;
+    }
+
+
+    /**
+     * @param array $params
+     * @return \yii\db\ActiveQuery
+     * @throws \Exception
+     */
+    protected function getBaseQuery(array $params)
+    {
+
+        $recordTableName = Record::tableName();
+
+        $searchKeys = ['category_id', 'account_id', 'source', 'transaction_type'];
+        $newParams = [];
+        foreach ($params as $key => $param) {
+            if (in_array($key, $searchKeys)) {
+                $newParams["{$recordTableName}.{$key}"] = $param;
+            }
+        }
+
+        $userId = Yii::$app->user->id;
+        $baseConditions = [
+            Record::tableName() . '.user_id' => $userId,
+            'exclude_from_stats' => (int)false
+        ];
+        $query = Record::find()
+            ->leftJoin(
+                Transaction::tableName(),
+                ["{$recordTableName}.transaction_id" => Transaction::tableName() . '.id']
+            )
+            ->where($baseConditions)
+            ->andFilterWhere($newParams);
+
+        if (isset($params['keyword']) && $searchKeywords = trim($params['keyword'])) {
+            $query->andWhere(
+                "MATCH(`description`, `tags`, `remark`) AGAINST ('*$searchKeywords*' IN BOOLEAN MODE)"
+            );
+        }
+        if (($date = explode('~', data_get($params, 'date'))) && count($date) == 2) {
+            $start = $date[0] . ' 00:00:00';
+            $end = $date[1] . ' 23:59:59';
+            $query->andWhere(['between', "{$recordTableName}.date", $start, $end]);
+        }
+
+        return $query;
     }
 }

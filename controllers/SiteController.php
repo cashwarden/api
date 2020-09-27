@@ -100,6 +100,11 @@ class SiteController extends Controller
                             'icon' => 'anticon-field-time',
                         ],
                         [
+                            'text' => '分析',
+                            'link' => '/analysis/index',
+                            'icon' => 'anticon-area-chart',
+                        ],
+                        [
                             'text' => '设置',
                             'icon' => 'anticon-setting',
                             'children' => [

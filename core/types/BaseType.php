@@ -18,7 +18,7 @@ abstract class BaseType
         try {
             return static::names()[$v];
         } catch (\ErrorException $e) {
-            throw new InvalidArgumentException(sprintf('Invaid: %s const value %s', __CLASS__, $v));
+            throw new InvalidArgumentException(sprintf('Invalid: %s const value %s', __CLASS__, $v));
         }
     }
 
@@ -30,7 +30,7 @@ abstract class BaseType
     public static function toEnumValue(string $v): int
     {
         if ($v === null) {
-            throw new InvalidArgumentException('parameter is invaild, value is ' . $v);
+            throw new InvalidArgumentException('parameter is invalid, value is ' . $v);
         }
 
         $constants = static::names();
@@ -38,7 +38,7 @@ abstract class BaseType
         $key = array_search($v, $constants);
 
         if ($key === false) {
-            throw new InvalidArgumentException('parameter is invaild , value is ' . $v);
+            throw new InvalidArgumentException('parameter is invalid , value is ' . $v);
         }
 
         return $key;
