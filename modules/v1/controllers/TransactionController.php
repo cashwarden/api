@@ -79,6 +79,10 @@ class TransactionController extends ActiveController
     }
 
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function actionExport()
     {
         return $this->transactionService->exportData();

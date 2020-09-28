@@ -537,7 +537,11 @@ class TransactionService extends BaseObject
         $categoriesMap = CategoryService::getCurrentMap();
         $accountsMap = AccountService::getCurrentMap();
         $types = TransactionType::texts();
-        $items = Transaction::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        $items = Transaction::find()
+            ->where(['user_id' => Yii::$app->user->id])
+            ->orderBy(['date' => SORT_DESC])
+            ->asArray()
+            ->all();
         foreach ($items as $k => $item) {
             $datum['date'] = $item['date'];
             $datum['category_name'] = data_get($categoriesMap, $item['category_id'], '');
