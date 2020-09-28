@@ -251,7 +251,7 @@ class Record extends ActiveRecord
             return $model->transaction ? ArrayHelper::merge(
                 ArrayHelper::toArray($model->transaction),
                 ['exclude_from_stats' => (bool)$model->exclude_from_stats]
-            ) : new \stdClass();
+            ) : null;
         };
 
         $fields['category'] = function (self $model) {
