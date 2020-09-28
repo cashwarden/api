@@ -43,6 +43,7 @@ cd <rest-api>
 cp .env.example .env
 chmod 777 -R runtime/
 chmod 777 -R web/uploads/
+php yii migrate
 php yii generate/key # optional 
 ~~~
 
@@ -62,6 +63,8 @@ git clone xxxx
 cd <rest-api>
 cp .env.example .env
 chmod 777 -R runtime/
+chmod 777 -R web/uploads/
+php yii migrate
 php yii generate/key # optional 
 ```
 
