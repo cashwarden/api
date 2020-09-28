@@ -238,30 +238,9 @@ class AnalysisService extends BaseObject
      */
     protected function getBaseQuery(array $params)
     {
-
-        $recordTableName = Record::tableName();
-
-        $searchKeys = ['category_id', 'account_id', 'source', 'transaction_type'];
-        $newParams = [];
-        foreach ($params as $key => $param) {
-            if (in_array($key, $searchKeys)) {
-                $newParams["{$recordTableName}.{$key}"] = $param;
-            }
-        }
-
-        $userId = Yii::$app->user->id;
-        $baseConditions = [
-            Record::tableName() . '.user_id' => $userId,
-            'exclude_from_stats' => (int)false
-        ];
-        $query = Record::find()
-            ->leftJoin(
-                Transaction::tableName(),
-                ["{$recordTableName}.transaction_id" => Transaction::tableName() . '.id']
-            )
-            ->where($baseConditions)
-            ->andFilterWhere($newParams);
-
+        $baseConditions = ['user_id' => Yii::$app->user->id,];
+        $condition = ['category_id' => request('category_id'), 'type' => request('transaction_type')];
+        $query = Transaction::find()->where($baseConditions)->andFilterWhere($condition);
         if (isset($params['keyword']) && $searchKeywords = trim($params['keyword'])) {
             $query->andWhere(
                 "MATCH(`description`, `tags`, `remark`) AGAINST ('*$searchKeywords*' IN BOOLEAN MODE)"
@@ -270,9 +249,19 @@ class AnalysisService extends BaseObject
         if (($date = explode('~', data_get($params, 'date'))) && count($date) == 2) {
             $start = $date[0] . ' 00:00:00';
             $end = $date[1] . ' 23:59:59';
-            $query->andWhere(['between', "{$recordTableName}.date", $start, $end]);
+            $query->andWhere(['between', 'date', $start, $end]);
         }
+        $transactionIds = $query->column();
 
-        return $query;
+        return Record::find()
+            ->where($baseConditions)
+            ->andWhere([
+                'transaction_id' => $transactionIds,
+                'exclude_from_stats' => (int)false,
+            ])
+            ->andFilterWhere([
+                'account_id' => request('account_id'),
+                'source' => request('source'),
+            ]);
     }
 }
