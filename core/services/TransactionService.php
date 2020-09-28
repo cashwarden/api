@@ -4,6 +4,7 @@ namespace app\core\services;
 
 use app\core\exceptions\CannotOperateException;
 use app\core\exceptions\InternalException;
+use app\core\exceptions\InvalidArgumentException;
 use app\core\helpers\ArrayHelper;
 use app\core\models\Account;
 use app\core\models\Category;
@@ -93,7 +94,7 @@ class TransactionService extends BaseObject
                 }
                 $_model = clone $model;
                 try {
-                    // 账单日期,类别,收入/支出,金额(CNY),标签（多个英文逗号隔开）,描述,备注,账户
+                    // 账单日期,类别,收入/支出,金额(CNY),标签（多个英文逗号隔开）,描述,备注,账户1,账户2
                     //2020-08-20,餐饮食品,支出,28.9,,买菜28.9,,
                     $baseConditions = ['user_id' => Yii::$app->user->id];
                     $_model->date = Yii::$app->formatter->asDatetime(strtotime($newData[0]), 'php:Y-m-d H:i');
@@ -114,6 +115,16 @@ class TransactionService extends BaseObject
                         case '支出':
                             $_model->type = TransactionType::getName(TransactionType::EXPENSE);
                             $_model->from_account_id = $accountId;
+                            break;
+                        case '转账':
+                            $_model->type = TransactionType::getName(TransactionType::TRANSFER);
+                            $_model->from_account_id = $accountId;
+                            $_model->to_account_id = Account::find()
+                                ->where($baseConditions + ['name' => $newData[8]])
+                                ->scalar();
+                            if (!$_model->to_account_id) {
+                                throw new InvalidArgumentException($newData[8] . '转账「账户2」不能为空');
+                            }
                             break;
                         default:
                             # code...
@@ -514,5 +525,46 @@ class TransactionService extends BaseObject
             throw new NotFoundHttpException('No data found');
         }
         return $model;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function exportData()
+    {
+        $data = [];
+        $categoriesMap = CategoryService::getCurrentMap();
+        $accountsMap = AccountService::getCurrentMap();
+        $types = TransactionType::texts();
+        $items = Transaction::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        foreach ($items as $k => $item) {
+            $datum['date'] = $item['date'];
+            $datum['category_name'] = data_get($categoriesMap, $item['category_id'], '');
+            $datum['type'] = data_get($types, $item['type'], '');
+            $datum['currency_amount'] = Setup::toYuan($item['currency_amount_cent']);
+            $datum['tags'] = str_replace(',', '/', $item['tags']);
+            $datum['description'] = $item['description'];
+            $datum['remark'] = $item['remark'];
+            $datum['account1'] = '';
+            $datum['account2'] = '';
+            switch ($item['type']) {
+                case TransactionType::INCOME:
+                    $datum['account1'] = data_get($accountsMap, $item['to_account_id'], '');
+                    break;
+                case TransactionType::EXPENSE:
+                    $datum['account1'] = data_get($accountsMap, $item['from_account_id'], '');
+                    break;
+                case TransactionType::TRANSFER:
+                    $datum['account1'] = data_get($accountsMap, $item['from_account_id'], '');
+                    $datum['account2'] = data_get($accountsMap, $item['to_account_id'], '');
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+            array_push($data, array_values($datum));
+        }
+        return $data;
     }
 }

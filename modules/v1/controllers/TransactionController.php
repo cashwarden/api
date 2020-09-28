@@ -77,4 +77,10 @@ class TransactionController extends ActiveController
         $this->uploadService->deleteLocalFile($filename);
         return $data;
     }
+
+
+    public function actionExport()
+    {
+        return $this->transactionService->exportData();
+    }
 }

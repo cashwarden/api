@@ -157,8 +157,7 @@ class AnalysisService extends BaseObject
     public function byCategory(array $params)
     {
         $items = [];
-        $categories = Category::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
-        $categoriesMap = ArrayHelper::map($categories, 'id', 'name');
+        $categoriesMap = CategoryService::getCurrentMap();
         foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
             $data = $this->getBaseQuery($params)
                 ->select([

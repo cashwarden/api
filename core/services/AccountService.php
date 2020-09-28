@@ -12,6 +12,7 @@ use app\core\types\DirectionType;
 use Exception;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yiier\helpers\Setup;
 
 class AccountService
@@ -122,5 +123,14 @@ class AccountService
         ])->sum('currency_amount_cent');
 
         return ($in - $out) ?: 0;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCurrentMap()
+    {
+        $accounts = Account::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        return ArrayHelper::map($accounts, 'id', 'name');
     }
 }

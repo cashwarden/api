@@ -7,6 +7,7 @@ use app\core\models\Category;
 use app\core\types\TransactionType;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 class CategoryService
@@ -33,6 +34,7 @@ class CategoryService
     /**
      * @param int $id
      * @return Account|ActiveRecord|null
+     * @throws NotFoundHttpException
      */
     public static function findCurrentOne(int $id)
     {
@@ -40,5 +42,14 @@ class CategoryService
             throw new NotFoundHttpException('No data found');
         }
         return $model;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCurrentMap()
+    {
+        $categories = Category::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        return ArrayHelper::map($categories, 'id', 'name');
     }
 }
