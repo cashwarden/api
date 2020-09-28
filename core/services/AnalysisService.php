@@ -159,15 +159,14 @@ class AnalysisService extends BaseObject
         $items = [];
         $categories = Category::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
         $categoriesMap = ArrayHelper::map($categories, 'id', 'name');
-        $recordTableName = Record::tableName();
         foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
             $data = $this->getBaseQuery($params)
                 ->select([
-                    "{$recordTableName}.category_id",
-                    "SUM({$recordTableName}.currency_amount_cent) AS currency_amount_cent"
+                    'category_id',
+                    'SUM(currency_amount_cent) AS currency_amount_cent'
                 ])
                 ->andWhere(['transaction_type' => $type])
-                ->groupBy("{$recordTableName}.category_id")
+                ->groupBy('category_id')
                 ->asArray()
                 ->all();
             $k = TransactionType::getName($type);
@@ -199,12 +198,11 @@ class AnalysisService extends BaseObject
     public function byDate(array $params, string $format)
     {
         $items = [];
-        $recordTableName = Record::tableName();
         foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
             $data = $this->getBaseQuery($params)
                 ->select([
-                    "DATE_FORMAT({$recordTableName}.date, '{$format}') as date",
-                    "SUM({$recordTableName}.currency_amount_cent) AS currency_amount_cent"
+                    "DATE_FORMAT(date, '{$format}') as date",
+                    'SUM(currency_amount_cent) AS currency_amount_cent'
                 ])
                 ->andWhere(['transaction_type' => $type])
                 ->groupBy('date')
