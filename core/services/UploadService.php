@@ -2,6 +2,8 @@
 
 namespace app\core\services;
 
+use app\core\exceptions\ErrorCodes;
+use app\core\exceptions\FileException;
 use Yii;
 use yii\base\BaseObject;
 use yii\helpers\FileHelper;
@@ -22,10 +24,11 @@ class UploadService extends BaseObject
             if (!$this->saveFile($uploadedFile, $filename)) {
                 throw new \Exception(Yii::t('app', 'Upload file failed'));
             }
+            $this->checkEncoding($filename);
             return $this->getFullFilename($filename, params('uploadWebPath'));
         } catch (\Exception $e) {
             Log::error('upload record error', [$uploadedFile, (string)$e]);
-            throw new \Exception($e->getMessage());
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
     }
 
@@ -63,5 +66,19 @@ class UploadService extends BaseObject
     {
         $fileAbsoluteName = $this->getFullFilename($filename);
         @unlink($fileAbsoluteName);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $encoding
+     * @throws FileException
+     */
+    public function checkEncoding(string $filename, $encoding = 'UTF-8')
+    {
+        $fileAbsoluteName = $this->getFullFilename($filename);
+        if (!mb_check_encoding(file_get_contents($fileAbsoluteName), $encoding)) {
+            @unlink($fileAbsoluteName);
+            throw new FileException(Yii::t('app/error', ErrorCodes::FILE_ENCODING_ERROR));
+        }
     }
 }

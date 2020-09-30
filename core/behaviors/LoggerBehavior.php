@@ -96,31 +96,29 @@ class LoggerBehavior extends Behavior
             if ($key && in_array($key, $ignoredKeys)) {
                 unset($params[$key]);
             } elseif ($key && in_array($key, $hideKeys)) {
-                $item = $this->paramReplace($key, $item);
+                $item = $this->paramReplace($item);
             } elseif ($key && in_array($key, $halfHideKeys)) {
-                $item = $this->paramPartialHiddenReplace($key, $item);
+                $item = $this->paramPartialHiddenReplace($item);
             }
         }
         return $params;
     }
 
     /**
-     * @param string $key
      * @param string $value
      * @return string
      */
-    protected function paramReplace(string $key, $value)
+    protected function paramReplace(string $value)
     {
         return str_repeat('*', strlen($value));
     }
 
 
     /**
-     * @param string $key
      * @param $value
      * @return string
      */
-    protected function paramPartialHiddenReplace(string $key, $value)
+    protected function paramPartialHiddenReplace(string $value)
     {
         $valueLength = strlen($value);
         if ($valueLength > 2) {
@@ -130,7 +128,7 @@ class LoggerBehavior extends Behavior
                 . str_repeat('*', $hideLength)
                 . mb_substr($value, -1 * $showLength);
         } else {
-            $newValue = $this->paramReplace($key, $value);
+            $newValue = $this->paramReplace($value);
         }
 
         return $newValue;
