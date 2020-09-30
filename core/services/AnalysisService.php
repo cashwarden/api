@@ -12,7 +12,6 @@ use app\core\types\TransactionType;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 
@@ -200,11 +199,11 @@ class AnalysisService extends BaseObject
         foreach ([TransactionType::EXPENSE, TransactionType::INCOME] as $type) {
             $data = $this->getBaseQuery($params)
                 ->select([
-                    "DATE_FORMAT(date, '{$format}') as date",
+                    "DATE_FORMAT(date, '{$format}') as m_date",
                     'SUM(currency_amount_cent) AS currency_amount_cent'
                 ])
                 ->andWhere(['transaction_type' => $type])
-                ->groupBy('date')
+                ->groupBy('m_date')
                 ->asArray()
                 ->all();
 
@@ -212,7 +211,7 @@ class AnalysisService extends BaseObject
             $items['total'][$k] = 0;
             $items[$k] = [];
             foreach ($data as $key => $value) {
-                $v['date'] = $value['date'];
+                $v['date'] = $value['m_date'];
                 $v['currency_amount'] = (float)Setup::toYuan($value['currency_amount_cent']);
                 $items['total'][$k] += $v['currency_amount'];
                 $items[$k][] = $v;
