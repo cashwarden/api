@@ -68,7 +68,8 @@ COPY . /srv/
 
 RUN chmod 777 -R /srv/runtime \
     && chmod 777 -R /srv/web/assets \
-    && chown -R www-data:www-data /srv/
+    && chown -R www-data:www-data /srv/ \
+    && chmod +x ./yii
 
 EXPOSE 80
 
