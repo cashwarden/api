@@ -1,8 +1,10 @@
 FROM php:7.4.3-apache
 
-RUN requirements="nano cron mariadb-client libwebp-dev libxpm-dev libmcrypt-dev libmcrypt4 libcurl3-dev libxml2-dev \
+RUN sed -i "s@http://deb.debian.org@http://mirrors.aliyun.com@g" /etc/apt/sources.list \
+    && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list \
+    && requirements="nano cron mariadb-client libwebp-dev libxpm-dev libmcrypt-dev libmcrypt4 libcurl3-dev libxml2-dev \
 libmemcached-dev zlib1g-dev libc6 libstdc++6 libkrb5-3 openssl debconf libfreetype6-dev libjpeg-dev libtiff-dev \
-libpng-dev git imagemagick libmagickwand-dev ghostscript gsfonts libbz2-dev libonig-dev libzip-dev zip unzip" \
+libpng-dev git imagemagick libmagickwand-dev ghostscript gsfonts libbz2-dev libonig-dev libzip-dev zip unzip zlibc" \
     && apt-get update && apt-get install -y --no-install-recommends $requirements && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install mysqli \
                               pdo_mysql \
@@ -11,6 +13,7 @@ libpng-dev git imagemagick libmagickwand-dev ghostscript gsfonts libbz2-dev libo
                               mbstring \
                               soap  \
                               exif \
+                              bcmath \
                               opcache \
     && pecl install apcu \
                     xdebug \
@@ -46,7 +49,7 @@ RUN chmod 700 \
         /usr/local/bin/composer
 
 # Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- \
+RUN curl -sS https://install.phpcomposer.com/installer | php -- \
         --filename=composer.phar \
         --install-dir=/usr/local/bin && \
     composer global require --optimize-autoloader \
@@ -63,9 +66,7 @@ ENV PATH /srv/vendor/bin:${PATH}
 
 COPY . /srv/
 
-RUN mkdir /srv/runtime \
-    && chmod 777 -R /srv/runtime \
-    && mkdir /srv/web/assets \
+RUN chmod 777 -R /srv/runtime \
     && chmod 777 -R /srv/web/assets \
     && chown -R www-data:www-data /srv/
 

@@ -35,10 +35,11 @@ return [
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => env('DB_DSN'),
-            'username' => env('DB_USERNAME'),
-            'password' => env('DB_PASSWORD'),
-            'tablePrefix' => env('DB_TABLE_PREFIX'),
+            'dsn' => 'mysql:host=' . env('MYSQL_HOST')
+                . ';port=' . env('MYSQL_PORT')
+                . ';dbname=' . env('MYSQL_DATABASE'),
+            'username' => env('MYSQL_USERNAME'),
+            'password' => env('MYSQL_PASSWORD'),
             'charset' => 'utf8mb4',
             'enableSchemaCache' => YII_ENV_PROD,
             'schemaCacheDuration' => 60,
