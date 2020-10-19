@@ -1,75 +1,50 @@
 FROM php:7.4.3-apache
 
+ARG TIMEZONE
+
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
     && sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' /etc/apt/sources.list \
-    && requirements="nano cron mariadb-client libwebp-dev libxpm-dev libmcrypt-dev libmcrypt4 libcurl3-dev libxml2-dev \
+    && requirements="vim cron mariadb-client libwebp-dev libxpm-dev libmcrypt-dev libmcrypt4 libcurl3-dev libxml2-dev \
 libmemcached-dev zlib1g-dev libc6 libstdc++6 libkrb5-3 openssl debconf libfreetype6-dev libjpeg-dev libtiff-dev \
-libpng-dev git imagemagick libmagickwand-dev ghostscript gsfonts libbz2-dev libonig-dev libzip-dev zip unzip zlibc" \
+libpng-dev git libmagickwand-dev ghostscript gsfonts libbz2-dev libonig-dev libzip-dev zip unzip" \
     && apt-get update && apt-get install -y --no-install-recommends $requirements && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install mysqli \
                               pdo_mysql \
-                              iconv  \
                               gd  \
-                              mbstring \
-                              soap  \
                               exif \
                               bcmath \
                               opcache \
-    && pecl install apcu \
-                    xdebug \
-                    imagick \
-                    memcached \
-    && docker-php-ext-enable memcached \
-                            xdebug \
-                            imagick \
-                            apcu \
-                            opcache
+    && docker-php-ext-enable opcache
 
-# Configure version constraints
-ENV VERSION_COMPOSER_ASSET_PLUGIN=^1.4.2 \
-    VERSION_PRESTISSIMO_PLUGIN=^0.3.7 \
-    PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
-    TERM=linux \
-    COMPOSER_ALLOW_SUPERUSER=1
-
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-cert-snakeoil.key -out /etc/ssl/certs/ssl-cert-snakeoil.pem -subj "/C=AT/ST=Vienna/L=Vienna/O=Security/OU=Development/CN=example.com"
+RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone \
+    && printf '[PHP]\ndate.timezone = "%s"\n', ${TIMEZONE} > /usr/local/etc/php/conf.d/tzone.ini \
+    && "date"
 
 RUN a2enmod headers && \
-    a2enmod rewrite && \
-    a2ensite default-ssl && \
-    a2enmod ssl
+    a2enmod rewrite
+
+# Install composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN composer global require --optimize-autoloader \
+        "fxp/composer-asset-plugin" \
+        "hirak/prestissimo" && \
+    composer global dumpautoload --optimize && \
+    composer clear-cache
 
 # Add configuration files
 COPY image-files/ /
 
-# Add GITHUB_API_TOKEN support for composer
-
 RUN chmod 700 \
-        /usr/local/bin/docker-entrypoint.sh \
-        /usr/local/bin/composer
-
-# Install composer
-RUN curl -sS https://install.phpcomposer.com/installer | php -- \
-        --filename=composer.phar \
-        --install-dir=/usr/local/bin && \
-    composer global require --optimize-autoloader \
-        "fxp/composer-asset-plugin:${VERSION_COMPOSER_ASSET_PLUGIN}" \
-        "hirak/prestissimo:${VERSION_PRESTISSIMO_PLUGIN}" && \
-    composer global dumpautoload --optimize && \
-    composer clear-cache
+        /usr/local/bin/docker-entrypoint.sh
 
 WORKDIR /srv
-
-COPY composer.* /srv/
-RUN /usr/local/bin/composer install --prefer-dist
-ENV PATH /srv/vendor/bin:${PATH}
-
 COPY . /srv/
 
-RUN chmod 777 -R /srv/runtime \
+RUN composer install --prefer-dist \
+    && chmod 777 -R /srv/runtime \
     && chmod 777 -R /srv/web/assets \
-    && chown -R www-data:www-data /srv/ \
-    && chmod +x ./yii
+    && chmod 777 -R /srv/web/uploads \
+    && chown -R www-data:www-data /srv/
 
 EXPOSE 80
 
