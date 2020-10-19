@@ -12,7 +12,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php-versions: ['7.2']
+                php-versions: [ '7.2' ]
                 # php-versions: ['7.2', '7.3', '7.4']
         steps:
             -   name: Checkout
@@ -30,7 +30,7 @@ jobs:
                 with:
                     collation server: utf8mb4_unicode_ci
                     mysql version: 5.7
-                    mysql database: yii2
+                    mysql database: cashwarden
                     mysql root password: root
 
             -   name: Get composer cache directory
