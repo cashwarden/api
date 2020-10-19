@@ -10,7 +10,7 @@ use yiithings\dotenv\Loader;
 
 class GenerateController extends Controller
 {
-    public function actionKey(string $filename = '.env')
+    public function actionKey(bool $dryRun = false, string $filename = '.env')
     {
         $environmentFilePath = Yii::getAlias('@app/' . $filename);
         Loader::load('', $filename, true);
@@ -18,11 +18,13 @@ class GenerateController extends Controller
             $escaped = preg_quote('=' . env($item), '/');
             $keyReplacementPattern = "/^{$item}{$escaped}/m";
             $key = Security::generateRealUniqId(32);
-            file_put_contents($environmentFilePath, preg_replace(
-                $keyReplacementPattern,
-                "{$item}={$key}",
-                file_get_contents($environmentFilePath)
-            ));
+            if (!$dryRun) {
+                file_put_contents($environmentFilePath, preg_replace(
+                    $keyReplacementPattern,
+                    "{$item}={$key}",
+                    file_get_contents($environmentFilePath)
+                ));
+            }
             $this->stdout("{$item} key [{$key}] set successfully.\n", Console::FG_GREEN);
         }
     }
