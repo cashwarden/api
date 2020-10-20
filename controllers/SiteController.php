@@ -72,7 +72,8 @@ class SiteController extends Controller
                 'name' => Yii::$app->name,
                 'description' => params('seoDescription'),
                 'keywords' => params('seoKeywords'),
-                'google_analytics' => params('googleAnalyticsAU')
+                'google_analytics' => params('googleAnalyticsAU'),
+                'telegram_bot_name' => params('telegramBotName')
             ],
             'menu' => [
                 [

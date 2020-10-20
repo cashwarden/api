@@ -6,6 +6,7 @@ return [
     'senderEmail' => env('SENDER_EMAIL'),
     'senderName' => env('SENDER_NAME', env('APP_NAME')),
     'telegramToken' => env('TELEGRAM_TOKEN'),
+    'telegramBotName' => env('TELEGRAM_BOT_NAME'),
     'user.passwordResetTokenExpire' => env('USER_RESET_TOKEN_EXPIRE', 3600),
     'seoKeywords' => env('SEO_KEYWORDS'),
     'seoDescription' => env('SEO_DESCRIPTION'),
