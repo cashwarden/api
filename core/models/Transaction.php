@@ -10,6 +10,7 @@ use app\core\types\TransactionStatus;
 use app\core\types\TransactionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yiier\graylog\Log;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 use yiier\validators\ArrayValidator;
@@ -239,11 +240,10 @@ class Transaction extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        TransactionService::createUpdateRecord($this);
-
         if (!$insert) {
             TransactionService::deleteRecord($this, $changedAttributes);
         }
+        TransactionService::createUpdateRecord($this);
         $oldTags = data_get($changedAttributes, 'tags', '');
 
         $tags = explode(',', $this->tags) + explode(',', $oldTags);

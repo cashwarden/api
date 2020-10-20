@@ -180,10 +180,7 @@ class TransactionService extends BaseObject
         $type = $transaction->type;
         if (data_get($changedAttributes, 'type') && $transaction->type !== TransactionType::TRANSFER) {
             $direction = $type == TransactionType::INCOME ? DirectionType::EXPENSE : DirectionType::INCOME;
-            Record::find()->where([
-                'transaction_id' => $transaction->id,
-                'direction' => $direction
-            ])->one()->delete();
+            Record::deleteAll(['transaction_id' => $transaction->id, 'direction' => $direction]);
         }
     }
 
