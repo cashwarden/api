@@ -69,6 +69,12 @@ class TelegramController extends ActiveController
                 $bot->sendMessage($message->getChat()->getId(), '请选择指令', null, false, null, $keyboard);
             });
 
+            $bot->command(ltrim(TelegramKeyword::HELP, '/'), function (Message $message) use ($bot) {
+                $text = "我能做什么？\n /help - 查看帮助 \n /cmd - 列出所有指令 \n /start - 开始使用 \n \n 绑定账号成功之后发送文字直接记账";
+                /** @var BotApi $bot */
+                $bot->sendMessage($message->getChat()->getId(), $text);
+            });
+
             $bot->command('ping', function (Message $message) use ($bot) {
                 $keyboard = new ReplyKeyboardMarkup(
                     [["one", "two", "three"]],

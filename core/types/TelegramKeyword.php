@@ -7,6 +7,7 @@ class TelegramKeyword
     public const BIND = '/bind';
     public const START = '/start';
     public const CMD = '/cmd';
+    public const HELP = '/help';
     public const REPORT = '/report';
     public const TODAY = '/' . AnalysisDateType::TODAY;
     public const YESTERDAY = '/' . AnalysisDateType::YESTERDAY;
@@ -21,6 +22,7 @@ class TelegramKeyword
             self::BIND,
             self::START,
             self::CMD,
+            self::HELP,
             self::REPORT,
             self::TODAY,
             self::YESTERDAY,
