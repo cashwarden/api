@@ -10,7 +10,6 @@ use app\core\types\TransactionStatus;
 use app\core\types\TransactionType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yiier\graylog\Log;
 use yiier\helpers\DateHelper;
 use yiier\helpers\Setup;
 use yiier\validators\ArrayValidator;
