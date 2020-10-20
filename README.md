@@ -13,14 +13,14 @@ The template contains the basic features including user join/login api.
 It includes all commonly used configurations that would allow you to focus on adding new
 features to your application.
 
-[![Testing](https://github.com/cashwarden/core-api/workflows/Testing/badge.svg)](https://github.com/cashwarden/core-api/actions)
-[![Lint](https://github.com/cashwarden/core-api/workflows/Lint/badge.svg)](https://github.com/cashwarden/core-api/actions)
-[![Code Coverage](https://scrutinizer-ci.com/g/cashwarden/core-api/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/core-api/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cashwarden/core-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/core-api/?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/cashwarden/core-api/v/stable)](https://packagist.org/packages/cashwarden/core-api) 
-[![Total Downloads](https://poser.pugx.org/cashwarden/core-api/downloads)](https://packagist.org/packages/cashwarden/core-api) 
-[![Latest Unstable Version](https://poser.pugx.org/cashwarden/core-api/v/unstable)](https://packagist.org/packages/cashwarden/core-api) 
-[![License](https://poser.pugx.org/cashwarden/core-api/license)](https://packagist.org/packages/cashwarden/core-api)
+[![Testing](https://github.com/cashwarden/api/workflows/Testing/badge.svg)](https://github.com/cashwarden/api/actions)
+[![Lint](https://github.com/cashwarden/api/workflows/Lint/badge.svg)](https://github.com/cashwarden/api/actions)
+[![Code Coverage](https://scrutinizer-ci.com/g/cashwarden/api/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/api/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cashwarden/api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cashwarden/api/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/cashwarden/api/v/stable)](https://packagist.org/packages/cashwarden/api) 
+[![Total Downloads](https://poser.pugx.org/cashwarden/api/downloads)](https://packagist.org/packages/cashwarden/api) 
+[![Latest Unstable Version](https://poser.pugx.org/cashwarden/api/v/unstable)](https://packagist.org/packages/cashwarden/api) 
+[![License](https://poser.pugx.org/cashwarden/api/license)](https://packagist.org/packages/cashwarden/api)
 
 REQUIREMENTS
 ------------
@@ -38,7 +38,7 @@ at [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
 You can then install this project template using the following command:
 
 ~~~
-composer create-project --prefer-dist cashwarden/core-api <rest-api>
+composer create-project --prefer-dist cashwarden/api <rest-api>
 cd <rest-api>
 cp .env.example .env
 chmod 777 -R runtime/
@@ -56,7 +56,7 @@ http://localhost/<rest-api>/web/
 
 ### Install from GitHub
 
-Accessing [Use this template](https://github.com/cashwarden/core-api/generate) Create a new repository from yii2-rest-api
+Accessing [Use this template](https://github.com/cashwarden/api/generate) Create a new repository from yii2-rest-api
 
 ```sh
 git clone xxxx

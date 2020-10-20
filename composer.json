@@ -1,6 +1,6 @@
 {
-    "name": "forecho/yii2-rest-api",
-    "description": "Yii 2 REST API Project Template",
+    "name": "cashwarden/api",
+    "description": "CashWarden API",
     "keywords": [
         "yii2",
         "framework",
