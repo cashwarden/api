@@ -42,6 +42,7 @@ COPY . /srv/
 
 RUN composer install --prefer-dist \
     && chmod 777 -R /srv/runtime \
+    && chmod +x /srv/yii \
     && chmod 777 -R /srv/web/assets \
     && chmod 777 -R /srv/web/uploads \
     && chown -R www-data:www-data /srv/
