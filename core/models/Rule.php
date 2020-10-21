@@ -26,7 +26,7 @@ use yiier\validators\ArrayValidator;
  * @property int|null $then_transaction_status
  * @property int|null $then_reimbursement_status
  * @property string|null|array $then_tags Multiple choice use,
- * @property int|null $status
+ * @property int|string $status
  * @property int|null $sort
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -159,6 +159,7 @@ class Rule extends \yii\db\ActiveRecord
         $fields['status'] = function (self $model) {
             return RuleStatus::getName($model->status);
         };
+
         $fields['then_reimbursement_status'] = function (self $model) {
             return ReimbursementStatus::getName($model->then_reimbursement_status);
         };

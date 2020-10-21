@@ -5,6 +5,7 @@ namespace app\core\models;
 use app\core\exceptions\InvalidArgumentException;
 use app\core\services\AccountService;
 use app\core\services\TransactionService;
+use app\core\types\AccountStatus;
 use app\core\types\AccountType;
 use app\core\types\ColorType;
 use app\core\types\CurrencyCode;
@@ -25,7 +26,7 @@ use yiier\validators\MoneyValidator;
  * @property int|null $balance_cent
  * @property int|null $currency_balance_cent
  * @property string $currency_code
- * @property int|null $status
+ * @property int|string $status
  * @property int|null $exclude_from_stats
  * @property int|null $credit_card_limit
  * @property int|null $credit_card_repayment_day
@@ -83,7 +84,7 @@ class Account extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'name', 'type', 'currency_balance', 'currency_code'], 'required'],
+            [['user_id', 'name', 'type', 'currency_balance', 'currency_code', 'default'], 'required'],
             [
                 ['credit_card_limit', 'credit_card_repayment_day', 'credit_card_billing_day'],
                 'required',
@@ -94,7 +95,6 @@ class Account extends \yii\db\ActiveRecord
                     'user_id',
                     'balance_cent',
                     'currency_balance_cent',
-                    'status',
                     'credit_card_limit',
                     'credit_card_repayment_day',
                     'credit_card_billing_day',
@@ -102,6 +102,7 @@ class Account extends \yii\db\ActiveRecord
                 ],
                 'integer'
             ],
+            ['status', 'in', 'range' => AccountStatus::names()],
             [['name'], 'string', 'max' => 120],
             [['color'], 'string', 'max' => 7],
             ['type', 'in', 'range' => AccountType::names()],
@@ -164,6 +165,7 @@ class Account extends \yii\db\ActiveRecord
                 $ran = ColorType::items();
                 $this->color = $this->color ?: $ran[mt_rand(0, count($ran) - 1)];
             }
+            $this->status = is_null($this->status) ? AccountStatus::ACTIVE : AccountStatus::toEnumValue($this->status);
             $this->currency_balance_cent = Setup::toFen($this->currency_balance);
             if ($this->currency_code == $this->user->base_currency_code) {
                 $this->balance_cent = $this->currency_balance_cent;
@@ -220,6 +222,10 @@ class Account extends \yii\db\ActiveRecord
 
         $fields['type'] = function (self $model) {
             return AccountType::getName($model->type);
+        };
+
+        $fields['status'] = function (self $model) {
+            return AccountStatus::getName($model->status);
         };
 
         $fields['icon_name'] = function (self $model) {
