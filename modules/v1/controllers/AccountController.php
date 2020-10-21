@@ -5,6 +5,7 @@ namespace app\modules\v1\controllers;
 use app\core\models\Account;
 use app\core\services\AccountService;
 use app\core\traits\ServiceTrait;
+use app\core\types\AccountStatus;
 use app\core\types\AccountType;
 use Exception;
 use Yii;
@@ -22,7 +23,7 @@ class AccountController extends ActiveController
     public $noAuthActions = [];
     public $defaultOrder = ['sort' => SORT_ASC, 'id' => SORT_DESC];
     public $partialMatchAttributes = ['name'];
-    public $stringToIntAttributes = ['type' => AccountType::class];
+    public $stringToIntAttributes = ['type' => AccountType::class, 'status' => AccountStatus::class];
 
     public function actions()
     {
