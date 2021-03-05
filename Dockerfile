@@ -24,8 +24,9 @@ RUN a2enmod headers && \
     a2enmod rewrite
 
 # Install composer
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-RUN composer global require --optimize-autoloader \
+COPY --from=composer:1.10.20 /usr/bin/composer /usr/bin/composer
+RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ && \
+    composer global require --optimize-autoloader \
         "fxp/composer-asset-plugin" \
         "hirak/prestissimo" && \
     composer global dumpautoload --optimize && \
