@@ -25,11 +25,6 @@ RUN a2enmod headers && \
 
 # Install composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
-RUN composer global require --optimize-autoloader \
-        "fxp/composer-asset-plugin" \
-        "hirak/prestissimo" && \
-    composer global dumpautoload --optimize && \
-    composer clear-cache
 
 # Add configuration files
 COPY image-files/ /
