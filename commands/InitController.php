@@ -13,16 +13,16 @@ class InitController extends Controller
 {
     use ServiceTrait;
 
-    public function actionTelegram()
+    public function actionTelegram(string $url = '/v1/telegram/hook'): int
     {
-        $url = Url::to('/v1/telegram/hook', true);
+        $url = Url::to($url, true);
         TelegramService::newClient()->setWebHook($url);
         $this->stdout("Telegram set Webhook url success!: {$url}\n");
         return ExitCode::OK;
     }
 
     /**
-     * @param int $userId
+     * @param  int  $userId
      * @throws \app\core\exceptions\InvalidArgumentException
      * @throws \yii\db\Exception
      */
