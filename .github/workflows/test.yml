@@ -33,6 +33,12 @@ jobs:
           mysql database: cashwarden
           mysql root password: root
 
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping --host=127.0.0.1 --password=root --silent; do
+            sleep 1
+          done
+
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
