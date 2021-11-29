@@ -3,7 +3,7 @@ on: [ push, pull_request ]
 
 jobs:
   grumphp:
-    name: GrumPHP
+    name: Run GrumPHP
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
