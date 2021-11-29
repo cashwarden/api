@@ -33,6 +33,7 @@ jobs:
           mysql database: cashwarden
           mysql root password: root
 
+      # https://github.com/mirromutth/mysql-action/issues/10
       - name: Wait for MySQL
         run: |
           while ! mysqladmin ping --host=127.0.0.1 --password=root --silent; do
